@@ -1,0 +1,14 @@
+[project]
+name = "ai-template-oop"
+version = "0.1.0"
+description = "Contract-first boilerplate for parallel AI development sessions (UI / features / container)."
+requires-python = ">=3.11"
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+addopts = "-q"
