@@ -1169,6 +1169,15 @@ def apply(
             )
         return source_apply(state, event, stored=True)
     kind, data = event["kind"], event["data"]
+    # BEGIN M5 explicit acceptance integration
+    if (
+        kind == "REVIEW"
+        and data.get("acceptance_version") == "destination-acceptance-1"
+    ):
+        from scripts.acceptance import apply_feedback
+
+        return apply_feedback(state, event)
+    # END M5 explicit acceptance integration
     if kind in {"DISPATCH", "HALT", "REVIEW_DISPATCH"}:
         role = "reviewer" if kind == "REVIEW_DISPATCH" else "worker"
         exact(data, {"config", "options", "plan"})

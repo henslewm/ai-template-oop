@@ -143,6 +143,7 @@ def prepare(
     run=None,
     instructions=None,
     dispatch_stream=None,
+    immutable_workspace=False,
 ):
     check_state(scope, state)
     scope.verify_base()
@@ -176,6 +177,8 @@ def prepare(
     }
     if dispatch_stream is not None:
         record["dispatch_stream"] = dispatch_stream
+    if immutable_workspace:
+        record["immutable_workspace"] = True
 
     # Names precede external mutations: an interrupted create/claim stays discoverable.
     def save_record():
@@ -188,11 +191,17 @@ def prepare(
     docker("volume", "create", volume)
     # Docker cp from stdin normalizes UIDs on this Windows engine. A fixed trusted
     # initializer sets writable-file UIDs before any untrusted worker is created.
+    workspace_initializer = (
+        "[os.chown('/session/workspace/'+p,0,0) for p in s['read_paths']]; "
+        "[os.chmod('/session/workspace/'+p,0o444) for p in s['read_paths']]; "
+        if immutable_workspace
+        else "[os.chown('/session/workspace/'+p,1000,1000) for p in s['write_paths']]; "
+    )
     initializer = (
         "import json,os; from pathlib import Path; "
         "s=json.loads(Path('/session/scope.json').read_text()); "
-        "[os.chown('/session/workspace/'+p,1000,1000) for p in s['write_paths']]; "
-        "p=Path('/session/report.json'); p.exists() and os.chown(p,1000,1000)"
+        + workspace_initializer
+        + "p=Path('/session/report.json'); p.exists() and os.chown(p,1000,1000)"
     )
     setup = (
         docker(
@@ -254,7 +263,10 @@ def prepare(
             "--log-opt",
             "max-file=2",
             "--mount",
-            "type=volume,source=" + volume + ",destination=/session",
+            "type=volume,source="
+            + volume
+            + ",destination=/session"
+            + (",readonly" if immutable_workspace else ""),
             "--tmpfs",
             "/tmp:rw,noexec,nosuid,nodev,size=67108864",
             "--tmpfs",
@@ -270,6 +282,8 @@ def prepare(
         .strip()
     )
     assert_boundary(container, volume, image)
+    if immutable_workspace and inspect(container)["Mounts"][0].get("RW") is not False:
+        raise ValueError("Acceptance session must be mounted read-only")
     record.update(container=container, setup_container=setup)
     save_record()
     ownership = Ownership(state)
@@ -376,6 +390,11 @@ def execute(run, state, timeout, *, preflight=None, absolute_deadline=None):
     scope.verify_base()
     verify_baseline(scope, wp.read_json(run / "baseline.json"))
     assert_boundary(record["container"], record["volume"], record["image"])
+    if (
+        record.get("immutable_workspace")
+        and inspect(record["container"])["Mounts"][0].get("RW") is not False
+    ):
+        raise ValueError("Acceptance session mount changed")
     if inspect(record["container"])["State"]["Status"] != "created":
         raise ValueError("A prepared container starts once")
     ownership = Ownership(state)

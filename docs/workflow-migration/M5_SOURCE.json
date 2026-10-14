@@ -1,0 +1,18 @@
+{
+  "commit": "d6e582b7edeae24345a175f36639230726dbdead",
+  "method": "git show; no donor working files",
+  "references": {
+    "scripts/acceptance.py": {
+      "sha256": "2a24720d4a44eebc2e86eb7691ccc8ca834ff5f199aa69c31a39e00d66b6e729",
+      "bytes": 85181
+    },
+    "config/acceptance.schema.json": {
+      "sha256": "2ee6953bb1df492e418153106986ba3fc91ef7fdf7788ba9bd3bd67589d270cb",
+      "bytes": 14637
+    },
+    "tests/test_acceptance.py": {
+      "sha256": "49324064adf0e75f479c680295a729d4d7d08665fa14302f61b212f4a2004ec6",
+      "bytes": 97384
+    }
+  }
+}
