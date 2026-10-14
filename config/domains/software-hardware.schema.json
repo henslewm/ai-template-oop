@@ -1,0 +1,247 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Software + hardware domain extension",
+  "description": "Profile-specific structure for a software-hardware contract's `domain` block and for the hardware evidence record that a hardware-rung attestation must bind. The common contract is enforced independently; this schema adds structure and never loosens it. Runtime rules in scripts/software_hardware.py add the cross-field checks: every validation id is mapped to exactly one rung, rungs at or below integration require a declared command, hardware rungs forbid one. The verification ladder and the rule that VERIFIED_ON_HARDWARE is never authored are in templates/software-hardware/PROFILE.md.",
+  "$defs": {
+    "nonblank": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S"
+    },
+    "single_line": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1991,
+      "pattern": "\\S",
+      "not": {
+        "pattern": "[\\r\\n]"
+      },
+      "description": "Non-blank and on one physical line: no CR or LF anywhere, stated as a prohibition because an end anchor matches before a trailing newline. The 1991 bound leaves room for the longest key prefix (`firmware=` or `operator=`, 9 characters) an attestation line adds, so a schema-valid value can always be attested within the acceptance schema's 2000-character bounded_text limit."
+    },
+    "identifier": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 80,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,79}(?![\\s\\S])"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}(?![\\s\\S])"
+    },
+    "component": {
+      "type": "string",
+      "enum": [
+        "protocol_codec",
+        "transport",
+        "device_abstraction",
+        "hardware_adapter",
+        "configuration",
+        "persistence",
+        "business_logic",
+        "ui_api",
+        "simulator_fake",
+        "telemetry_logging",
+        "deployment_operations"
+      ],
+      "description": "The one separation category this packet implements. A packet spanning several is not independently testable and must be decomposed."
+    },
+    "validation_level": {
+      "type": "string",
+      "enum": [
+        "static",
+        "unit",
+        "contract",
+        "simulation",
+        "integration",
+        "hardware_in_loop",
+        "field"
+      ],
+      "description": "One rung of the verification ladder. static through integration are machine-runnable and must declare a command; hardware_in_loop and field are observed on physical hardware and must not."
+    },
+    "declared_hardware_status": {
+      "type": "string",
+      "enum": [
+        "UNVERIFIED_ON_HARDWARE",
+        "NOT_HARDWARE_FACING"
+      ],
+      "description": "What a contract may declare. See templates/software-hardware/PROFILE.md (Verification ladder) for how hardware status is earned."
+    },
+    "contract_domain": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "component",
+        "hardware_status",
+        "hardware_assumptions",
+        "protocol_references",
+        "validation_levels"
+      ],
+      "properties": {
+        "component": {
+          "$ref": "#/$defs/component"
+        },
+        "hardware_status": {
+          "$ref": "#/$defs/declared_hardware_status"
+        },
+        "hardware_assumptions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "assumption",
+              "source_id"
+            ],
+            "properties": {
+              "assumption": {
+                "$ref": "#/$defs/nonblank"
+              },
+              "source_id": {
+                "$ref": "#/$defs/identifier"
+              }
+            }
+          },
+          "description": "Every behavior of physical hardware this packet relies on, each citing a contract source. Empty means the packet relies on none and is NOT_HARDWARE_FACING."
+        },
+        "protocol_references": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/identifier"
+          },
+          "uniqueItems": true,
+          "description": "Contract source ids for the protocol or interface specifications the packet implements against. Required non-empty when any hardware assumption exists."
+        },
+        "validation_levels": {
+          "type": "object",
+          "propertyNames": {
+            "$ref": "#/$defs/identifier"
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/validation_level"
+          },
+          "minProperties": 1,
+          "description": "Exactly one ladder rung per contract validation id; no other ids."
+        },
+        "synthetic": {
+          "type": "boolean",
+          "description": "True when every input is fictional and establishes no real hardware behavior."
+        }
+      },
+      "description": "Closed: no free-text field exists in which a hardware claim could be written; hardware status is carried by hardware_status alone and VERIFIED_ON_HARDWARE is refused wherever it appears."
+    },
+    "hardware_evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "task_id",
+        "revision",
+        "contract_hash",
+        "dispatch_id",
+        "artifact_sha256",
+        "validation_id",
+        "level",
+        "device_identity",
+        "firmware_version",
+        "test_setup",
+        "expected_behavior",
+        "observed_behavior",
+        "outcome",
+        "observed_at",
+        "operator",
+        "artifacts"
+      ],
+      "properties": {
+        "schema_version": {
+          "type": "string",
+          "const": "1.0"
+        },
+        "task_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "The work-packet contract revision this observation was made against; record verification refuses one that does not match the acceptance ledger's binding, so hardware evidence for a changed implementation cannot verify a later revision."
+        },
+        "contract_hash": {
+          "$ref": "#/$defs/sha256",
+          "description": "The exact contract's hash at that revision. Revision numbers are lineage-local: two independently revised variants of the same task can both be \"revision 2\" with different content, so record verification checks this against the acceptance ledger's binding as well, binding the observation to the contract actually reviewed rather than merely its revision number."
+        },
+        "dispatch_id": {
+          "$ref": "#/$defs/sha256",
+          "description": "The submitted result's dispatch_id at the time this observation was made. Contract identity does not identify which implementation was tested: a rejected submission can be resubmitted under the same contract and revision, clearing prior attestations, and an unchanged evidence file must not silently re-verify a different, later submission. Record verification checks this against the acceptance ledger's current result."
+        },
+        "artifact_sha256": {
+          "$ref": "#/$defs/sha256",
+          "description": "The submitted artifact's identity at the time this observation was made, checked against the acceptance ledger's current artifact for the same reason as dispatch_id: a resubmission can replace the artifact together with the result while leaving the contract and revision untouched. This is not the artifact's own `sha256` field alone: a reference-kind artifact may carry empty content (and so the fixed empty-content digest) regardless of what it references, so the identity checked here combines the artifact's `reference` and `sha256` together."
+        },
+        "validation_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "level": {
+          "type": "string",
+          "enum": [
+            "hardware_in_loop",
+            "field"
+          ]
+        },
+        "device_identity": {
+          "$ref": "#/$defs/single_line",
+          "description": "Exact model, revision and serial or asset identifier of the physical unit observed."
+        },
+        "firmware_version": {
+          "$ref": "#/$defs/single_line"
+        },
+        "test_setup": {
+          "$ref": "#/$defs/nonblank",
+          "description": "Physical connections, host, tooling and environment during the observation."
+        },
+        "expected_behavior": {
+          "$ref": "#/$defs/nonblank"
+        },
+        "observed_behavior": {
+          "$ref": "#/$defs/nonblank",
+          "description": "What was actually observed, in enough detail to be contradicted."
+        },
+        "outcome": {
+          "type": "string",
+          "enum": [
+            "pass",
+            "fail"
+          ]
+        },
+        "observed_at": {
+          "$ref": "#/$defs/nonblank",
+          "format": "date-time",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}[Tt][0-9]{2}:[0-9]{2}:[0-9]{2}(?:\\.[0-9]+)?(?:[Zz]|[+-](?:[01][0-9]|2[0-3]):[0-5][0-9])$",
+          "description": "When the observation was made, RFC 3339; validated as a real calendar value, not only a shape."
+        },
+        "operator": {
+          "$ref": "#/$defs/single_line",
+          "description": "The person who ran the hardware and will record the attestation; never an implementation actor."
+        },
+        "artifacts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "reference"
+            ],
+            "properties": {
+              "reference": {
+                "$ref": "#/$defs/nonblank"
+              },
+              "sha256": {
+                "$ref": "#/$defs/sha256"
+              }
+            }
+          },
+          "description": "Logs, captures, photographs or measurements, by reference and digest where integrity matters. Never the artifact content itself."
+        }
+      },
+      "description": "The structured record a hardware_in_loop or field attestation binds by digest. It is an operator's declaration the controller cannot authenticate; the digest makes it auditable and immutable once attested."
+    }
+  }
+}

@@ -1,0 +1,2 @@
+# Packet, routing and feedback tools share these packages; bootstrap remains standard-library-only.
+jsonschema==4.26.0
