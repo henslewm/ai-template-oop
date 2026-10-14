@@ -1,0 +1,220 @@
+{
+  "recorded_at": "2026-10-14T22:51:39.106625+00:00",
+  "scope": "M4 AC-07 implementation only; stop before M5",
+  "source_commit": "d6e582b7edeae24345a175f36639230726dbdead",
+  "implementation_commit": "8404a44eb9bad3c25627454cbafb311d2779b066",
+  "m3_baseline_commit": "754b3a2b49f24f47b0f015e4e1eff4f90d08e0a1",
+  "branch": "feature/workflow-migration",
+  "origin_main_at_verification": "63b61ff9fcd1dba6676c6fd5dfb7561eaa92aed8",
+  "delivery_pr": "https://github.com/henslewm/ai-template-oop/pull/5",
+  "delivery_state_note": "Dated pre-merge verification snapshot. The linked PR and its final coordinator comment record the authoritative delivered head and merge SHA. All source/config/test hashes below are the exact reviewed snapshot.",
+  "full_suite": {
+    "command": "$env:WORKFLOW_TEST_IMAGE = 'sha256:61526e68966dc3330c3801cbed8740c62710376b0b01b15c960b60c66b6cae1e'; python -B -m pytest -q -rs -p no:cacheprovider -o addopts= --ignore=tests/test_workflow_approval.py",
+    "exit_code": 0,
+    "passed": 463,
+    "skipped": 0,
+    "seconds": 457.01,
+    "output": "........................................................................ [ 15%]\n........................................................................ [ 31%]\n........................................................................ [ 46%]\n........................................................................ [ 62%]\n........................................................................ [ 77%]\n........................................................................ [ 93%]\n...............................                                          [100%]\n463 passed in 457.01s (0:07:37)",
+    "m4_cases": 107,
+    "m3_cases": 85,
+    "m2_cases": 89,
+    "scope_cases": 42,
+    "startup_cases": 43
+  },
+  "checks": {
+    "approval_projection": {
+      "command": "C:\\Users\\hensl\\AppData\\Local\\Programs\\Python\\Python312\\python.exe -B tools/check_workflow_approval.py",
+      "exit_code": 0,
+      "seconds": 2.341,
+      "output": "..............................................                           [100%]\n46 passed in 1.66s\nActual ACTIVE receipt preserved: 33761b533bca129aa0d90133d0fb2ce970ba85945c5f381e7f5f9ce6621bc81f"
+    },
+    "active_source_fingerprint": {
+      "command": "C:\\Users\\hensl\\AppData\\Local\\Programs\\Python\\Python312\\python.exe -B scripts/validate_workflow_approval.py --fingerprint --check-source --require-active",
+      "exit_code": 0,
+      "seconds": 1.822,
+      "output": "FOUNDATION VALID: ACTIVE; live workers and publication disabled\n8e75e71b3561eaec4ad5cf71e37a1dec9f2c7dce0d07e0be46346daacfc90481"
+    },
+    "canonical_journal": {
+      "command": "C:\\Users\\hensl\\AppData\\Local\\Programs\\Python\\Python312\\python.exe -B scripts/workflow_state.py verify",
+      "exit_code": 0,
+      "seconds": 0.385,
+      "output": "Control journal verified: 1 streams; evidence intact"
+    },
+    "boundaries": {
+      "command": "C:\\Users\\hensl\\AppData\\Local\\Programs\\Python\\Python312\\python.exe -B tools/validate_boundaries.py",
+      "exit_code": 0,
+      "seconds": 0.088,
+      "output": "Boundaries OK."
+    },
+    "preservation": {
+      "command": "C:\\Users\\hensl\\AppData\\Local\\Programs\\Python\\Python312\\python.exe -B tools/check_m4_preservation.py",
+      "exit_code": 0,
+      "seconds": 0.698,
+      "output": "{\n  \"protected\": {\n    \"ai-template-oop\": {\n      \"head\": \"f624e207276372d9386b669bf087a66b44aba714\",\n      \"index_sha256\": \"fe7124042405022bf442485ce5e340489d0b292f2bbaa8a8935321b6653ec39b\",\n      \"status\": \"1 D. N... 100644 000000 000000 9e771558f3c032c37727dbb6ed461c78e3905114 0000000000000000000000000000000000000000 revised-plan-and-quickstart-2026-10-12-0011Z.md\\n\",\n      \"files\": 26,\n      \"matches\": true\n    },\n    \"universal-ai-project-template\": {\n      \"head\": \"d6e582b7edeae24345a175f36639230726dbdead\",\n      \"index_sha256\": \"ac3c6beb7fe41745ede3543cac4f368aa310f6fd83a5dacceaef15042f5f4e25\",\n      \"status\": \"? config/codex.toml\\n? config/field_encryption_key\\n? config/secret_key\\n? docs/projects/\\n? examples/layered-app/\\n? scripts/validate_boundaries.py\\n? tests/test_validate_boundaries.py\\n? windows-preflight.ps1\\n\",\n      \"files\": 305,\n      \"matches\": true\n    }\n  },\n  \"m3_files_preserved\": 18,\n  \"canonical_files_preserved\": 31,\n  \"archive_files_preserved\": 14,\n  \"existing_tracked_changes\": [\n    \"scripts/workflow_runtime.py\",\n    \"scripts/workflow_scope.py\"\n  ],\n  \"frozen_other_files_preserved\": true,\n  \"head\": \"8404a44eb9bad3c25627454cbafb311d2779b066\",\n  \"refs\": {\n    \"refs/heads/feature/workflow-migration\": \"8404a44eb9bad3c25627454cbafb311d2779b066\",\n    \"refs/heads/main\": \"f624e207276372d9386b669bf087a66b44aba714\",\n    \"refs/remotes/origin/HEAD\": \"63b61ff9fcd1dba6676c6fd5dfb7561eaa92aed8\",\n    \"refs/remotes/origin/copilot/restore-merged-feature-branches\": \"9683d58ef201cdc825605a144bd4d0c7a0cf60fd\",\n    \"refs/remotes/origin/feature/workflow-migration\": \"8404a44eb9bad3c25627454cbafb311d2779b066\",\n    \"refs/remotes/origin/main\": \"63b61ff9fcd1dba6676c6fd5dfb7561eaa92aed8\",\n    \"refs/remotes/origin/policy/preserve-feature-branches\": \"60a848dfc7396b7b2b578a007b9be6aafec1fd83\"\n  },\n  \"branch\": \"feature/workflow-migration\",\n  \"passed\": true\n}"
+    },
+    "ruff_lint": {
+      "command": "ruff check scripts/execution_harness.py scripts/worker_launcher.py scripts/dispatch_state.py scripts/workflow_runtime.py scripts/workflow_scope.py tests/test_execution_harness.py tests/test_worker_launcher.py tools/check_m4_preservation.py",
+      "exit_code": 0,
+      "seconds": 0.027,
+      "output": "All checks passed!"
+    },
+    "ruff_format": {
+      "command": "ruff format --check scripts/execution_harness.py scripts/worker_launcher.py scripts/dispatch_state.py scripts/workflow_runtime.py scripts/workflow_scope.py tests/test_execution_harness.py tests/test_worker_launcher.py tools/check_m4_preservation.py",
+      "exit_code": 0,
+      "seconds": 0.025,
+      "output": "8 files already formatted"
+    },
+    "ty": {
+      "command": "uvx --offline ty check scripts/execution_harness.py scripts/worker_launcher.py scripts/dispatch_state.py scripts/workflow_runtime.py scripts/workflow_scope.py tools/check_m4_preservation.py",
+      "exit_code": 0,
+      "seconds": 0.173,
+      "output": "All checks passed!"
+    },
+    "basedpyright_native": {
+      "command": "uvx --offline basedpyright --outputjson scripts/execution_harness.py scripts/worker_launcher.py scripts/dispatch_state.py",
+      "exit_code": 1,
+      "seconds": 1.372,
+      "summary": {
+        "filesAnalyzed": 3,
+        "errorCount": 0,
+        "warningCount": 913,
+        "informationCount": 0,
+        "timeInSec": 0.841
+      },
+      "errors_by_file_rule": {}
+    },
+    "basedpyright_broader_legacy_diagnostic": {
+      "command": "uvx --offline basedpyright --outputjson scripts/execution_harness.py scripts/worker_launcher.py scripts/dispatch_state.py scripts/workflow_runtime.py scripts/workflow_scope.py",
+      "exit_code": 1,
+      "seconds": 1.47,
+      "summary": {
+        "filesAnalyzed": 5,
+        "errorCount": 16,
+        "warningCount": 1439,
+        "informationCount": 0,
+        "timeInSec": 0.948
+      },
+      "errors_by_file_rule": {
+        "('workflow_runtime.py', 'reportImplicitRelativeImport')": 5,
+        "('workflow_scope.py', 'reportImplicitRelativeImport')": 2,
+        "('workflow_scope.py', 'reportMissingTypeArgument')": 9
+      }
+    },
+    "git_diff_check": {
+      "command": "git diff --check",
+      "exit_code": 0,
+      "seconds": 0.034,
+      "output": ""
+    },
+    "git_cached_diff_check": {
+      "command": "git diff --cached --check",
+      "exit_code": 0,
+      "seconds": 0.03,
+      "output": ""
+    }
+  },
+  "distinct_verified_cases": 509,
+  "review": {
+    "status": "PASS F1-F5 closed",
+    "report_sha256": "26ed281698b4b023cd0337e8aa156441fd78a0ec9167bb8e63dfdb65122c981b",
+    "reviewed_sha256": {
+      "scripts/execution_harness.py": "a17d242303d509d3dd874f822a22a2e36f8421d06df1bfcfab154b9be542687e",
+      "scripts/worker_launcher.py": "7f758e07ab4be07f7aa25db7c291a1cd3e81f34f215dabdfe430748bfdae9757",
+      "scripts/dispatch_state.py": "1996ff2df99c45ffc44c9b5d4b4fa0091a4a41b2c452f17879de356cc476b71a",
+      "scripts/workflow_runtime.py": "a7dac529fe2322ba860a724a73492ef838e94e71fd4c5710a83858bd3bb25b4b",
+      "scripts/workflow_scope.py": "4f2ebc3b92a9323b63be3182b068ce6fdc11cb9112b2e4a5fcb99bf92b6290e2",
+      "config/execution-harness.schema.json": "3926dd6fa3b5c2700561f49acb79c0e5ba0807be3c7e0aadf57b2bc5a5ff6e32",
+      "config/execution-harness.json": "a44473d9edb9e9f1b8c571e955b49b8cee327d9f68111f2a18850ad30ba2c192",
+      "tests/test_execution_harness.py": "5cfd1a4ff6932d145b77441cbbbca351d052dba8a5bf0a74d6c84bb63d496479",
+      "tests/test_worker_launcher.py": "1d5c81ef6f07de4a6f5ddd16fcff7cde85683d44db38e1768656faf964c5f88e"
+    }
+  },
+  "preservation": {
+    "protected": {
+      "ai-template-oop": {
+        "head": "f624e207276372d9386b669bf087a66b44aba714",
+        "index_sha256": "fe7124042405022bf442485ce5e340489d0b292f2bbaa8a8935321b6653ec39b",
+        "status": "1 D. N... 100644 000000 000000 9e771558f3c032c37727dbb6ed461c78e3905114 0000000000000000000000000000000000000000 revised-plan-and-quickstart-2026-10-12-0011Z.md\n",
+        "files": 26,
+        "matches": true
+      },
+      "universal-ai-project-template": {
+        "head": "d6e582b7edeae24345a175f36639230726dbdead",
+        "index_sha256": "ac3c6beb7fe41745ede3543cac4f368aa310f6fd83a5dacceaef15042f5f4e25",
+        "status": "? config/codex.toml\n? config/field_encryption_key\n? config/secret_key\n? docs/projects/\n? examples/layered-app/\n? scripts/validate_boundaries.py\n? tests/test_validate_boundaries.py\n? windows-preflight.ps1\n",
+        "files": 305,
+        "matches": true
+      }
+    },
+    "m3_files_preserved": 18,
+    "canonical_files_preserved": 31,
+    "archive_files_preserved": 14,
+    "existing_tracked_changes": [
+      "scripts/workflow_runtime.py",
+      "scripts/workflow_scope.py"
+    ],
+    "frozen_other_files_preserved": true,
+    "head": "8404a44eb9bad3c25627454cbafb311d2779b066",
+    "refs": {
+      "refs/heads/feature/workflow-migration": "8404a44eb9bad3c25627454cbafb311d2779b066",
+      "refs/heads/main": "f624e207276372d9386b669bf087a66b44aba714",
+      "refs/remotes/origin/HEAD": "63b61ff9fcd1dba6676c6fd5dfb7561eaa92aed8",
+      "refs/remotes/origin/copilot/restore-merged-feature-branches": "9683d58ef201cdc825605a144bd4d0c7a0cf60fd",
+      "refs/remotes/origin/feature/workflow-migration": "8404a44eb9bad3c25627454cbafb311d2779b066",
+      "refs/remotes/origin/main": "63b61ff9fcd1dba6676c6fd5dfb7561eaa92aed8",
+      "refs/remotes/origin/policy/preserve-feature-branches": "60a848dfc7396b7b2b578a007b9be6aafec1fd83"
+    },
+    "branch": "feature/workflow-migration",
+    "passed": true
+  },
+  "defaults": {
+    "harness_enabled": false,
+    "resources_enabled": false,
+    "task_role_project_api_budgets_usd": 0,
+    "paid_workers": false,
+    "canonical_project_sequence": 2,
+    "canonical_project_head": "5e1f221812eaabd3666f40d4c003a046840ee01e4a51cba0e1881a19e1546bf7"
+  },
+  "earlier_runs": [
+    {
+      "scope": "initial report suite",
+      "passed": 29,
+      "seconds": 127.03
+    },
+    {
+      "scope": "initial launcher suite",
+      "passed": 28,
+      "seconds": 45.59
+    },
+    {
+      "scope": "pre-fixture-fix combined coordinator run",
+      "passed": 73,
+      "errors": 28,
+      "seconds": 266.17
+    },
+    {
+      "scope": "pre-F4 full snapshot; historical only",
+      "passed": 460,
+      "skipped": 0,
+      "seconds": 427.23
+    },
+    {
+      "scope": "pre-F5 full snapshot; compatibility failure fixed without changing old test",
+      "passed": 461,
+      "failed": 1,
+      "skipped": 1,
+      "seconds": 486.55
+    }
+  ],
+  "limitations": [
+    "M1 AC-02/AC-03 independent acceptance and M5 acceptance remain open; no M5 implementation",
+    "No live provider transport, trusted live usage, credential delivery, paid workers or deployment",
+    "Actor identities are coordinator declarations, not authentication",
+    "Approval-file replacement is separate from SQLite; repeated checks do not claim cross-filesystem atomicity",
+    "Orphaned or missing run manifests require explicit operator investigation; no implicit restart",
+    "No new numeric coverage measurement or global typing/coverage gate; behavioral and negative branches tested",
+    "Broader BasedPyright legacy import/generic typing diagnostics remain visible; native M4 modules have zero errors and ty passes all changed modules",
+    "Intermittent existing Windows Tk smoke skip is tracked in https://github.com/henslewm/ai-template-oop/issues/4; isolated case passes",
+    "No repository CI test workflow or required status checks are configured; available local checks and exact-head PR state are verified before merge"
+  ]
+}

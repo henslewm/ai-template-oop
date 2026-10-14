@@ -23,13 +23,13 @@
     "scripts/workflow_scope.py"
   ],
   "frozen_other_files_preserved": true,
-  "head": "754b3a2b49f24f47b0f015e4e1eff4f90d08e0a1",
+  "head": "8404a44eb9bad3c25627454cbafb311d2779b066",
   "refs": {
-    "refs/heads/feature/workflow-migration": "754b3a2b49f24f47b0f015e4e1eff4f90d08e0a1",
+    "refs/heads/feature/workflow-migration": "8404a44eb9bad3c25627454cbafb311d2779b066",
     "refs/heads/main": "f624e207276372d9386b669bf087a66b44aba714",
     "refs/remotes/origin/HEAD": "63b61ff9fcd1dba6676c6fd5dfb7561eaa92aed8",
     "refs/remotes/origin/copilot/restore-merged-feature-branches": "9683d58ef201cdc825605a144bd4d0c7a0cf60fd",
-    "refs/remotes/origin/feature/workflow-migration": "a56743f20517577363bf5affccf3a27f66136c5a",
+    "refs/remotes/origin/feature/workflow-migration": "8404a44eb9bad3c25627454cbafb311d2779b066",
     "refs/remotes/origin/main": "63b61ff9fcd1dba6676c6fd5dfb7561eaa92aed8",
     "refs/remotes/origin/policy/preserve-feature-branches": "60a848dfc7396b7b2b578a007b9be6aafec1fd83"
   },
