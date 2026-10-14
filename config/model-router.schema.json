@@ -1,0 +1,722 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Offline model-router configuration and request",
+  "description": "Canonical config and request definitions for metadata-only model routing. Example values are synthetic defaults; all example resources are disabled and use fictional model names. No real model capability, price, performance, credential access, or execution authorization is asserted.",
+  "$ref": "#/$defs/destination_config",
+  "$defs": {
+    "nonblank": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S"
+    },
+    "identifier": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 80,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,79}(?![\\s\\S])"
+    },
+    "sha256": {
+      "type": "string",
+      "minLength": 64,
+      "maxLength": 64,
+      "pattern": "^[a-f0-9]{64}(?![\\s\\S])"
+    },
+    "tier": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 4
+    },
+    "money": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1000000
+    },
+    "acceptance_probability": {
+      "type": "number",
+      "minimum": 1e-06,
+      "maximum": 1
+    },
+    "probability": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "seconds": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 31536000
+    },
+    "minutes": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 525600
+    },
+    "tokens": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 1000000000
+    },
+    "reasoning_effort": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "very_high"
+      ]
+    },
+    "estimates": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "acceptance_probability",
+        "latency_seconds",
+        "context_churn_tokens",
+        "review_minutes",
+        "regression_probability"
+      ],
+      "properties": {
+        "acceptance_probability": {
+          "$ref": "#/$defs/acceptance_probability"
+        },
+        "latency_seconds": {
+          "$ref": "#/$defs/seconds"
+        },
+        "context_churn_tokens": {
+          "$ref": "#/$defs/tokens"
+        },
+        "review_minutes": {
+          "$ref": "#/$defs/minutes"
+        },
+        "regression_probability": {
+          "$ref": "#/$defs/probability"
+        }
+      }
+    },
+    "provider": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "adapter",
+        "credential_env"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "adapter": {
+          "$ref": "#/$defs/nonblank"
+        },
+        "credential_env": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[A-Z_][A-Z0-9_]*(?![\\s\\S])",
+          "description": "Optional environment-variable name only; never a credential value. This metadata does not load credentials or call providers."
+        }
+      }
+    },
+    "resource": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "provider_id",
+        "model",
+        "enabled",
+        "tier",
+        "context_window",
+        "input_million_usd",
+        "output_million_usd",
+        "efforts"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "provider_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "model": {
+          "$ref": "#/$defs/nonblank"
+        },
+        "enabled": {
+          "type": "boolean"
+        },
+        "tier": {
+          "$ref": "#/$defs/tier"
+        },
+        "context_window": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1000000000
+        },
+        "input_million_usd": {
+          "$ref": "#/$defs/money"
+        },
+        "output_million_usd": {
+          "$ref": "#/$defs/money"
+        },
+        "efforts": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [],
+          "properties": {
+            "low": {
+              "$ref": "#/$defs/estimates"
+            },
+            "medium": {
+              "$ref": "#/$defs/estimates"
+            },
+            "high": {
+              "$ref": "#/$defs/estimates"
+            },
+            "very_high": {
+              "$ref": "#/$defs/estimates"
+            }
+          },
+          "minProperties": 1
+        },
+        "model_family": {
+          "$ref": "#/$defs/identifier",
+          "description": "Declared model family for cross-family review, saved with dispatch rates."
+        }
+      }
+    },
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "version",
+        "risk_floor",
+        "complexity_floor",
+        "min_acceptance",
+        "failures_per_tier",
+        "max_review_attempts",
+        "role_api_budget_usd",
+        "wall_second_usd",
+        "review_minute_usd",
+        "regression_usd",
+        "prior_samples"
+      ],
+      "properties": {
+        "version": {
+          "$ref": "#/$defs/nonblank"
+        },
+        "risk_floor": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "low",
+            "medium",
+            "high",
+            "critical"
+          ],
+          "properties": {
+            "low": {
+              "$ref": "#/$defs/tier"
+            },
+            "medium": {
+              "$ref": "#/$defs/tier"
+            },
+            "high": {
+              "$ref": "#/$defs/tier"
+            },
+            "critical": {
+              "$ref": "#/$defs/tier"
+            }
+          }
+        },
+        "complexity_floor": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "low",
+            "medium",
+            "high"
+          ],
+          "properties": {
+            "low": {
+              "$ref": "#/$defs/tier"
+            },
+            "medium": {
+              "$ref": "#/$defs/tier"
+            },
+            "high": {
+              "$ref": "#/$defs/tier"
+            }
+          }
+        },
+        "min_acceptance": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "low",
+            "medium",
+            "high",
+            "critical"
+          ],
+          "properties": {
+            "low": {
+              "$ref": "#/$defs/acceptance_probability"
+            },
+            "medium": {
+              "$ref": "#/$defs/acceptance_probability"
+            },
+            "high": {
+              "$ref": "#/$defs/acceptance_probability"
+            },
+            "critical": {
+              "$ref": "#/$defs/acceptance_probability"
+            }
+          }
+        },
+        "failures_per_tier": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 20
+        },
+        "max_review_attempts": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 20
+        },
+        "role_api_budget_usd": {
+          "$ref": "#/$defs/money",
+          "description": "API-spend cap for one task revision and one role. Worker and reviewer histories use separate bindings; this is not a combined task-wide budget."
+        },
+        "wall_second_usd": {
+          "$ref": "#/$defs/money"
+        },
+        "review_minute_usd": {
+          "$ref": "#/$defs/money"
+        },
+        "regression_usd": {
+          "$ref": "#/$defs/money"
+        },
+        "prior_samples": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1000000
+        }
+      }
+    },
+    "binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task_id",
+        "revision",
+        "contract_hash",
+        "role"
+      ],
+      "properties": {
+        "task_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "contract_hash": {
+          "$ref": "#/$defs/sha256"
+        },
+        "role": {
+          "type": "string",
+          "enum": [
+            "worker",
+            "reviewer"
+          ]
+        }
+      },
+      "description": "Binds routing history to one exact work-packet contract revision and role. Worker routing applies the packet retry budget; reviewer routing applies policy.max_review_attempts."
+    },
+    "attempt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sequence",
+        "resource_id",
+        "provider_id",
+        "tier",
+        "outcome",
+        "api_cost_usd",
+        "elapsed_seconds",
+        "decision_id",
+        "config_hash",
+        "evidence"
+      ],
+      "properties": {
+        "sequence": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 20
+        },
+        "resource_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "provider_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "tier": {
+          "$ref": "#/$defs/tier"
+        },
+        "outcome": {
+          "type": "string",
+          "enum": [
+            "FAIL",
+            "PASS",
+            "BLOCKED",
+            "NEEDS_ESCALATION",
+            "ARCHITECTURE_CONFLICT",
+            "PROVIDER_UNAVAILABLE",
+            "PROVIDER_RECOVERED"
+          ]
+        },
+        "api_cost_usd": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/money"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "null means the attempt's cost is unknown; routing never reads it as zero."
+        },
+        "elapsed_seconds": {
+          "$ref": "#/$defs/seconds"
+        },
+        "decision_id": {
+          "$ref": "#/$defs/sha256"
+        },
+        "config_hash": {
+          "$ref": "#/$defs/sha256"
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/nonblank"
+          },
+          "minItems": 1
+        }
+      }
+    },
+    "observation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "resource_id",
+        "task_class",
+        "reasoning_effort",
+        "samples",
+        "accepted",
+        "mean_latency_seconds",
+        "mean_context_churn_tokens",
+        "mean_review_minutes",
+        "regressions",
+        "source"
+      ],
+      "properties": {
+        "resource_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "task_class": {
+          "$ref": "#/$defs/identifier"
+        },
+        "reasoning_effort": {
+          "$ref": "#/$defs/reasoning_effort"
+        },
+        "samples": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1000000000
+        },
+        "accepted": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1000000000
+        },
+        "mean_latency_seconds": {
+          "$ref": "#/$defs/seconds"
+        },
+        "mean_context_churn_tokens": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1000000000
+        },
+        "mean_review_minutes": {
+          "$ref": "#/$defs/minutes"
+        },
+        "regressions": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1000000000
+        },
+        "source": {
+          "$ref": "#/$defs/nonblank"
+        }
+      }
+    },
+    "config": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "policy",
+        "providers",
+        "resources"
+      ],
+      "properties": {
+        "schema_version": {
+          "type": "string",
+          "const": "1.0"
+        },
+        "policy": {
+          "$ref": "#/$defs/policy"
+        },
+        "providers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/provider"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "resources": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/resource"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      },
+      "description": "Offline routing configuration. The accompanying example contains disabled fictional resources and synthetic estimates, not claims about real models, prices, or performance. Runtime validation enforces finite numbers, unique provider/resource IDs, cross-references, and monotonic policy floors."
+    },
+    "request": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "binding",
+        "task_class",
+        "input_tokens",
+        "output_tokens",
+        "unavailable_providers",
+        "unavailable_resources",
+        "attempts",
+        "observations"
+      ],
+      "properties": {
+        "schema_version": {
+          "type": "string",
+          "const": "1.0"
+        },
+        "binding": {
+          "$ref": "#/$defs/binding"
+        },
+        "task_class": {
+          "$ref": "#/$defs/identifier"
+        },
+        "input_tokens": {
+          "$ref": "#/$defs/tokens"
+        },
+        "output_tokens": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1000000000
+        },
+        "unavailable_providers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/identifier"
+          },
+          "minItems": 0,
+          "uniqueItems": true
+        },
+        "unavailable_resources": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/identifier"
+          },
+          "minItems": 0,
+          "uniqueItems": true
+        },
+        "attempts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/attempt"
+          },
+          "minItems": 0,
+          "maxItems": 20
+        },
+        "observations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/observation"
+          },
+          "minItems": 0,
+          "maxItems": 10000
+        }
+      },
+      "description": "Offline metadata request; it does not authorize or execute work. Runtime checks work-packet state (worker READY/IN_PROGRESS; reviewer REVIEW), current binding, history, counters, references, and role-specific caps. Reviewer selection stays at the packet reviewer_tier and stops if a risk/complexity floor exceeds that tier; executor authorization belongs to a later gate."
+    },
+    "destination_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "version",
+        "risk_floor",
+        "complexity_floor",
+        "min_acceptance",
+        "failures_per_tier",
+        "max_review_attempts",
+        "role_api_budget_usd",
+        "wall_second_usd",
+        "review_minute_usd",
+        "regression_usd",
+        "prior_samples"
+      ],
+      "properties": {
+        "version": {
+          "$ref": "#/$defs/nonblank"
+        },
+        "risk_floor": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "low",
+            "medium",
+            "high",
+            "critical"
+          ],
+          "properties": {
+            "low": {
+              "$ref": "#/$defs/tier"
+            },
+            "medium": {
+              "$ref": "#/$defs/tier"
+            },
+            "high": {
+              "$ref": "#/$defs/tier"
+            },
+            "critical": {
+              "$ref": "#/$defs/tier"
+            }
+          }
+        },
+        "complexity_floor": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "low",
+            "medium",
+            "high"
+          ],
+          "properties": {
+            "low": {
+              "$ref": "#/$defs/tier"
+            },
+            "medium": {
+              "$ref": "#/$defs/tier"
+            },
+            "high": {
+              "$ref": "#/$defs/tier"
+            }
+          }
+        },
+        "min_acceptance": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "low",
+            "medium",
+            "high",
+            "critical"
+          ],
+          "properties": {
+            "low": {
+              "$ref": "#/$defs/acceptance_probability"
+            },
+            "medium": {
+              "$ref": "#/$defs/acceptance_probability"
+            },
+            "high": {
+              "$ref": "#/$defs/acceptance_probability"
+            },
+            "critical": {
+              "$ref": "#/$defs/acceptance_probability"
+            }
+          }
+        },
+        "failures_per_tier": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2
+        },
+        "max_review_attempts": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2
+        },
+        "role_api_budget_usd": {
+          "$ref": "#/$defs/money",
+          "description": "API-spend cap for one task revision and one role. Worker and reviewer histories use separate bindings; this is not a combined task-wide budget."
+        },
+        "wall_second_usd": {
+          "$ref": "#/$defs/money"
+        },
+        "review_minute_usd": {
+          "$ref": "#/$defs/money"
+        },
+        "regression_usd": {
+          "$ref": "#/$defs/money"
+        },
+        "prior_samples": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1000000
+        }
+      }
+    },
+    "destination_config": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "policy",
+        "providers",
+        "resources"
+      ],
+      "properties": {
+        "schema_version": {
+          "type": "string",
+          "const": "1.0"
+        },
+        "policy": {
+          "$ref": "#/$defs/destination_policy"
+        },
+        "providers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/provider"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "resources": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/resource"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      },
+      "description": "Offline routing configuration. The accompanying example contains disabled fictional resources and synthetic estimates, not claims about real models, prices, or performance. Runtime validation enforces finite numbers, unique provider/resource IDs, cross-references, and monotonic policy floors."
+    }
+  }
+}

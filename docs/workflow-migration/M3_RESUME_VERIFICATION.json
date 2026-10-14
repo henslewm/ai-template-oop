@@ -1,0 +1,139 @@
+{
+  "recorded_at": "2026-10-14T22:00:15.410436+00:00",
+  "scope": "M3 only AC-04 AC-05 AC-06; owner reconfirmed stop before M4",
+  "scope_correction": {
+    "cause": "A stale saved goal naming M4 was mistakenly followed after the original M3-only scope",
+    "archive": "C:\\Users\\hensl\\AppData\\Local\\Temp\\m3-scope-correction-b0ee9f7b3e8a4c3b9a43d8e80857cfac",
+    "archive_manifest_sha256": "fc513791aadcb5b68f5b6fa7eb4d7fd98c96112e1ef9f214161d2f636f2cd77e",
+    "preserved_files": 13,
+    "restoration": "Known M4 additions reversed; all nine raw SHA256 values exactly match final M3 review; tracked diff empty",
+    "m4_delivery": false,
+    "worker_launches": false,
+    "canonical_writes": false
+  },
+  "implementation_sha256": {
+    "scripts/model_router.py": "ca206455f10c7314c7dd80a323e7a69253f6b62d9eaaf08033cefbdc55573d2f",
+    "scripts/feedback.py": "2d42c83c1009425f32c4aa541ba8e56b0d1cdd039ef8da50e0790a07491d27cd",
+    "scripts/workflow_budget.py": "b0c9233dcd04388cb67b6f31577cf347cf5d121ee26a5e5c5cf2f81d800add29",
+    "config/model-router.schema.json": "2000779025d25f450931191d74ef8fe28b2a13e3cabbc7f1c83a8f91ce1a8620",
+    "config/feedback.schema.json": "7c2094aefab362dca9a28e1b40047ecb6bd044892994a9943466e694ecb06a99",
+    "config/model-router.json": "3a9d29898d30bd0fec5bb1dcd1c1a4f0d14133d20ae1c7727d9dcb086ca1028f",
+    "config/feedback.json": "93dd79b8ff9722613d812b3b587163890856e44e93c0707406095f4a4da42973",
+    "tests/test_model_router.py": "6d95caf2ab98e5b82dca85d40ab6af53e4a74f26c86f7cb00a3739d0fd417675",
+    "tests/test_feedback.py": "e639253c86edcf1e124bc40c314484bc7c0845b7dcbfb818d426acc1b10db2a9"
+  },
+  "git": {
+    "branch": "feature/workflow-migration",
+    "head": "ef6ae42bdef7ef32793764400761383fe650bea7",
+    "origin_main": "63b61ff9fcd1dba6676c6fd5dfb7561eaa92aed8",
+    "origin_feature": "a56743f20517577363bf5affccf3a27f66136c5a",
+    "delivery": "17 new M3 files plus this resume record uncommitted; no push/PR/merge for M3",
+    "fetch": "git fetch --no-prune origin; no ref changes",
+    "normal_sync": "git merge --no-ff --no-edit origin/main: Already up to date"
+  },
+  "preservation": {
+    "protected_content_files": 331,
+    "protected_heads_indexes_statuses": "exact match with M3_PRESERVATION.json",
+    "canonical_state_files": 31,
+    "canonical_inventory": "exact match with M3_PRESERVATION.json",
+    "receipt_sha256": "33761b533bca129aa0d90133d0fb2ce970ba85945c5f381e7f5f9ce6621bc81f",
+    "journal_sequence": 2,
+    "journal_head": "5e1f221812eaabd3666f40d4c003a046840ee01e4a51cba0e1881a19e1546bf7",
+    "refs": "all local/cached remote names and tips unchanged from M3 closeout"
+  },
+  "checks": {
+    "ruff_lint": "PASS",
+    "ruff_format": "PASS; 5 files already formatted",
+    "ty": "PASS",
+    "basedpyright": {
+      "version": "1.40.2",
+      "filesAnalyzed": 3,
+      "errorCount": 0,
+      "warningCount": 1219,
+      "informationCount": 0,
+      "timeInSec": 1.219,
+      "exit_code": 1,
+      "meaning": "Warnings remain visible; no errors; no suppressions or toolchain changes"
+    },
+    "full_suite": {
+      "command": "$env:WORKFLOW_TEST_IMAGE = 'sha256:61526e68966dc3330c3801cbed8740c62710376b0b01b15c960b60c66b6cae1e'; python -B -m pytest -q -rs -p no:cacheprovider -o addopts= --ignore=tests/test_workflow_approval.py",
+      "exit_code": 0,
+      "passed": 356,
+      "skipped": 0,
+      "seconds": 115.88,
+      "m3_cases": 85,
+      "m2_cases": 89,
+      "scope_runtime_cases": 42
+    },
+    "approval_projection": {
+      "command": "python -B tools/check_workflow_approval.py",
+      "exit_code": 0,
+      "passed": 46,
+      "seconds": 2.04,
+      "actual_receipt_unchanged": true
+    },
+    "distinct_cases": 402,
+    "active_source_fingerprint": {
+      "command": "python -B scripts/validate_workflow_approval.py --fingerprint --check-source --require-active",
+      "exit_code": 0,
+      "fingerprint": "8e75e71b3561eaec4ad5cf71e37a1dec9f2c7dce0d07e0be46346daacfc90481"
+    },
+    "canonical_journal": {
+      "command": "python -B scripts/workflow_state.py verify",
+      "exit_code": 0,
+      "streams": 1,
+      "evidence": "intact"
+    },
+    "boundaries": {
+      "command": "python -B tools/validate_boundaries.py",
+      "exit_code": 0
+    },
+    "git_diff_check": {
+      "tracked": "PASS",
+      "staged": "PASS"
+    },
+    "restoration_review": {
+      "reviewer": "m3_review",
+      "status": "PASS; no remaining correctness issue identified",
+      "targeted_cases": 17,
+      "seconds": 13.42,
+      "hashes_match_before_and_after": 9,
+      "report_sha256": "cce4647e71d8356344a334a65e998e57d66059ed3ee8e3897485dba69be42b1f",
+      "report_correction": "model-router.json hash transcription typo corrected in three historical report tables; config bytes unchanged",
+      "new_correctness_findings": []
+    }
+  },
+  "post_regression_preservation": {
+    "recorded_at": "2026-10-14T21:59:23.790260+00:00",
+    "protected_checkouts": {
+      "ai-template-oop": {
+        "head": "f624e207276372d9386b669bf087a66b44aba714",
+        "index_sha256": "fe7124042405022bf442485ce5e340489d0b292f2bbaa8a8935321b6653ec39b",
+        "status": "1 D. N... 100644 000000 000000 9e771558f3c032c37727dbb6ed461c78e3905114 0000000000000000000000000000000000000000 revised-plan-and-quickstart-2026-10-12-0011Z.md\n",
+        "files_verified": 26,
+        "matches": true
+      },
+      "universal-ai-project-template": {
+        "head": "d6e582b7edeae24345a175f36639230726dbdead",
+        "index_sha256": "ac3c6beb7fe41745ede3543cac4f368aa310f6fd83a5dacceaef15042f5f4e25",
+        "status": "? config/codex.toml\n? config/field_encryption_key\n? config/secret_key\n? docs/projects/\n? examples/layered-app/\n? scripts/validate_boundaries.py\n? tests/test_validate_boundaries.py\n? windows-preflight.ps1\n",
+        "files_verified": 305,
+        "matches": true
+      }
+    },
+    "canonical_state_files_verified": 31,
+    "canonical_inventory_match": true,
+    "existing_tracked_diff": "",
+    "staged_diff": "",
+    "refs": "ef6ae42bdef7ef32793764400761383fe650bea7 refs/heads/feature/workflow-migration\nf624e207276372d9386b669bf087a66b44aba714 refs/heads/main\n63b61ff9fcd1dba6676c6fd5dfb7561eaa92aed8 refs/remotes/origin/HEAD\n9683d58ef201cdc825605a144bd4d0c7a0cf60fd refs/remotes/origin/copilot/restore-merged-feature-branches\na56743f20517577363bf5affccf3a27f66136c5a refs/remotes/origin/feature/workflow-migration\n63b61ff9fcd1dba6676c6fd5dfb7561eaa92aed8 refs/remotes/origin/main\n60a848dfc7396b7b2b578a007b9be6aafec1fd83 refs/remotes/origin/policy/preserve-feature-branches\n",
+    "status": "## feature/workflow-migration...origin/feature/workflow-migration [ahead 2]\n?? config/feedback.json\n?? config/feedback.schema.json\n?? config/model-router.json\n?? config/model-router.schema.json\n?? docs/workflow-migration/M3_ACCEPTANCE.md\n?? docs/workflow-migration/M3_CLOSEOUT.md\n?? docs/workflow-migration/M3_OPERATIONS.md\n?? docs/workflow-migration/M3_PLAN.md\n?? docs/workflow-migration/M3_PRESERVATION.json\n?? docs/workflow-migration/M3_RESUME_VERIFICATION.json\n?? docs/workflow-migration/M3_REVIEW.md\n?? docs/workflow-migration/M3_VERIFICATION.json\n?? docs/workflow-migration/M4_HANDOFF.md\n?? scripts/feedback.py\n?? scripts/model_router.py\n?? scripts/workflow_budget.py\n?? tests/test_feedback.py\n?? tests/test_model_router.py\n"
+  },
+  "limitations": [
+    "No M4 adapter or M5 independent acceptance; M1 AC-02/AC-03 independent evidence remains open",
+    "No live providers, paid workers, trusted live usage, credentials or deployment",
+    "Actor identities remain coordinator declarations rather than external authentication",
+    "Diagnostic coverage remains partial; no new coverage measurement; 1219 dynamic typing warnings remain",
+    "Approval replacement is a separate filesystem operation; future launch must revalidate",
+    "No M3 commit, push, PR or main merge; 18 new files remain uncommitted"
+  ]
+}

@@ -1,0 +1,1017 @@
+{
+  "recorded_at": "2026-10-14T21:34:07.978144+00:00",
+  "scope": "M3 AC-04 AC-05 AC-06 implementation verification only",
+  "source_commit": "d6e582b7edeae24345a175f36639230726dbdead",
+  "head": "ef6ae42bdef7ef32793764400761383fe650bea7",
+  "branch": "feature/workflow-migration",
+  "delivery": "new M3 files uncommitted; no push or M3 PR/merge",
+  "implementation_sha256": {
+    "scripts/model_router.py": "ca206455f10c7314c7dd80a323e7a69253f6b62d9eaaf08033cefbdc55573d2f",
+    "scripts/feedback.py": "2d42c83c1009425f32c4aa541ba8e56b0d1cdd039ef8da50e0790a07491d27cd",
+    "scripts/workflow_budget.py": "b0c9233dcd04388cb67b6f31577cf347cf5d121ee26a5e5c5cf2f81d800add29",
+    "config/model-router.schema.json": "2000779025d25f450931191d74ef8fe28b2a13e3cabbc7f1c83a8f91ce1a8620",
+    "config/feedback.schema.json": "7c2094aefab362dca9a28e1b40047ecb6bd044892994a9943466e694ecb06a99",
+    "config/model-router.json": "3a9d29898d30bd0fec5bb1dcd1c1a4f0d14133d20ae1c7727d9dcb086ca1028f",
+    "config/feedback.json": "93dd79b8ff9722613d812b3b587163890856e44e93c0707406095f4a4da42973",
+    "tests/test_model_router.py": "6d95caf2ab98e5b82dca85d40ab6af53e4a74f26c86f7cb00a3739d0fd417675",
+    "tests/test_feedback.py": "e639253c86edcf1e124bc40c314484bc7c0845b7dcbfb818d426acc1b10db2a9"
+  },
+  "checks": {
+    "full_suite": {
+      "passed": 356,
+      "skipped": 0,
+      "seconds": 158.0,
+      "image": "sha256:61526e68966dc3330c3801cbed8740c62710376b0b01b15c960b60c66b6cae1e",
+      "approval_test_excluded": true,
+      "m2_cases": 89,
+      "scope_runtime_cases": 42,
+      "m3_cases": 85
+    },
+    "approval_projection": {
+      "passed": 46,
+      "seconds": 4.16,
+      "receipt_unchanged": true
+    },
+    "distinct_final_cases": 402,
+    "fresh_scoped_review": {
+      "passed": 85,
+      "seconds": 78.09,
+      "status": "PASS; F1-F6 closed"
+    },
+    "expert_judgment": "PASS after strict native/source validator split; exact pinned source decision and seven-event historical replay independently matched",
+    "active_source_fingerprint": "PASS",
+    "canonical_journal": "PASS; existing sequence2 retained",
+    "boundaries": "PASS",
+    "ruff_lint": "PASS",
+    "ruff_format": "PASS",
+    "ty": "PASS",
+    "basedpyright": {
+      "filesAnalyzed": 3,
+      "errorCount": 0,
+      "warningCount": 1219,
+      "informationCount": 0,
+      "timeInSec": 2.222
+    },
+    "coverage": {
+      "passed": 85,
+      "seconds": 144.22,
+      "python": "3.12.10",
+      "method": "offline isolated cached pytest-cov; filesystem scripts source; summaries restricted to three M3 implementation files",
+      "global_threshold": "none configured; coverage diagnostic",
+      "modules": {
+        "scripts/feedback.py": {
+          "covered_lines": 591,
+          "num_statements": 768,
+          "percent_covered": 73.85964912280701,
+          "percent_covered_display": "74",
+          "missing_lines": 177,
+          "excluded_lines": 0,
+          "percent_statements_covered": 76.953125,
+          "percent_statements_covered_display": "77",
+          "num_branches": 372,
+          "num_partial_branches": 85,
+          "covered_branches": 251,
+          "missing_branches": 121,
+          "percent_branches_covered": 67.47311827956989,
+          "percent_branches_covered_display": "67"
+        },
+        "scripts/model_router.py": {
+          "covered_lines": 254,
+          "num_statements": 291,
+          "percent_covered": 88.48920863309353,
+          "percent_covered_display": "88",
+          "missing_lines": 37,
+          "excluded_lines": 0,
+          "percent_statements_covered": 87.2852233676976,
+          "percent_statements_covered_display": "87",
+          "num_branches": 126,
+          "num_partial_branches": 3,
+          "covered_branches": 115,
+          "missing_branches": 11,
+          "percent_branches_covered": 91.26984126984127,
+          "percent_branches_covered_display": "91"
+        },
+        "scripts/workflow_budget.py": {
+          "covered_lines": 68,
+          "num_statements": 89,
+          "percent_covered": 70.62937062937063,
+          "percent_covered_display": "71",
+          "missing_lines": 21,
+          "excluded_lines": 0,
+          "percent_statements_covered": 76.40449438202248,
+          "percent_statements_covered_display": "76",
+          "num_branches": 54,
+          "num_partial_branches": 21,
+          "covered_branches": 33,
+          "missing_branches": 21,
+          "percent_branches_covered": 61.111111111111114,
+          "percent_branches_covered_display": "61"
+        }
+      },
+      "totals": {
+        "num_statements": 1148,
+        "covered_lines": 913,
+        "missing_lines": 235,
+        "num_branches": 552,
+        "covered_branches": 399,
+        "missing_branches": 153,
+        "excluded_lines": 0,
+        "line_percent": 79.52961672473867,
+        "branch_percent": 72.28260869565217,
+        "combined_percent": 77.17647058823529
+      },
+      "remaining": {
+        "files": {
+          "scripts/feedback.py": {
+            "missing_lines": [
+              50,
+              55,
+              71,
+              75,
+              78,
+              158,
+              186,
+              190,
+              193,
+              214,
+              217,
+              218,
+              219,
+              246,
+              247,
+              256,
+              267,
+              268,
+              270,
+              328,
+              347,
+              353,
+              358,
+              360,
+              364,
+              371,
+              378,
+              381,
+              387,
+              401,
+              420,
+              433,
+              462,
+              477,
+              517,
+              520,
+              524,
+              570,
+              571,
+              577,
+              578,
+              587,
+              597,
+              602,
+              610,
+              613,
+              620,
+              624,
+              633,
+              644,
+              655,
+              663,
+              691,
+              703,
+              708,
+              711,
+              717,
+              721,
+              749,
+              764,
+              798,
+              803,
+              812,
+              835,
+              839,
+              849,
+              893,
+              894,
+              895,
+              896,
+              905,
+              907,
+              916,
+              950,
+              978,
+              988,
+              1011,
+              1014,
+              1027,
+              1028,
+              1029,
+              1117,
+              1122,
+              1167,
+              1177,
+              1180,
+              1243,
+              1287,
+              1295,
+              1302,
+              1326,
+              1358,
+              1363,
+              1371,
+              1386,
+              1402,
+              1494,
+              1555,
+              1605,
+              1610,
+              1721,
+              1722,
+              1723,
+              1724,
+              1725,
+              1726,
+              1727,
+              1728,
+              1729,
+              1730,
+              1731,
+              1732,
+              1733,
+              1734,
+              1735,
+              1736,
+              1737,
+              1738,
+              1739,
+              1740,
+              1741,
+              1742,
+              1743,
+              1744,
+              1745,
+              1746,
+              1747,
+              1748,
+              1749,
+              1750,
+              1751,
+              1752,
+              1755,
+              1763,
+              1764,
+              1765,
+              1766,
+              1777,
+              1778,
+              1785,
+              1786,
+              1787,
+              1788,
+              1789,
+              1790,
+              1791,
+              1792,
+              1793,
+              1801,
+              1805,
+              1806,
+              1807,
+              1809,
+              1816,
+              1817,
+              1818,
+              1819,
+              1820,
+              1824,
+              1857,
+              1858,
+              1864,
+              1865,
+              1870,
+              1882,
+              1890,
+              1905,
+              1909,
+              1910,
+              1911,
+              1912,
+              1918,
+              1919,
+              1920,
+              1923,
+              1926,
+              1930
+            ],
+            "missing_branches": [
+              [
+                49,
+                50
+              ],
+              [
+                54,
+                55
+              ],
+              [
+                70,
+                71
+              ],
+              [
+                74,
+                75
+              ],
+              [
+                77,
+                78
+              ],
+              [
+                157,
+                158
+              ],
+              [
+                185,
+                186
+              ],
+              [
+                189,
+                190
+              ],
+              [
+                192,
+                193
+              ],
+              [
+                213,
+                214
+              ],
+              [
+                245,
+                246
+              ],
+              [
+                255,
+                256
+              ],
+              [
+                264,
+                267
+              ],
+              [
+                268,
+                270
+              ],
+              [
+                268,
+                271
+              ],
+              [
+                327,
+                328
+              ],
+              [
+                337,
+                347
+              ],
+              [
+                352,
+                353
+              ],
+              [
+                357,
+                358
+              ],
+              [
+                359,
+                360
+              ],
+              [
+                363,
+                364
+              ],
+              [
+                370,
+                371
+              ],
+              [
+                374,
+                378
+              ],
+              [
+                380,
+                381
+              ],
+              [
+                386,
+                387
+              ],
+              [
+                400,
+                401
+              ],
+              [
+                419,
+                420
+              ],
+              [
+                432,
+                433
+              ],
+              [
+                440,
+                450
+              ],
+              [
+                461,
+                462
+              ],
+              [
+                470,
+                477
+              ],
+              [
+                516,
+                517
+              ],
+              [
+                519,
+                520
+              ],
+              [
+                523,
+                524
+              ],
+              [
+                569,
+                570
+              ],
+              [
+                571,
+                577
+              ],
+              [
+                571,
+                578
+              ],
+              [
+                592,
+                597
+              ],
+              [
+                598,
+                602
+              ],
+              [
+                606,
+                610
+              ],
+              [
+                612,
+                613
+              ],
+              [
+                616,
+                620
+              ],
+              [
+                623,
+                624
+              ],
+              [
+                640,
+                644
+              ],
+              [
+                654,
+                655
+              ],
+              [
+                659,
+                663
+              ],
+              [
+                690,
+                691
+              ],
+              [
+                702,
+                703
+              ],
+              [
+                707,
+                708
+              ],
+              [
+                710,
+                711
+              ],
+              [
+                714,
+                717
+              ],
+              [
+                720,
+                721
+              ],
+              [
+                748,
+                749
+              ],
+              [
+                752,
+                754
+              ],
+              [
+                760,
+                764
+              ],
+              [
+                797,
+                798
+              ],
+              [
+                802,
+                803
+              ],
+              [
+                804,
+                823
+              ],
+              [
+                808,
+                812
+              ],
+              [
+                834,
+                835
+              ],
+              [
+                838,
+                839
+              ],
+              [
+                850,
+                893
+              ],
+              [
+                864,
+                870
+              ],
+              [
+                893,
+                894
+              ],
+              [
+                893,
+                895
+              ],
+              [
+                895,
+                896
+              ],
+              [
+                895,
+                907
+              ],
+              [
+                949,
+                950
+              ],
+              [
+                977,
+                978
+              ],
+              [
+                987,
+                988
+              ],
+              [
+                1010,
+                1011
+              ],
+              [
+                1013,
+                1014
+              ],
+              [
+                1116,
+                1117
+              ],
+              [
+                1121,
+                1122
+              ],
+              [
+                1166,
+                1167
+              ],
+              [
+                1176,
+                1177
+              ],
+              [
+                1179,
+                1180
+              ],
+              [
+                1242,
+                1243
+              ],
+              [
+                1283,
+                1287
+              ],
+              [
+                1294,
+                1295
+              ],
+              [
+                1301,
+                1302
+              ],
+              [
+                1322,
+                1326
+              ],
+              [
+                1357,
+                1358
+              ],
+              [
+                1362,
+                1363
+              ],
+              [
+                1366,
+                1371
+              ],
+              [
+                1385,
+                1386
+              ],
+              [
+                1389,
+                1403
+              ],
+              [
+                1398,
+                1402
+              ],
+              [
+                1493,
+                1494
+              ],
+              [
+                1552,
+                1555
+              ],
+              [
+                1601,
+                1605
+              ],
+              [
+                1607,
+                1610
+              ],
+              [
+                1726,
+                1727
+              ],
+              [
+                1726,
+                1728
+              ],
+              [
+                1729,
+                1730
+              ],
+              [
+                1729,
+                1731
+              ],
+              [
+                1738,
+                1739
+              ],
+              [
+                1738,
+                1745
+              ],
+              [
+                1743,
+                1738
+              ],
+              [
+                1743,
+                1744
+              ],
+              [
+                1745,
+                1746
+              ],
+              [
+                1745,
+                1748
+              ],
+              [
+                1751,
+                1752
+              ],
+              [
+                1751,
+                1765
+              ],
+              [
+                1765,
+                1766
+              ],
+              [
+                1765,
+                1777
+              ],
+              [
+                1777,
+                1778
+              ],
+              [
+                1777,
+                1787
+              ],
+              [
+                1787,
+                1788
+              ],
+              [
+                1787,
+                1805
+              ],
+              [
+                1790,
+                1791
+              ],
+              [
+                1790,
+                1792
+              ],
+              [
+                1792,
+                1793
+              ],
+              [
+                1792,
+                1801
+              ],
+              [
+                1806,
+                1807
+              ],
+              [
+                1806,
+                1809
+              ],
+              [
+                1910,
+                1911
+              ],
+              [
+                1910,
+                1918
+              ],
+              [
+                1919,
+                1920
+              ],
+              [
+                1919,
+                1923
+              ],
+              [
+                1929,
+                1930
+              ]
+            ]
+          },
+          "scripts/model_router.py": {
+            "missing_lines": [
+              469,
+              471,
+              490,
+              491,
+              495,
+              496,
+              497,
+              498,
+              499,
+              503,
+              504,
+              505,
+              506,
+              507,
+              508,
+              509,
+              510,
+              511,
+              517,
+              518,
+              519,
+              520,
+              521,
+              522,
+              523,
+              526,
+              527,
+              528,
+              530,
+              535,
+              539,
+              540,
+              541,
+              542,
+              543,
+              544,
+              548
+            ],
+            "missing_branches": [
+              [
+                468,
+                469
+              ],
+              [
+                470,
+                471
+              ],
+              [
+                491,
+                495
+              ],
+              [
+                491,
+                496
+              ],
+              [
+                497,
+                498
+              ],
+              [
+                497,
+                499
+              ],
+              [
+                521,
+                522
+              ],
+              [
+                521,
+                527
+              ],
+              [
+                527,
+                528
+              ],
+              [
+                527,
+                530
+              ],
+              [
+                547,
+                548
+              ]
+            ]
+          },
+          "scripts/workflow_budget.py": {
+            "missing_lines": [
+              16,
+              19,
+              34,
+              54,
+              65,
+              100,
+              102,
+              109,
+              116,
+              118,
+              120,
+              127,
+              130,
+              142,
+              145,
+              149,
+              153,
+              160,
+              162,
+              164,
+              167
+            ],
+            "missing_branches": [
+              [
+                15,
+                16
+              ],
+              [
+                18,
+                19
+              ],
+              [
+                29,
+                34
+              ],
+              [
+                53,
+                54
+              ],
+              [
+                60,
+                65
+              ],
+              [
+                94,
+                100
+              ],
+              [
+                101,
+                102
+              ],
+              [
+                108,
+                109
+              ],
+              [
+                112,
+                116
+              ],
+              [
+                117,
+                118
+              ],
+              [
+                119,
+                120
+              ],
+              [
+                121,
+                127
+              ],
+              [
+                129,
+                130
+              ],
+              [
+                140,
+                167
+              ],
+              [
+                141,
+                142
+              ],
+              [
+                144,
+                145
+              ],
+              [
+                146,
+                149
+              ],
+              [
+                152,
+                153
+              ],
+              [
+                155,
+                160
+              ],
+              [
+                161,
+                162
+              ],
+              [
+                163,
+                164
+              ]
+            ]
+          }
+        }
+      }
+    }
+  },
+  "earlier_runs": {
+    "pre_final_full": {
+      "passed": 350,
+      "skipped": 1,
+      "seconds": 123.82,
+      "skip": "existing Tk smoke test; missing ttk spinbox.tcl"
+    },
+    "isolated_ui": {
+      "passed": 1,
+      "seconds": 0.09
+    },
+    "coverage_setup": "Pinned pytest9.0.2 unavailable offline; cached unpinned tool environment used. Module-name source missed donor router import alias; corrected to filesystem source."
+  },
+  "limitations": [
+    "No paid worker, provider transport, live credentials or deployment",
+    "Actor identities are coordinator declarations, not authentication",
+    "Remaining M1 AC-02/AC-03 independent export evidence and M5 acceptance are not closed",
+    "Coverage is partial, with legacy/error/CLI branches recorded and no exclusions",
+    "No repository-wide typing/toolchain migration; BasedPyright dynamic boundary warnings remain",
+    "Current receipt replacement is not atomic with arbitrary filesystem editors; launch must revalidate",
+    "Imported source histories retain original semantics but cannot be relabeled for new scheduling",
+    "M4 has not started"
+  ]
+}

@@ -1,0 +1,73 @@
+{
+  "schema_version": "1.0",
+  "policy": {
+    "version": "destination-offline-1",
+    "risk_floor": {
+      "low": 0,
+      "medium": 1,
+      "high": 3,
+      "critical": 4
+    },
+    "complexity_floor": {
+      "low": 0,
+      "medium": 2,
+      "high": 3
+    },
+    "min_acceptance": {
+      "low": 0.5,
+      "medium": 0.65,
+      "high": 0.8,
+      "critical": 0.9
+    },
+    "failures_per_tier": 2,
+    "max_review_attempts": 2,
+    "role_api_budget_usd": 0,
+    "wall_second_usd": 0.001,
+    "review_minute_usd": 0.05,
+    "regression_usd": 5,
+    "prior_samples": 5
+  },
+  "providers": [
+    {
+      "id": "lmstudio",
+      "adapter": "offline-metadata",
+      "credential_env": null
+    },
+    {
+      "id": "mistral",
+      "adapter": "offline-metadata",
+      "credential_env": null
+    },
+    {
+      "id": "claude",
+      "adapter": "offline-metadata",
+      "credential_env": null
+    },
+    {
+      "id": "openai",
+      "adapter": "offline-metadata",
+      "credential_env": null
+    }
+  ],
+  "resources": [
+    {
+      "id": "disabled-synthetic",
+      "provider_id": "lmstudio",
+      "model": "fictional-offline-only",
+      "enabled": false,
+      "tier": 1,
+      "context_window": 100000,
+      "input_million_usd": 0,
+      "output_million_usd": 0,
+      "efforts": {
+        "medium": {
+          "acceptance_probability": 1,
+          "latency_seconds": 1,
+          "context_churn_tokens": 0,
+          "review_minutes": 0,
+          "regression_probability": 0
+        }
+      }
+    }
+  ]
+}
