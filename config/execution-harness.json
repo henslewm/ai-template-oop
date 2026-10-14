@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "enabled": false,
+  "limits": {
+    "brief_max_chars": 40000,
+    "report_max_bytes": 262144,
+    "chars_per_token": 1,
+    "context_growth_reserve_tokens": 1024,
+    "startup_max_chars": 12000
+  },
+  "harnesses": [
+    {
+      "id": "offline",
+      "adapter": "docker",
+      "command": "python",
+      "argv": [
+        "-c",
+        "raise SystemExit('No worker configured')",
+        "{brief}",
+        "{report}"
+      ],
+      "context_overhead_tokens": 100,
+      "description": "Disabled offline harness. Configure only in disposable synthetic tests."
+    }
+  ],
+  "bindings": [
+    {
+      "resource_id": "disabled-offline-example",
+      "harness_id": "offline",
+      "provider": "offline",
+      "model": "fixture-only",
+      "api_base": null,
+      "credential_env": null,
+      "served_context_window": null,
+      "image": "sha256:61526e68966dc3330c3801cbed8740c62710376b0b01b15c960b60c66b6cae1e"
+    }
+  ]
+}

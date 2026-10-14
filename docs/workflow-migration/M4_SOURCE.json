@@ -1,0 +1,30 @@
+{
+  "commit": "d6e582b7edeae24345a175f36639230726dbdead",
+  "read_method": "git show from pinned donor object database",
+  "references": {
+    "scripts/execution_harness.py": {
+      "sha256": "bbe20af277b7247f4a20335beaf7f10cf04ac235f105baddd69e617d58651f58",
+      "bytes": 47005
+    },
+    "scripts/worker_launcher.py": {
+      "sha256": "4436903e273c1362011872659c901430cb059e2d166107e6fc756f3622776720",
+      "bytes": 21988
+    },
+    "config/execution-harness.schema.json": {
+      "sha256": "20f014a42658d877e3538beea732a42d7d3a55f3f44c71aa0cf5fdeba5d9c716",
+      "bytes": 4981
+    },
+    "tests/test_execution_harness.py": {
+      "sha256": "1fc6adc60aa46b6b8ef39867071d8770b650a3da51d73c5cd9ff5457d6134e8a",
+      "bytes": 61460
+    },
+    "tests/test_worker_launcher.py": {
+      "sha256": "72cc7ea2ff571247005661451c35bc2978ab53f876be6774b9cadd747eeb869c",
+      "bytes": 49064
+    },
+    "templates/harness/BOUNDED_WORKER_RULES.md": {
+      "sha256": "9f98fc6c825136991abb4e9cddce462732a574ec757ec8c0e045695f596668c4",
+      "bytes": 3715
+    }
+  }
+}
