@@ -22,6 +22,51 @@ require = h.require
 sha = h.sha
 
 
+def pilot_review(state, report, attempt):
+    """Independent pilot review binds exact candidate and all preset criteria."""
+    from scripts import pilot_authority
+
+    require(
+        attempt["role"] == "reviewer" and attempt["model"] == "gpt-6.1-sol",
+        "Pilot requires its separate Sol reviewer invocation",
+    )
+    independent(attempt["actor"], [a["actor"] for a in state["attempts"]])
+    require(
+        state["checks"] is not None
+        and all(c["passed"] for c in state["checks"]["checks"]),
+        "Independent deterministic checks must pass before review",
+    )
+    contract = f.wp.current(state["packet"])["contract"]
+    require(
+        contract["risk"] in {"low", "medium"},
+        "Higher risk review requirements remain in force",
+    )
+    found = [c["id"] for c in report["criteria"]]
+    expected = [c["id"] for c in contract["acceptance_criteria"]]
+    require(
+        len(found) == len(set(found)) and set(found) == set(expected),
+        "Every criterion must be reviewed exactly once",
+    )
+    require(
+        report["bundle_sha256"] == h.sha(state["bundle"]),
+        "Review binds a different candidate",
+    )
+    require(
+        state["scope"]["write_paths"] == pilot_authority.WRITE_PATHS,
+        "Pilot scope differs",
+    )
+    if report["verdict"] == "APPROVE":
+        require(
+            all(c["met"] for c in report["criteria"]), "Approval has unmet criteria"
+        )
+    if report["verdict"] == "REJECT_BOUNDED":
+        require(
+            any(not c["met"] for c in report["criteria"]),
+            "Bounded rejection needs an unmet criterion",
+        )
+    require(bool(report["summary"].strip()), "Review summary required")
+
+
 def config_valid(config):
     reports.shape("config", config)
     h.secret_free(config)

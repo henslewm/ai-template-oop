@@ -26,7 +26,12 @@ def main() -> int:
         prefix="workflow-approval-regression-"
     ) as directory:
         snapshot = Path(directory)
-        for relative in set(package["bound_files"]) | set(package["baseline_files"]):
+        # Include the new exported ABC without changing the frozen receipt.
+        for relative in (
+            set(package["bound_files"])
+            | set(package["baseline_files"])
+            | {"contracts/operator.py"}
+        ):
             target = snapshot / relative
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(ROOT / relative, target)

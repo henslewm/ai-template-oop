@@ -28,7 +28,37 @@ def apply(state: dict[str, Any] | None, event: dict[str, Any]) -> dict[str, Any]
             "receipt": None,
         }
     state = copy.deepcopy(state)
-    if kind == "PREPARED" and state["phase"] == "PREPARING":
+    if (
+        kind == "PROVIDER_REQUEST"
+        and state["phase"] == "PREPARING"
+        and "provider" not in state
+    ):
+        feedback.exact(
+            data,
+            {
+                "request",
+                "request_sha256",
+                "actor",
+                "model",
+                "rates",
+                "ceiling",
+                "deadline",
+            },
+        )
+        if feedback.router.digest(data["request"]) != data["request_sha256"]:
+            raise ValueError("Provider request digest differs")
+        state.update(phase="REQUEST_READY", provider=copy.deepcopy(data))
+    elif kind == "PROVIDER_CONSUMED" and state["phase"] == "REQUEST_READY":
+        feedback.exact(data, {"request_sha256"})
+        if data["request_sha256"] != state["provider"]["request_sha256"]:
+            raise ValueError("Consumed provider request differs")
+        state["phase"] = "REQUEST_CONSUMED"
+    elif kind == "PROVIDER_RESPONSE" and state["phase"] == "REQUEST_CONSUMED":
+        feedback.exact(data, {"response", "response_sha256", "usage", "cost_usd"})
+        if feedback.router.digest(data["response"]) != data["response_sha256"]:
+            raise ValueError("Provider response digest differs")
+        state.update(phase="PREPARING", response=copy.deepcopy(data))
+    elif kind == "PREPARED" and state["phase"] == "PREPARING":
         feedback.exact(data, {"run", "files", "runtime"})
         state.update(phase="PREPARED", prepared=copy.deepcopy(data))
     elif kind == "LAUNCHING" and state["phase"] == "PREPARED":

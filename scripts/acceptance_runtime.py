@@ -56,6 +56,109 @@ class _CandidateScope:
         return output.getvalue(), baseline
 
 
+def pilot_checks(journal, state):
+    """Separate immutable Docker exports; worker check claims confer no acceptance."""
+    from scripts import pilot_authority as authority
+
+    original = h.SessionScope.load(state["scope"])
+    baseline = {
+        p: h.digest(b) if (original.root / p).exists() else None
+        for p, b in original.files().items()
+    }
+    h.verify_bundle(original, baseline, state["bundle"])
+    worker_id = state["attempts"][-1]["id"]
+    checks = []
+    for check in h.f.wp.current(state["packet"])["contract"]["validation"]:
+        stream = "pilot-check:" + worker_id[:32] + ":" + check["id"]
+        if stream in journal.verify():
+            events, _ = journal.read(stream)
+            if events[-1]["kind"] != "RESULT":
+                raise ValueError(
+                    "Interrupted independent check; inspect and reconcile its existing run, never silently restart"
+                )
+            checks.append(events[-1]["data"])
+            continue
+        command = check["command"]
+        h.require(command["argv"][0] == "python", "Pilot check entry point differs")
+        scope = h.SessionScope.load(
+            {
+                **original.data,
+                "owner": "Independent-pilot-checks",
+                "run_id": "check-" + uuid.uuid4().hex,
+            }
+        )
+        journal.create(
+            stream,
+            family="acceptance",
+            binding={"worker": worker_id, "bundle_sha256": h.sha(state["bundle"])},
+            data={"check": check, "scope": scope.data},
+        )
+        run = runtime.prepare(
+            _CandidateScope(scope, {"bundle": state["bundle"]}),
+            state["packet"],
+            [],
+            journal.directory,
+            authority.IMAGE,
+            command["argv"],
+            immutable_workspace=True,
+            dispatch_stream=stream,
+        )
+        manifest = h.f.wp.read_json(run / "runtime.json")
+        saved = {p.name: h.digest(p.read_bytes()) for p in run.iterdir() if p.is_file()}
+        journal.append(
+            stream,
+            "CHECK_PREPARED",
+            {"run": run.name, "runtime": manifest, "files": saved},
+            expected=journal.read(stream)[1],
+        )
+        deadline = (h.f.instant(h.f.wp.now()) + timedelta(seconds=180)).isoformat()
+        journal.append(
+            stream,
+            "CHECK_LAUNCHING",
+            {"deadline": deadline},
+            expected=journal.read(stream)[1],
+        )
+
+        def preflight(_consumed):
+            authority.load_profile(journal.root)
+            if journal.read(stream)[0][-1]["kind"] != "CHECK_LAUNCHING":
+                raise ValueError("Independent check phase changed")
+            for name, expected in saved.items():
+                h.require(
+                    h.digest(h.read_file(run / name)) == expected,
+                    "Independent check input changed",
+                )
+
+        outcome = runtime.execute(
+            run,
+            journal.directory,
+            min(180, command["timeout_seconds"]),
+            preflight=preflight,
+            absolute_deadline=deadline,
+        )
+        evidence = journal.evidence(
+            (run / "stdout.log").relative_to(journal.directory).as_posix()
+        )
+        result = {
+            "id": check["id"],
+            "passed": outcome["exit_code"] == 0,
+            "bundle_sha256": h.sha(state["bundle"]),
+            "image": authority.IMAGE,
+            "argv": command["argv"],
+            "evidence": asdict(evidence),
+            "log": h.read_file(run / "stdout.log").decode(errors="replace")[-4000:],
+        }
+        journal.append(
+            stream,
+            "RESULT",
+            result,
+            expected=journal.read(stream)[1],
+            evidence=(evidence,),
+        )
+        checks.append(result)
+    return {"checks": checks, "bundle_sha256": h.sha(state["bundle"])}
+
+
 def prepare_check(journal, task_stream, validation_id):
     state, head, native, native_head = a.current(journal, task_stream)
     a.require(

@@ -461,6 +461,53 @@ def _validation(
     }
 
 
+def review_history(live):
+    """Shared automated-review history gates for offline and live delivery."""
+    blockers = []
+    rounds = [
+        r
+        for r in live["reviews"]
+        if r["user"]["login"] in BOTS
+        and r.get("commit_id")
+        and (r.get("body", "").strip() or r["state"] != "COMMENTED")
+    ]
+    clean_rounds = [
+        comment
+        for comment in live.get("comments", [])
+        if comment["user"]["login"] in BOTS
+        and re.search(
+            r"\*\*Reviewed commit:\*\*\s*`[0-9a-f]{7,40}`", comment.get("body") or ""
+        )
+    ]
+    round_count = len(rounds) + len(clean_rounds)
+    ambiguous_round_history = any(
+        comment["user"]["login"] in BOTS
+        and (
+            "codex-pull-request-review-summary" in (comment.get("body") or "")
+            or (
+                "Review trigger" in (comment.get("body") or "")
+                and "Completed" in (comment.get("body") or "")
+            )
+            or (
+                comment in clean_rounds
+                and comment.get("updated_at") != comment.get("created_at")
+            )
+        )
+        for comment in live.get("comments", [])
+    )
+    if ambiguous_round_history:
+        blockers.append("AUTOMATED_REVIEW_HISTORY_UNVERIFIABLE")
+    if round_count > REVIEW_CAP:
+        blockers.append("REVIEW_ROUND_CAP_EXCEEDED")
+    if live["unresolved"] or live["more_threads"]:
+        blockers.append("UNRESOLVED_OR_UNOBSERVED_REVIEW_THREADS")
+    return {
+        "blockers": blockers,
+        "round_count": round_count,
+        "ambiguous": ambiguous_round_history,
+    }
+
+
 def assess(
     journal: ws.Journal,
     task_stream: str,
@@ -535,43 +582,10 @@ def assess(
     if live["unsupported_rules"]:
         blockers.append("UNSUPPORTED_LIVE_REQUIRED_RULE")
     blockers.extend(_checks(live))
-    rounds = [
-        r
-        for r in live["reviews"]
-        if r["user"]["login"] in BOTS
-        and r.get("commit_id")
-        and (r.get("body", "").strip() or r["state"] != "COMMENTED")
-    ]
-    clean_rounds = [
-        comment
-        for comment in live.get("comments", [])
-        if comment["user"]["login"] in BOTS
-        and re.search(
-            r"\*\*Reviewed commit:\*\*\s*`[0-9a-f]{7,40}`", comment.get("body") or ""
-        )
-    ]
-    round_count = len(rounds) + len(clean_rounds)
-    ambiguous_round_history = any(
-        comment["user"]["login"] in BOTS
-        and (
-            "codex-pull-request-review-summary" in (comment.get("body") or "")
-            or (
-                "Review trigger" in (comment.get("body") or "")
-                and "Completed" in (comment.get("body") or "")
-            )
-            or (
-                comment in clean_rounds
-                and comment.get("updated_at") != comment.get("created_at")
-            )
-        )
-        for comment in live.get("comments", [])
-    )
-    if ambiguous_round_history:
-        blockers.append("AUTOMATED_REVIEW_HISTORY_UNVERIFIABLE")
-    if round_count > REVIEW_CAP:
-        blockers.append("REVIEW_ROUND_CAP_EXCEEDED")
-    if live["unresolved"] or live["more_threads"]:
-        blockers.append("UNRESOLVED_OR_UNOBSERVED_REVIEW_THREADS")
+    review_status = review_history(live)
+    blockers.extend(review_status["blockers"])
+    round_count = review_status["round_count"]
+    ambiguous_round_history = review_status["ambiguous"]
     latest = {}
     for review in live["reviews"]:
         if review["state"] in {"APPROVED", "CHANGES_REQUESTED", "DISMISSED"}:

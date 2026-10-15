@@ -358,7 +358,7 @@ def bundle_from_archive(scope, baseline, archive):
                         "content_base64": base64.b64encode(data).decode(),
                     }
                 )
-        if not set(baseline).issubset(seen):
+        if not {p.casefold() for p in baseline}.issubset(seen):
             raise ValueError("Output deleted a supplied file")
     return {
         "scope_sha256": scope.hash,
