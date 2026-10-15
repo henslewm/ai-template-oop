@@ -1,0 +1,14 @@
+{
+  "frozen_at": "2026-10-15T01:34:09.724640+00:00",
+  "source_sha256": {
+    "scripts/workflow_handoff.py": "d911f7e12016e680394451bc932e5df22dc99c2c119248495ec21289ba2f2dc7",
+    "scripts/workflow_closeout.py": "47156712b36f196424a4f38e34aa1098af96edd9ddd70a2898b178a62c646ae0",
+    "tests/test_workflow_handoff.py": "0f6bc3daa560b3230f6649f4cf15c7622ecbe8376573e40778811defee90cab0",
+    "tests/test_workflow_closeout.py": "a8db2b26954dac8f9f11a8a747f43f19e7cc8cb979819f6913a12d01fd045db7",
+    "tools/check_m6_preservation.py": "0d8edfef1cef9cdc82b6c727b8ef0dc108379b02a24b7a3fba47792995bae3ef",
+    "tools/verify_m6.py": "3e5ed711a52a318c60e72fd365bda3fa35a4fbd4214eea63192adc92095c0439"
+  },
+  "entry_head": "34b5a3103b397bab6ae2e490a87a00aba6d118e3",
+  "policy": "No source/test/tool edits after freeze except a verified blocking defect; preserve any invalidated verification separately.",
+  "supersedes": "M6_SOURCE_PRE_REVIEW.json; verification recorder now retains every observed source mismatch"
+}

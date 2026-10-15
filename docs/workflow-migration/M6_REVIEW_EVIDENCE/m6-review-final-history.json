@@ -1,0 +1,41 @@
+{
+  "frozen_at": "2026-10-15T01:36:02.245246+00:00",
+  "before": {
+    "scripts/workflow_handoff.py": "d911f7e12016e680394451bc932e5df22dc99c2c119248495ec21289ba2f2dc7",
+    "scripts/workflow_closeout.py": "e8fc9bb82a311613bbbfe54ae246989033697ba73b2fbe921e844178a4e810f6",
+    "tests/test_workflow_handoff.py": "0f6bc3daa560b3230f6649f4cf15c7622ecbe8376573e40778811defee90cab0",
+    "tests/test_workflow_closeout.py": "4a37146bf1fec555fffe09dd8332333a354e3bc60e018e304b1e46c98435da60",
+    "tools/check_m6_preservation.py": "0d8edfef1cef9cdc82b6c727b8ef0dc108379b02a24b7a3fba47792995bae3ef",
+    "tools/verify_m6.py": "3e5ed711a52a318c60e72fd365bda3fa35a4fbd4214eea63192adc92095c0439"
+  },
+  "after": {
+    "scripts/workflow_handoff.py": "d911f7e12016e680394451bc932e5df22dc99c2c119248495ec21289ba2f2dc7",
+    "scripts/workflow_closeout.py": "e8fc9bb82a311613bbbfe54ae246989033697ba73b2fbe921e844178a4e810f6",
+    "tests/test_workflow_handoff.py": "0f6bc3daa560b3230f6649f4cf15c7622ecbe8376573e40778811defee90cab0",
+    "tests/test_workflow_closeout.py": "4a37146bf1fec555fffe09dd8332333a354e3bc60e018e304b1e46c98435da60",
+    "tools/check_m6_preservation.py": "0d8edfef1cef9cdc82b6c727b8ef0dc108379b02a24b7a3fba47792995bae3ef",
+    "tools/verify_m6.py": "3e5ed711a52a318c60e72fd365bda3fa35a4fbd4214eea63192adc92095c0439"
+  },
+  "matches_frozen_source": true,
+  "probe_sha256": "8a62a86a0808fdbb25c048bd83077c055bf9f739f88110cfe33f48942f633c30",
+  "command": [
+    "C:\\Users\\hensl\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+    "-B",
+    "-m",
+    "pytest",
+    "-q",
+    "-rs",
+    "-p",
+    "no:cacheprovider",
+    "-o",
+    "addopts=",
+    "--rootdir=C:\\Users\\hensl\\AppData\\Local\\Temp",
+    "--basetemp",
+    "C:\\Users\\hensl\\AppData\\Local\\Temp\\m6-review-final-history-01",
+    "C:\\Users\\hensl\\AppData\\Local\\Temp\\m6_review_final_history_probe.py"
+  ],
+  "exit_code": 0,
+  "elapsed_seconds": 34.141,
+  "stdout": ".                                                                        [100%]\n1 passed in 33.73s\n",
+  "stderr": ""
+}

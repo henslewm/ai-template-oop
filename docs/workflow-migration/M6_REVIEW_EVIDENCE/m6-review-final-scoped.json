@@ -1,0 +1,46 @@
+{
+  "frozen_at": "2026-10-15T01:32:14.685173+00:00",
+  "before": {
+    "scripts/workflow_handoff.py": "d911f7e12016e680394451bc932e5df22dc99c2c119248495ec21289ba2f2dc7",
+    "scripts/workflow_closeout.py": "47156712b36f196424a4f38e34aa1098af96edd9ddd70a2898b178a62c646ae0",
+    "tests/test_workflow_handoff.py": "0f6bc3daa560b3230f6649f4cf15c7622ecbe8376573e40778811defee90cab0",
+    "tests/test_workflow_closeout.py": "a8db2b26954dac8f9f11a8a747f43f19e7cc8cb979819f6913a12d01fd045db7",
+    "tools/check_m6_preservation.py": "0d8edfef1cef9cdc82b6c727b8ef0dc108379b02a24b7a3fba47792995bae3ef",
+    "tools/verify_m6.py": "bc2817defbbdf9ac5a886669fa44a3a7ea0c631188a8804a7d544b93724f591f"
+  },
+  "after": {
+    "scripts/workflow_handoff.py": "d911f7e12016e680394451bc932e5df22dc99c2c119248495ec21289ba2f2dc7",
+    "scripts/workflow_closeout.py": "e8fc9bb82a311613bbbfe54ae246989033697ba73b2fbe921e844178a4e810f6",
+    "tests/test_workflow_handoff.py": "0f6bc3daa560b3230f6649f4cf15c7622ecbe8376573e40778811defee90cab0",
+    "tests/test_workflow_closeout.py": "4a37146bf1fec555fffe09dd8332333a354e3bc60e018e304b1e46c98435da60",
+    "tools/check_m6_preservation.py": "0d8edfef1cef9cdc82b6c727b8ef0dc108379b02a24b7a3fba47792995bae3ef",
+    "tools/verify_m6.py": "3e5ed711a52a318c60e72fd365bda3fa35a4fbd4214eea63192adc92095c0439"
+  },
+  "matches_frozen_source": false,
+  "command": [
+    "C:\\Users\\hensl\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+    "-B",
+    "-m",
+    "pytest",
+    "-q",
+    "-rs",
+    "-p",
+    "no:cacheprovider",
+    "-o",
+    "addopts=",
+    "--basetemp",
+    "C:\\Users\\hensl\\AppData\\Local\\Temp\\m6-review-final-scoped-01",
+    "tests/test_workflow_handoff.py::test_prepare_and_consumed_start_interruption_never_restart",
+    "tests/test_workflow_handoff.py::test_concurrent_change_during_build_refuses",
+    "tests/test_workflow_handoff.py::test_parallel_views_replay_without_writes",
+    "tests/test_workflow_handoff.py::test_context_approval_commit_interruption_replays_receipt",
+    "tests/test_workflow_handoff.py::test_context_approval_race_replays_one_receipt",
+    "tests/test_workflow_handoff.py::test_shared_coordinator_uses_saved_worker_workspace_for_context",
+    "tests/test_workflow_closeout.py::test_interface_change_requires_exact_owner_ui_and_mocks",
+    "tests/test_workflow_closeout.py::test_two_successive_explicit_releases_keep_real_local_and_origin_branches"
+  ],
+  "exit_code": 0,
+  "elapsed_seconds": 136.141,
+  "stdout": "............                                                             [100%]\n12 passed in 135.67s (0:02:15)\n",
+  "stderr": ""
+}
