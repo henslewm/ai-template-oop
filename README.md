@@ -9,6 +9,11 @@ The demo app is a Tk window with login/register and a numeric batch
 processor, backed by SQLite in production and by in-memory mocks during UI
 development.
 
+For the existing offline operator workflow, start with the
+[Windows quickstart](docs/workflow-migration/WINDOWS_QUICKSTART.md). It covers
+clean setup, a disposable Docker worker, independent acceptance, handoff/resume
+and integration-readiness inspection without enabling live resources.
+
 ## Layout
 
 ```
@@ -95,8 +100,9 @@ python -B tools/check_workflow_approval.py
 The approval runner preserves the real receipt and does not launch workers.
 See [M6 operations](docs/workflow-migration/M6_OPERATIONS.md) and
 [final verification](docs/workflow-migration/M6_CLOSEOUT.md) for the delivered
-offline foundation and its verification limits. These focused checks are not
-a complete fresh-checkout setup or full template release procedure.
+offline foundation and its verification limits. Use the Windows quickstart for
+the disposable end-to-end operator proof. A full template release procedure
+remains separate.
 
 ## How the pattern works
 
