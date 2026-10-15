@@ -1,0 +1,8 @@
+{
+  "commit": "d6e582b7edeae24345a175f36639230726dbdead",
+  "path": "scripts/closeout.py",
+  "sha256": "5b50da6d019e654ea308fb4d35b5f238e8e3358311139672f088f96acc3cf848",
+  "bytes": 19385,
+  "method": "git show only",
+  "adaptation": "Read-only readiness and exact facts only; no cleanup, deletion, issue mirroring, host untrusted commands or inherited merge authority."
+}

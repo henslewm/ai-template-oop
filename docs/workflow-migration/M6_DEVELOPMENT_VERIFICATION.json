@@ -1,0 +1,42 @@
+{
+  "scope": "Development-only scoped results; sources changed between these runs. These do not replace final frozen-source verification.",
+  "runs": [
+    {
+      "selection": "initial tests/test_workflow_handoff.py",
+      "result": "22 passed in 92.40s",
+      "final_source": false
+    },
+    {
+      "selection": "initial tests/test_workflow_closeout.py",
+      "result": "29 passed in 620.92s",
+      "final_source": false
+    },
+    {
+      "selection": "context/startup subset",
+      "result": "11 passed, 13 deselected in 28.62s",
+      "final_source": false
+    },
+    {
+      "selection": "context race/shared-coordinator/edited-context subset",
+      "result": "6 passed, 24 deselected in 18.65s",
+      "final_source": false
+    },
+    {
+      "selection": "interface/two-release/approval subset before final refinements",
+      "result": "4 passed, 32 deselected in 140.44s",
+      "final_source": false
+    },
+    {
+      "selection": "five interface approval cases",
+      "result": "5 passed, 34 deselected in 65.51s",
+      "final_source": false
+    },
+    {
+      "selection": "two successive releases with distinct main merges and normal retained synchronization",
+      "result": "1 passed, 38 deselected in 31.24s",
+      "final_source": false
+    }
+  ],
+  "review_failures": "Concrete reproduced pre-final defects and reviewer probe outcomes are retained in M6_REVIEW.md.",
+  "limits": "No complete M6 suite has run yet. No final-source claim from these development counts. Canonical/protected stores and all 131 entry files passed unchanged raw-byte preservation."
+}
