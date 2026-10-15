@@ -7,6 +7,21 @@ is dated in closeout; inspect its linked live PR and final coordinator comment
 for the delivered head/merge and retained synchronization SHA. Do not infer
 delivery from an old file. M6 has not been implemented.
 
+The subsequent M1 AC-02/AC-03 acceptance-only campaign uses delivered M5
+5f83ac755369f850af74ee8f17e6b566b871f769. Read M1_ACCEPTANCE.md,
+M1_ACCEPTANCE_REVIEW.md, M1_ACCEPTANCE_FINAL_VERIFICATION.json and its linked
+Docker evidence, M1_ACCEPTANCE_BASELINE.json and the new read-only
+tools/check_m1_acceptance_preservation.py. M1_ACCEPTANCE_DECISIONS.json separately
+closes AC-02 and AC-03 for the delivered software, supported by fresh scoped
+review and final complete verification: 544 passed/1 tracked Tk skip, 46 approval
+passes, and the skipped unchanged Tk case passed alone. All 13 real-Docker
+campaign cases passed. Ruff/format/ty, ACTIVE/Journal/boundary and preservation
+passed. BasedPyright remains non-green: existing 4 errors/1454 warnings; new
+test/tools 0 errors/687 warnings. Consult the acceptance record and final PR
+comment for actual delivery state. The source-changing pre-final run is retained separately
+in M1_ACCEPTANCE_VERIFICATION.json and cannot replace final-source verification.
+All delivered production source/config/existing tests/tools are unchanged.
+
 Also read M5_HANDOFF.md and its final M4/M3 references, especially
 M3_RESUME_VERIFICATION.json; CLAUDE.md, PROMPTS.md, BRANCH_RETENTION.md;
 the frozen docs/workflow-migration/ARCHITECTURE.md and
@@ -56,10 +71,13 @@ crash, replay and liability guarantees. Never use donor cleanup or automatic
 branch deletion. Inspect live required checks and exact reviewed heads before
 claiming readiness, and distinguish unavailable checks from green checks.
 
-Remaining M1 AC-02/AC-03 independent export evidence is still open. M5's tests
-and implementation alone do not close it. Frozen acceptance statuses, approval,
-application contracts and canonical packet files remain unchanged. The separate
-Windows Tk intermittent skip is tracked in issue #4 and must be reported honestly.
+M1 AC-02/AC-03 evidence was open at M5 delivery. The separate acceptance-only
+campaign adds paired real Docker isolation and actual process ownership/start/
+crash/restart/recovery evidence; its separate supported closure decisions and
+limits are recorded in M1_ACCEPTANCE.md. M5 implementation alone is insufficient.
+Frozen acceptance statuses, approval, application contracts and canonical packet
+files remain unchanged. Hardware remains UNVERIFIED. The separate Windows Tk
+intermittent skip is tracked in issue #4 and must be reported honestly.
 
 Copy/paste prompt for a new explicit request:
 
@@ -68,7 +86,9 @@ Implement M6 only in
 C:\Users\hensl\Documents\GitHub\ai-template\ai-template-oop-workflow-migration.
 Read docs/workflow-migration/M6_HANDOFF.md and every listed reference, final M5
 review/verification/typing/operations/preservation evidence, and the actual
-M2/M3/M4/M5 controllers. Inspect current worktree, refs and live delivery state;
+M2/M3/M4/M5 controllers. Also read the subsequent M1_ACCEPTANCE.md,
+M1_ACCEPTANCE_REVIEW.md and final verification/decision/preservation evidence.
+Inspect current worktree, refs and live delivery state;
 preserve all local work, both protected checkouts, every branch, canonical
 control/ownership/start stores and archives. Fetch --no-prune and normally merge
 current origin/main after inspecting/preserving work. Never reset, force-push,
@@ -101,6 +121,7 @@ python -B tools/validate_boundaries.py
 python -B tools/check_m4_preservation.py
 python -B tools/check_m5_preservation.py
 Run scoped lint/format/type checks, record actual results/skips/limitations,
-preservation and current Git state. Do not close remaining M1 evidence or
-claim live rollout/deployment from implementation alone. Stop after M6.
+preservation and current Git state. Preserve the separate M1 acceptance decisions
+and frozen historical statuses; do not infer hardware, live rollout or deployment
+from implementation alone. Stop after M6.
 ```

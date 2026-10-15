@@ -1,0 +1,22 @@
+{
+  "recorded_at": "2026-10-15T00:25:56.772022+00:00",
+  "reason": "The pre-final complete run skipped this existing Windows Tk case, tracked separately in issue #4; no UI/application code changed.",
+  "argv": [
+    "C:\\Users\\hensl\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+    "-B",
+    "-m",
+    "pytest",
+    "tests/test_ui.py::test_bad_login_stays_on_login_screen",
+    "-q",
+    "-rs",
+    "-p",
+    "no:cacheprovider",
+    "-o",
+    "addopts="
+  ],
+  "exit_code": 0,
+  "seconds": 0.547,
+  "stdout": ".                                                                        [100%]\n1 passed in 0.08s\n",
+  "stderr": "",
+  "test_source_sha256": "d654b823df8062c2a013e0b5554e79b0d53d3fd79020740bc7b0c9df2016d4a0"
+}

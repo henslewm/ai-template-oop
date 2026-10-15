@@ -1,0 +1,309 @@
+{
+  "scope": "M1 AC-02/AC-03 acceptance only; M6 not implemented",
+  "started_at": "2026-10-15T00:06:47.156195+00:00",
+  "source_sha256": {
+    "tests/test_m1_acceptance.py": "faa85f6d908e6158ad408ff9bfe3d26ee102a81978b0506bea84b9ca2a3045bd",
+    "tests/ac02_ac03_process.py": "ecbb5d3582ab1b19000ffdbd8936af3397266fd55a9f109f4b0e48ba86ac5404",
+    "tools/check_m1_acceptance_preservation.py": "a1db4c95ef3cf12feb129a0d5d1b5c320677ecb59e63cee5b19d88a0ff20d396",
+    "tools/verify_m1_acceptance.py": "55eb8153509221f64d2a5a3ab8a1caebaa1541cb0bd13dca1d4cc4829fddb81f",
+    "scripts/acceptance.py": "7fd67c6eb39b8c0f4945d9338e659dd8a6e5aab2b5f08966d98c85c410340ef9",
+    "scripts/acceptance_runtime.py": "d84a1b62f74e415824277d85f01fd1cf545e6234f4995238e8a60e7dd1af27b1",
+    "scripts/acceptance_report.py": "ca8d6e39e2d7002eeda66db932ea08ece935d10222eabf203096b56513102545",
+    "scripts/feedback.py": "81c10c75116146e054d2e8adbdc4c39a49fdc7b9579273249e1663661adc55c1",
+    "scripts/workflow_runtime.py": "7e4d7cb2e9e7c4424f9edff883232596d65035c25b334376bbabe23809c3ece6",
+    "tools/check_m4_preservation.py": "c5ddb7d25da1a12151e798b1248df05e6cea4b8ab840c66aef3249a4b309f1e5",
+    "tools/check_m5_preservation.py": "575ce62bcd10546356ba51e28aed4535213b5e5539d2d886b53181a57d1ed05d"
+  },
+  "image": "sha256:61526e68966dc3330c3801cbed8740c62710376b0b01b15c960b60c66b6cae1e",
+  "commands": [
+    {
+      "argv": [
+        "C:\\Users\\hensl\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+        "-B",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "-p",
+        "no:cacheprovider",
+        "-o",
+        "addopts=",
+        "--ignore=tests/test_workflow_approval.py"
+      ],
+      "exit_code": 0,
+      "seconds": 1383.234,
+      "stdout": "........................................................................ [ 13%]\n........................................................................ [ 26%]\n........................................................................ [ 39%]\n........................................................................ [ 52%]\n......s................................................................. [ 66%]\n........................................................................ [ 79%]\n........................................................................ [ 92%]\n.........................................                                [100%]\n=========================== short test summary info ===========================\nSKIPPED [1] tests\\test_ui.py:85: Tk unavailable: Can't find a usable tk.tcl in the following directories: \n    C:/Users/hensl/AppData/Local/Programs/Python/Python312/tcl/tcl8.6/tk8.6 C:/Users/hensl/AppData/Local/Programs/Python/Python312/tcl/tk8.6 C:/Users/hensl/AppData/Local/Programs/Python/lib/tk8.6 C:/Users/hensl/AppData/Local/Programs/Python/lib/tk8.6 C:/Users/hensl/AppData/Local/Programs/lib/tk8.6 C:/Users/hensl/AppData/Local/Programs/Python/library\n\nC:/Users/hensl/AppData/Local/Programs/Python/Python312/tcl/tk8.6/tk.tcl: couldn't read file \"C:/Users/hensl/AppData/Local/Programs/Python/Python312/tcl/tk8.6/ttk/menubutton.tcl\": no such file or directory\ncouldn't read file \"C:/Users/hensl/AppData/Local/Programs/Python/Python312/tcl/tk8.6/ttk/menubutton.tcl\": no such file or directory\n    while executing\n\"source -encoding utf-8 [file join $::ttk::library menubutton.tcl]\"\n    (file \"C:/Users/hensl/AppData/Local/Programs/Python/Python312/tcl/tk8.6/ttk/ttk.tcl\" line 116)\n    invoked from within\n\"source -encoding utf-8 C:/Users/hensl/AppData/Local/Programs/Python/Python312/tcl/tk8.6/ttk/ttk.tcl\"\n    (\"uplevel\" body line 1)\n    invoked from within\n\"uplevel \\#0 [list source -encoding utf-8 $::ttk::library/ttk.tcl]\"\n    (file \"C:/Users/hensl/AppData/Local/Programs/Python/Python312/tcl/tk8.6/tk.tcl\" line 702)\n    invoked from within\n\"source -encoding utf-8 C:/Users/hensl/AppData/Local/Programs/Python/Python312/tcl/tk8.6/tk.tcl\"\n    (\"uplevel\" body line 1)\n    invoked from within\n\"uplevel #0 [list source -encoding utf-8 $file]\"\n\n\nThis probably means that tk wasn't installed properly.\n544 passed, 1 skipped in 1382.64s (0:23:02)\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\hensl\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+        "-B",
+        "tools/check_workflow_approval.py"
+      ],
+      "exit_code": 0,
+      "seconds": 8.203,
+      "stdout": "..............................................                           [100%]\n46 passed in 1.93s\nActual ACTIVE receipt preserved: 33761b533bca129aa0d90133d0fb2ce970ba85945c5f381e7f5f9ce6621bc81f\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\hensl\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+        "-B",
+        "scripts/validate_workflow_approval.py",
+        "--fingerprint",
+        "--check-source",
+        "--require-active"
+      ],
+      "exit_code": 0,
+      "seconds": 1.891,
+      "stdout": "FOUNDATION VALID: ACTIVE; live workers and publication disabled\n8e75e71b3561eaec4ad5cf71e37a1dec9f2c7dce0d07e0be46346daacfc90481\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\hensl\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+        "-B",
+        "scripts/workflow_state.py",
+        "verify"
+      ],
+      "exit_code": 0,
+      "seconds": 0.422,
+      "stdout": "Control journal verified: 1 streams; evidence intact\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\hensl\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+        "-B",
+        "tools/validate_boundaries.py"
+      ],
+      "exit_code": 0,
+      "seconds": 0.093,
+      "stdout": "Boundaries OK.\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\hensl\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+        "-B",
+        "tools/check_m4_preservation.py"
+      ],
+      "exit_code": 0,
+      "seconds": 0.688,
+      "stdout": "{\n  \"protected\": {\n    \"ai-template-oop\": {\n      \"head\": \"f624e207276372d9386b669bf087a66b44aba714\",\n      \"index_sha256\": \"fe7124042405022bf442485ce5e340489d0b292f2bbaa8a8935321b6653ec39b\",\n      \"status\": \"1 D. N... 100644 000000 000000 9e771558f3c032c37727dbb6ed461c78e3905114 0000000000000000000000000000000000000000 revised-plan-and-quickstart-2026-10-12-0011Z.md\\n\",\n      \"files\": 26,\n      \"matches\": true\n    },\n    \"universal-ai-project-template\": {\n      \"head\": \"d6e582b7edeae24345a175f36639230726dbdead\",\n      \"index_sha256\": \"ac3c6beb7fe41745ede3543cac4f368aa310f6fd83a5dacceaef15042f5f4e25\",\n      \"status\": \"? config/codex.toml\\n? config/field_encryption_key\\n? config/secret_key\\n? docs/projects/\\n? examples/layered-app/\\n? scripts/validate_boundaries.py\\n? tests/test_validate_boundaries.py\\n? windows-preflight.ps1\\n\",\n      \"files\": 305,\n      \"matches\": true\n    }\n  },\n  \"m3_files_preserved\": 18,\n  \"m3_preservation_note\": \"17 byte-identical files; feedback.py reproduces original bytes after removing the exact additive M5 hook\",\n  \"canonical_files_preserved\": 31,\n  \"archive_files_preserved\": 14,\n  \"existing_tracked_changes\": [\n    \"scripts/workflow_runtime.py\",\n    \"scripts/workflow_scope.py\"\n  ],\n  \"frozen_other_files_preserved\": true,\n  \"head\": \"5f83ac755369f850af74ee8f17e6b566b871f769\",\n  \"refs\": {\n    \"refs/heads/feature/workflow-migration\": \"5f83ac755369f850af74ee8f17e6b566b871f769\",\n    \"refs/heads/main\": \"f624e207276372d9386b669bf087a66b44aba714\",\n    \"refs/remotes/origin/HEAD\": \"5f83ac755369f850af74ee8f17e6b566b871f769\",\n    \"refs/remotes/origin/copilot/restore-merged-feature-branches\": \"9683d58ef201cdc825605a144bd4d0c7a0cf60fd\",\n    \"refs/remotes/origin/feature/workflow-migration\": \"5f83ac755369f850af74ee8f17e6b566b871f769\",\n    \"refs/remotes/origin/main\": \"5f83ac755369f850af74ee8f17e6b566b871f769\",\n    \"refs/remotes/origin/policy/preserve-feature-branches\": \"60a848dfc7396b7b2b578a007b9be6aafec1fd83\"\n  },\n  \"branch\": \"feature/workflow-migration\",\n  \"passed\": true\n}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\hensl\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+        "-B",
+        "tools/check_m5_preservation.py"
+      ],
+      "exit_code": 0,
+      "seconds": 0.844,
+      "stdout": "{\n  \"protected\": {\n    \"ai-template-oop\": {\n      \"head\": \"f624e207276372d9386b669bf087a66b44aba714\",\n      \"index_sha256\": \"fe7124042405022bf442485ce5e340489d0b292f2bbaa8a8935321b6653ec39b\",\n      \"status\": \"1 D. N... 100644 000000 000000 9e771558f3c032c37727dbb6ed461c78e3905114 0000000000000000000000000000000000000000 revised-plan-and-quickstart-2026-10-12-0011Z.md\\n\",\n      \"files\": 26,\n      \"matches\": true\n    },\n    \"universal-ai-project-template\": {\n      \"head\": \"d6e582b7edeae24345a175f36639230726dbdead\",\n      \"index_sha256\": \"ac3c6beb7fe41745ede3543cac4f368aa310f6fd83a5dacceaef15042f5f4e25\",\n      \"status\": \"? config/codex.toml\\n? config/field_encryption_key\\n? config/secret_key\\n? docs/projects/\\n? examples/layered-app/\\n? scripts/validate_boundaries.py\\n? tests/test_validate_boundaries.py\\n? windows-preflight.ps1\\n\",\n      \"files\": 305,\n      \"matches\": true\n    }\n  },\n  \"m3_files_preserved\": 18,\n  \"m3_preservation_note\": \"17 byte-identical files; feedback.py reproduces original bytes after removing the exact additive M5 hook\",\n  \"canonical_files_preserved\": 31,\n  \"archive_files_preserved\": 14,\n  \"existing_tracked_changes\": [\n    \"scripts/workflow_runtime.py\",\n    \"scripts/workflow_scope.py\"\n  ],\n  \"frozen_other_files_preserved\": true,\n  \"head\": \"5f83ac755369f850af74ee8f17e6b566b871f769\",\n  \"refs\": {\n    \"refs/heads/feature/workflow-migration\": \"5f83ac755369f850af74ee8f17e6b566b871f769\",\n    \"refs/heads/main\": \"f624e207276372d9386b669bf087a66b44aba714\",\n    \"refs/remotes/origin/HEAD\": \"5f83ac755369f850af74ee8f17e6b566b871f769\",\n    \"refs/remotes/origin/copilot/restore-merged-feature-branches\": \"9683d58ef201cdc825605a144bd4d0c7a0cf60fd\",\n    \"refs/remotes/origin/feature/workflow-migration\": \"5f83ac755369f850af74ee8f17e6b566b871f769\",\n    \"refs/remotes/origin/main\": \"5f83ac755369f850af74ee8f17e6b566b871f769\",\n    \"refs/remotes/origin/policy/preserve-feature-branches\": \"60a848dfc7396b7b2b578a007b9be6aafec1fd83\"\n  },\n  \"branch\": \"feature/workflow-migration\",\n  \"passed\": true,\n  \"m5_entry_tracked_changes\": [\n    \"scripts/feedback.py\",\n    \"scripts/workflow_runtime.py\",\n    \"tools/check_m4_preservation.py\"\n  ],\n  \"m5_other_entry_files_byte_identical\": true\n}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\hensl\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+        "-B",
+        "tools/check_m1_acceptance_preservation.py"
+      ],
+      "exit_code": 0,
+      "seconds": 0.875,
+      "stdout": "{\n  \"protected\": {\n    \"ai-template-oop\": {\n      \"head\": \"f624e207276372d9386b669bf087a66b44aba714\",\n      \"index_sha256\": \"fe7124042405022bf442485ce5e340489d0b292f2bbaa8a8935321b6653ec39b\",\n      \"status\": \"1 D. N... 100644 000000 000000 9e771558f3c032c37727dbb6ed461c78e3905114 0000000000000000000000000000000000000000 revised-plan-and-quickstart-2026-10-12-0011Z.md\\n\",\n      \"files\": 26,\n      \"matches\": true\n    },\n    \"universal-ai-project-template\": {\n      \"head\": \"d6e582b7edeae24345a175f36639230726dbdead\",\n      \"index_sha256\": \"ac3c6beb7fe41745ede3543cac4f368aa310f6fd83a5dacceaef15042f5f4e25\",\n      \"status\": \"? config/codex.toml\\n? config/field_encryption_key\\n? config/secret_key\\n? docs/projects/\\n? examples/layered-app/\\n? scripts/validate_boundaries.py\\n? tests/test_validate_boundaries.py\\n? windows-preflight.ps1\\n\",\n      \"files\": 305,\n      \"matches\": true\n    }\n  },\n  \"m3_files_preserved\": 18,\n  \"m3_preservation_note\": \"17 byte-identical files; feedback.py reproduces original bytes after removing the exact additive M5 hook\",\n  \"canonical_files_preserved\": 31,\n  \"archive_files_preserved\": 14,\n  \"existing_tracked_changes\": [\n    \"scripts/workflow_runtime.py\",\n    \"scripts/workflow_scope.py\"\n  ],\n  \"frozen_other_files_preserved\": true,\n  \"head\": \"5f83ac755369f850af74ee8f17e6b566b871f769\",\n  \"refs\": {\n    \"refs/heads/feature/workflow-migration\": \"5f83ac755369f850af74ee8f17e6b566b871f769\",\n    \"refs/heads/main\": \"f624e207276372d9386b669bf087a66b44aba714\",\n    \"refs/remotes/origin/HEAD\": \"5f83ac755369f850af74ee8f17e6b566b871f769\",\n    \"refs/remotes/origin/copilot/restore-merged-feature-branches\": \"9683d58ef201cdc825605a144bd4d0c7a0cf60fd\",\n    \"refs/remotes/origin/feature/workflow-migration\": \"5f83ac755369f850af74ee8f17e6b566b871f769\",\n    \"refs/remotes/origin/main\": \"5f83ac755369f850af74ee8f17e6b566b871f769\",\n    \"refs/remotes/origin/policy/preserve-feature-branches\": \"60a848dfc7396b7b2b578a007b9be6aafec1fd83\"\n  },\n  \"branch\": \"feature/workflow-migration\",\n  \"passed\": true,\n  \"m5_entry_tracked_changes\": [\n    \"scripts/feedback.py\",\n    \"scripts/workflow_runtime.py\",\n    \"tools/check_m4_preservation.py\"\n  ],\n  \"m5_other_entry_files_byte_identical\": true,\n  \"delivered_m5_head\": \"5f83ac755369f850af74ee8f17e6b566b871f769\",\n  \"m5_delivered_files_checked\": 115,\n  \"m5_delivered_changes\": [\n    \"docs/workflow-migration/M6_HANDOFF.md\"\n  ],\n  \"m5_production_source_config_tests_tools_byte_identical\": true,\n  \"m1_entry_refs_retained\": true\n}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "ruff",
+        "check",
+        "tests/test_m1_acceptance.py",
+        "tests/ac02_ac03_process.py",
+        "tools/check_m1_acceptance_preservation.py",
+        "tools/verify_m1_acceptance.py",
+        "scripts/acceptance.py",
+        "scripts/acceptance_runtime.py",
+        "scripts/acceptance_report.py",
+        "scripts/feedback.py",
+        "scripts/workflow_runtime.py",
+        "tools/check_m4_preservation.py",
+        "tools/check_m5_preservation.py"
+      ],
+      "exit_code": 0,
+      "seconds": 0.015,
+      "stdout": "All checks passed!\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "ruff",
+        "format",
+        "--check",
+        "tests/test_m1_acceptance.py",
+        "tests/ac02_ac03_process.py",
+        "tools/check_m1_acceptance_preservation.py",
+        "tools/verify_m1_acceptance.py",
+        "scripts/acceptance.py",
+        "scripts/acceptance_runtime.py",
+        "scripts/acceptance_report.py",
+        "scripts/feedback.py",
+        "scripts/workflow_runtime.py",
+        "tools/check_m4_preservation.py",
+        "tools/check_m5_preservation.py"
+      ],
+      "exit_code": 0,
+      "seconds": 0.031,
+      "stdout": "11 files already formatted\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "uvx",
+        "--offline",
+        "ty",
+        "check",
+        "--python",
+        "C:\\Users\\hensl\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+        "tests/test_m1_acceptance.py",
+        "tests/ac02_ac03_process.py",
+        "tools/check_m1_acceptance_preservation.py",
+        "tools/verify_m1_acceptance.py",
+        "scripts/acceptance.py",
+        "scripts/acceptance_runtime.py",
+        "scripts/acceptance_report.py",
+        "scripts/feedback.py",
+        "scripts/workflow_runtime.py",
+        "tools/check_m4_preservation.py",
+        "tools/check_m5_preservation.py"
+      ],
+      "exit_code": 0,
+      "seconds": 0.157,
+      "stdout": "All checks passed!\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "uvx",
+        "--offline",
+        "basedpyright",
+        "--outputjson",
+        "scripts/acceptance.py",
+        "scripts/acceptance_runtime.py",
+        "scripts/acceptance_report.py"
+      ],
+      "exit_code": 1,
+      "seconds": 1.484,
+      "stderr": "",
+      "summary": {
+        "filesAnalyzed": 3,
+        "errorCount": 4,
+        "warningCount": 1454,
+        "informationCount": 0,
+        "timeInSec": 0.952
+      },
+      "errors": [
+        {
+          "file": "c:\\Users\\hensl\\Documents\\GitHub\\ai-template\\ai-template-oop-workflow-migration\\scripts\\acceptance.py",
+          "severity": "error",
+          "message": "Cycle detected in import chain\n  c:\\Users\\hensl\\Documents\\GitHub\\ai-template\\ai-template-oop-workflow-migration\\scripts\\acceptance.py\n  c:\\Users\\hensl\\Documents\\GitHub\\ai-template\\ai-template-oop-workflow-migration\\scripts\\acceptance_report.py\n  c:\\Users\\hensl\\Documents\\GitHub\\ai-template\\ai-template-oop-workflow-migration\\scripts\\execution_harness.py\n  c:\\Users\\hensl\\Documents\\GitHub\\ai-template\\ai-template-oop-workflow-migration\\scripts\\feedback.py",
+          "rule": "reportImportCycles"
+        },
+        {
+          "file": "c:\\Users\\hensl\\Documents\\GitHub\\ai-template\\ai-template-oop-workflow-migration\\scripts\\acceptance.py",
+          "severity": "error",
+          "message": "Cycle detected in import chain\n  c:\\Users\\hensl\\Documents\\GitHub\\ai-template\\ai-template-oop-workflow-migration\\scripts\\acceptance.py\n  c:\\Users\\hensl\\Documents\\GitHub\\ai-template\\ai-template-oop-workflow-migration\\scripts\\acceptance_runtime.py",
+          "rule": "reportImportCycles"
+        },
+        {
+          "file": "c:\\Users\\hensl\\Documents\\GitHub\\ai-template\\ai-template-oop-workflow-migration\\scripts\\acceptance.py",
+          "severity": "error",
+          "message": "Cycle detected in import chain\n  c:\\Users\\hensl\\Documents\\GitHub\\ai-template\\ai-template-oop-workflow-migration\\scripts\\acceptance.py\n  c:\\Users\\hensl\\Documents\\GitHub\\ai-template\\ai-template-oop-workflow-migration\\scripts\\execution_harness.py\n  c:\\Users\\hensl\\Documents\\GitHub\\ai-template\\ai-template-oop-workflow-migration\\scripts\\feedback.py",
+          "rule": "reportImportCycles"
+        },
+        {
+          "file": "c:\\Users\\hensl\\Documents\\GitHub\\ai-template\\ai-template-oop-workflow-migration\\scripts\\acceptance.py",
+          "severity": "error",
+          "message": "Cycle detected in import chain\n  c:\\Users\\hensl\\Documents\\GitHub\\ai-template\\ai-template-oop-workflow-migration\\scripts\\acceptance.py\n  c:\\Users\\hensl\\Documents\\GitHub\\ai-template\\ai-template-oop-workflow-migration\\scripts\\acceptance_runtime.py\n  c:\\Users\\hensl\\Documents\\GitHub\\ai-template\\ai-template-oop-workflow-migration\\scripts\\execution_harness.py\n  c:\\Users\\hensl\\Documents\\GitHub\\ai-template\\ai-template-oop-workflow-migration\\scripts\\feedback.py",
+          "rule": "reportImportCycles"
+        }
+      ],
+      "warning_rules": {
+        "reportUnknownVariableType": 236,
+        "reportUnknownMemberType": 261,
+        "reportUnknownParameterType": 136,
+        "reportMissingParameterType": 111,
+        "reportUnknownArgumentType": 502,
+        "reportUnusedCallResult": 25,
+        "reportPrivateLocalImportUsage": 54,
+        "reportAny": 118,
+        "reportUnusedVariable": 1,
+        "reportUnannotatedClassAttribute": 5,
+        "reportUnusedParameter": 1,
+        "reportUnknownLambdaType": 4
+      },
+      "stdout_sha256": "ae1044f7595a13bbc508785b994ae27abe3311674c3df075724dde0122a76f5d"
+    },
+    {
+      "argv": [
+        "uvx",
+        "--offline",
+        "basedpyright",
+        "--pythonpath",
+        "C:\\Users\\hensl\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+        "--outputjson",
+        "tests/test_m1_acceptance.py",
+        "tests/ac02_ac03_process.py",
+        "tools/check_m1_acceptance_preservation.py",
+        "tools/verify_m1_acceptance.py"
+      ],
+      "exit_code": 1,
+      "seconds": 1.688,
+      "stderr": "",
+      "summary": {
+        "filesAnalyzed": 4,
+        "errorCount": 0,
+        "warningCount": 687,
+        "informationCount": 0,
+        "timeInSec": 1.173
+      },
+      "errors": [],
+      "warning_rules": {
+        "reportAny": 77,
+        "reportUnknownArgumentType": 174,
+        "reportUnknownLambdaType": 11,
+        "reportPrivateLocalImportUsage": 24,
+        "reportUnknownVariableType": 75,
+        "reportUnknownMemberType": 212,
+        "reportUnknownParameterType": 47,
+        "reportMissingParameterType": 42,
+        "reportUnusedCallResult": 20,
+        "reportUnusedVariable": 1,
+        "reportExplicitAny": 4
+      },
+      "stdout_sha256": "6c33e6cc697beebed071ef0ad8a93b0f188f17c7ee803ce84c4c784621ad3ade"
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0,
+      "seconds": 0.016,
+      "stdout": "",
+      "stderr": "warning: in the working copy of 'docs/workflow-migration/M6_HANDOFF.md', LF will be replaced by CRLF the next time Git touches it\n"
+    }
+  ],
+  "docker_evidence_directory": "C:\\Users\\hensl\\AppData\\Local\\Temp\\ai-template-m1-evidence-511e4f82f72948ad8d698a714ce20ef0",
+  "finished_at": "2026-10-15T00:30:06.815307+00:00",
+  "source_hashes_unchanged": true,
+  "non_typing_gates_passed": true,
+  "docker_case_count": 13,
+  "docker_bundle": {
+    "path": "C:\\Users\\hensl\\Documents\\GitHub\\ai-template\\ai-template-oop-workflow-migration\\docs\\workflow-migration\\M1_ACCEPTANCE_FINAL_VERIFICATION_DOCKER.json",
+    "sha256": "16606ec89d60af5b07fbd38b5b38d071226a0fd8c15a0b8cb9299020bcaae1e2"
+  }
+}

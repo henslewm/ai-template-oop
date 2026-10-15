@@ -1,0 +1,57 @@
+{
+  "recorded_at": "2026-10-15T00:41:26.472Z",
+  "phase": "final local gates before Git delivery",
+  "preservation": {
+    "protected": {
+      "ai-template-oop": {
+        "head": "f624e207276372d9386b669bf087a66b44aba714",
+        "index_sha256": "fe7124042405022bf442485ce5e340489d0b292f2bbaa8a8935321b6653ec39b",
+        "status": "1 D. N... 100644 000000 000000 9e771558f3c032c37727dbb6ed461c78e3905114 0000000000000000000000000000000000000000 revised-plan-and-quickstart-2026-10-12-0011Z.md\n",
+        "files": 26,
+        "matches": true
+      },
+      "universal-ai-project-template": {
+        "head": "d6e582b7edeae24345a175f36639230726dbdead",
+        "index_sha256": "ac3c6beb7fe41745ede3543cac4f368aa310f6fd83a5dacceaef15042f5f4e25",
+        "status": "? config/codex.toml\n? config/field_encryption_key\n? config/secret_key\n? docs/projects/\n? examples/layered-app/\n? scripts/validate_boundaries.py\n? tests/test_validate_boundaries.py\n? windows-preflight.ps1\n",
+        "files": 305,
+        "matches": true
+      }
+    },
+    "m3_files_preserved": 18,
+    "m3_preservation_note": "17 byte-identical files; feedback.py reproduces original bytes after removing the exact additive M5 hook",
+    "canonical_files_preserved": 31,
+    "archive_files_preserved": 14,
+    "existing_tracked_changes": [
+      "scripts/workflow_runtime.py",
+      "scripts/workflow_scope.py"
+    ],
+    "frozen_other_files_preserved": true,
+    "head": "5f83ac755369f850af74ee8f17e6b566b871f769",
+    "refs": {
+      "refs/heads/feature/workflow-migration": "5f83ac755369f850af74ee8f17e6b566b871f769",
+      "refs/heads/main": "f624e207276372d9386b669bf087a66b44aba714",
+      "refs/remotes/origin/HEAD": "5f83ac755369f850af74ee8f17e6b566b871f769",
+      "refs/remotes/origin/copilot/restore-merged-feature-branches": "9683d58ef201cdc825605a144bd4d0c7a0cf60fd",
+      "refs/remotes/origin/feature/workflow-migration": "5f83ac755369f850af74ee8f17e6b566b871f769",
+      "refs/remotes/origin/main": "5f83ac755369f850af74ee8f17e6b566b871f769",
+      "refs/remotes/origin/policy/preserve-feature-branches": "60a848dfc7396b7b2b578a007b9be6aafec1fd83"
+    },
+    "branch": "feature/workflow-migration",
+    "passed": true,
+    "m5_entry_tracked_changes": [
+      "scripts/feedback.py",
+      "scripts/workflow_runtime.py",
+      "tools/check_m4_preservation.py"
+    ],
+    "m5_other_entry_files_byte_identical": true,
+    "delivered_m5_head": "5f83ac755369f850af74ee8f17e6b566b871f769",
+    "m5_delivered_files_checked": 115,
+    "m5_delivered_changes": [
+      "docs/workflow-migration/M6_HANDOFF.md"
+    ],
+    "m5_production_source_config_tests_tools_byte_identical": true,
+    "m1_entry_refs_retained": true
+  },
+  "hosting_observations": "{\"allow_merge_commit\":false,\"allow_rebase_merge\":true,\"allow_squash_merge\":false,\"default_branch\":\"main\",\"delete_branch_on_merge\":false}\ngh: Branch not protected (HTTP 404)\n{\"message\":\"Branch not protected\",\"documentation_url\":\"https://docs.github.com/rest/branches/branch-protection#get-branch-protection\",\"status\":\"404\"}[][{\"name\":\"Copilot cloud agent\",\"path\":\"dynamic/copilot-swe-agent/copilot\",\"state\":\"active\"},{\"name\":\"Dependency Graph\",\"path\":\"dynamic/dependabot/update-graph\",\"state\":\"active\"}]\n5f83ac755369f850af74ee8f17e6b566b871f769 refs/heads/feature/workflow-migration\nf624e207276372d9386b669bf087a66b44aba714 refs/heads/main\n5f83ac755369f850af74ee8f17e6b566b871f769 refs/remotes/origin/HEAD\n9683d58ef201cdc825605a144bd4d0c7a0cf60fd refs/remotes/origin/copilot/restore-merged-feature-branches\n5f83ac755369f850af74ee8f17e6b566b871f769 refs/remotes/origin/feature/workflow-migration\n5f83ac755369f850af74ee8f17e6b566b871f769 refs/remotes/origin/main\n60a848dfc7396b7b2b578a007b9be6aafec1fd83 refs/remotes/origin/policy/preserve-feature-branches\n"
+}
