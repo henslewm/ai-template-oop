@@ -1,0 +1,62 @@
+{
+  "observed_at": "2026-10-15 02:17:09 UTC",
+  "implementation_commit": "2a3a26bd796847db76c3bbfd956b39772730a578",
+  "original_entry_commit": "34b5a3103b397bab6ae2e490a87a00aba6d118e3",
+  "branch": "feature/workflow-migration",
+  "pull_request": "https://github.com/henslewm/ai-template-oop/pull/9",
+  "scope": "M6 AC-10, remaining integration/readiness AC-11, AC-12 only",
+  "delivery": "Implementation pushed normally to retained destination branch; PR open for separate integration decision.",
+  "source_binding": "All six frozen source files match M6_SOURCE.json and M6_VERIFICATION.json. This delivery record and its closeout link are documentation only.",
+  "verification": {
+    "complete_final_runs": 1,
+    "bulk_passed": 614,
+    "bulk_skipped": 1,
+    "approval_passed": 46,
+    "isolated_unchanged_tk_passed": 1,
+    "required_gates_passed": true,
+    "source_hashes_unchanged": true,
+    "basedpyright": {
+      "green": false,
+      "errors": 26,
+      "warnings": 1602,
+      "diagnostic_only": true
+    },
+    "final_record": "M6_VERIFICATION.json",
+    "isolated_record": "M6_UI_RECHECK.json",
+    "independent_review": "M6_REVIEW.md"
+  },
+  "hosting_observation": {
+    "head": "2a3a26bd796847db76c3bbfd956b39772730a578",
+    "base": "34b5a3103b397bab6ae2e490a87a00aba6d118e3",
+    "state": "OPEN",
+    "merge_state": "CLEAN",
+    "required_checks": "none configured; main unprotected and effective branch rules empty",
+    "check_runs": 0,
+    "github_reviews": [],
+    "coderabbit": "SUCCESS context explicitly reports review skipped: manual review required for this OSS repository; no independent-review claim",
+    "delete_branch_on_merge": false,
+    "merged": false,
+    "raw_cli_output": "{\"baseRefOid\":\"34b5a3103b397bab6ae2e490a87a00aba6d118e3\",\"headRefOid\":\"2a3a26bd796847db76c3bbfd956b39772730a578\",\"isDraft\":false,\"mergeStateStatus\":\"CLEAN\",\"number\":9,\"reviewDecision\":\"\",\"reviews\":[],\"state\":\"OPEN\",\"statusCheckRollup\":[{\"__typename\":\"StatusContext\",\"context\":\"CodeRabbit\",\"startedAt\":\"2026-10-15T02:16:03Z\",\"state\":\"SUCCESS\",\"targetUrl\":\"\"}],\"url\":\"https://github.com/henslewm/ai-template-oop/pull/9\"}\n[]{\"check_runs\":[],\"total_count\":0}\n{\"sha\":\"2a3a26bd796847db76c3bbfd956b39772730a578\",\"state\":\"success\",\"statuses\":[{\"context\":\"CodeRabbit\",\"description\":\"Review skipped: manual review required for this OSS repository\",\"state\":\"success\",\"target_url\":null}]}\n",
+    "cli_exit_code": 0
+  },
+  "preservation_observation": {
+    "passed": true,
+    "m6_entry_files_byte_identical": 131,
+    "protected_files": 331,
+    "canonical_files": 31,
+    "retained_archive_files": 14,
+    "all_four_origin_branches_retained": true,
+    "unrelated_local_work_preserved": [
+      "AD docs/workflow-migration/Original_plan.md",
+      "?? docs/workflow-migration/ORIGINAL_GOALS_HANDOFF.md"
+    ],
+    "raw_cli_output": "{\r\n  \"protected\": {\r\n    \"ai-template-oop\": {\r\n      \"head\": \"f624e207276372d9386b669bf087a66b44aba714\",\r\n      \"index_sha256\": \"fe7124042405022bf442485ce5e340489d0b292f2bbaa8a8935321b6653ec39b\",\r\n      \"status\": \"1 D. N... 100644 000000 000000 9e771558f3c032c37727dbb6ed461c78e3905114 0000000000000000000000000000000000000000 revised-plan-and-quickstart-2026-10-12-0011Z.md\\n\",\r\n      \"files\": 26,\r\n      \"matches\": true\r\n    },\r\n    \"universal-ai-project-template\": {\r\n      \"head\": \"d6e582b7edeae24345a175f36639230726dbdead\",\r\n      \"index_sha256\": \"ac3c6beb7fe41745ede3543cac4f368aa310f6fd83a5dacceaef15042f5f4e25\",\r\n      \"status\": \"? config/codex.toml\\n? config/field_encryption_key\\n? config/secret_key\\n? docs/projects/\\n? examples/layered-app/\\n? scripts/validate_boundaries.py\\n? tests/test_validate_boundaries.py\\n? windows-preflight.ps1\\n\",\r\n      \"files\": 305,\r\n      \"matches\": true\r\n    }\r\n  },\r\n  \"m3_files_preserved\": 18,\r\n  \"m3_preservation_note\": \"17 byte-identical files; feedback.py reproduces original bytes after removing the exact additive M5 hook\",\r\n  \"canonical_files_preserved\": 31,\r\n  \"archive_files_preserved\": 14,\r\n  \"existing_tracked_changes\": [\r\n    \"scripts/workflow_runtime.py\",\r\n    \"scripts/workflow_scope.py\"\r\n  ],\r\n  \"frozen_other_files_preserved\": true,\r\n  \"head\": \"2a3a26bd796847db76c3bbfd956b39772730a578\",\r\n  \"refs\": {\r\n    \"refs/heads/feature/workflow-migration\": \"2a3a26bd796847db76c3bbfd956b39772730a578\",\r\n    \"refs/heads/main\": \"f624e207276372d9386b669bf087a66b44aba714\",\r\n    \"refs/remotes/origin/HEAD\": \"34b5a3103b397bab6ae2e490a87a00aba6d118e3\",\r\n    \"refs/remotes/origin/copilot/restore-merged-feature-branches\": \"9683d58ef201cdc825605a144bd4d0c7a0cf60fd\",\r\n    \"refs/remotes/origin/feature/workflow-migration\": \"2a3a26bd796847db76c3bbfd956b39772730a578\",\r\n    \"refs/remotes/origin/main\": \"34b5a3103b397bab6ae2e490a87a00aba6d118e3\",\r\n    \"refs/remotes/origin/policy/preserve-feature-branches\": \"60a848dfc7396b7b2b578a007b9be6aafec1fd83\"\r\n  },\r\n  \"branch\": \"feature/workflow-migration\",\r\n  \"passed\": true,\r\n  \"m5_entry_tracked_changes\": [\r\n    \"scripts/feedback.py\",\r\n    \"scripts/workflow_runtime.py\",\r\n    \"tools/check_m4_preservation.py\"\r\n  ],\r\n  \"m5_other_entry_files_byte_identical\": true,\r\n  \"delivered_m5_head\": \"5f83ac755369f850af74ee8f17e6b566b871f769\",\r\n  \"m5_delivered_files_checked\": 115,\r\n  \"m5_delivered_changes\": [\r\n    \"docs/workflow-migration/M6_HANDOFF.md\"\r\n  ],\r\n  \"m5_production_source_config_tests_tools_byte_identical\": true,\r\n  \"m1_entry_refs_retained\": true,\r\n  \"m6_entry_files_checked\": 131,\r\n  \"all_m6_entry_files_byte_identical\": true,\r\n  \"m6_entry_refs_retained\": true\r\n}\r\nAD docs/workflow-migration/Original_plan.md\n?? docs/workflow-migration/ORIGINAL_GOALS_HANDOFF.md\n9683d58ef201cdc825605a144bd4d0c7a0cf60fd\trefs/heads/copilot/restore-merged-feature-branches\n2a3a26bd796847db76c3bbfd956b39772730a578\trefs/heads/feature/workflow-migration\n34b5a3103b397bab6ae2e490a87a00aba6d118e3\trefs/heads/main\n60a848dfc7396b7b2b578a007b9be6aafec1fd83\trefs/heads/policy/preserve-feature-branches\n",
+    "cli_exit_code": 0
+  },
+  "limits": [
+    "Dated implementation-head observation. The following evidence-only commit advances the PR head; inspect live exact-head facts again before integration.",
+    "No actual task output applied, worker launched, retry granted, task integrated, dependency VERIFIED or deployment performed.",
+    "Default resources remain disabled, real API caps remain USD 0, hardware remains UNVERIFIED.",
+    "Original-checkout raw-byte audits retain their documented original-environment scope."
+  ]
+}
