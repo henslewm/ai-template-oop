@@ -1,0 +1,102 @@
+{
+  "schema_version": "destination-m1-acceptance-1",
+  "recorded_at": "2026-10-15T00:40:48.859285+00:00",
+  "scope": "M1 AC-02 and AC-03 acceptance only; M6 not implemented",
+  "production_baseline_commit": "5f83ac755369f850af74ee8f17e6b566b871f769",
+  "reviewed_source_sha256": {
+    "scripts/workflow_scope.py": "4f2ebc3b92a9323b63be3182b068ce6fdc11cb9112b2e4a5fcb99bf92b6290e2",
+    "scripts/workflow_runtime.py": "7e4d7cb2e9e7c4424f9edff883232596d65035c25b334376bbabe23809c3ece6",
+    "scripts/worker_launcher.py": "7f758e07ab4be07f7aa25db7c291a1cd3e81f34f215dabdfe430748bfdae9757",
+    "scripts/execution_harness.py": "a17d242303d509d3dd874f822a22a2e36f8421d06df1bfcfab154b9be542687e",
+    "scripts/acceptance.py": "7fd67c6eb39b8c0f4945d9338e659dd8a6e5aab2b5f08966d98c85c410340ef9",
+    "scripts/acceptance_runtime.py": "d84a1b62f74e415824277d85f01fd1cf545e6234f4995238e8a60e7dd1af27b1",
+    "tests/test_m1_acceptance.py": "faa85f6d908e6158ad408ff9bfe3d26ee102a81978b0506bea84b9ca2a3045bd",
+    "tests/ac02_ac03_process.py": "ecbb5d3582ab1b19000ffdbd8936af3397266fd55a9f109f4b0e48ba86ac5404",
+    "tools/check_m1_acceptance_preservation.py": "a1db4c95ef3cf12feb129a0d5d1b5c320677ecb59e63cee5b19d88a0ff20d396",
+    "tools/verify_m1_acceptance.py": "55eb8153509221f64d2a5a3ab8a1caebaa1541cb0bd13dca1d4cc4829fddb81f",
+    "docs/workflow-migration/M1_ACCEPTANCE_BASELINE.json": "b32b20ea6ba536ef21554de6009843d1908e2168ee9793fef06045d1c4c60649"
+  },
+  "evidence": {
+    "M1_ACCEPTANCE_FINAL_VERIFICATION.json": "29e2c5c501b78d273ba18f94d341d51f16c2a10fd89fa648d62a78921c0e9773",
+    "M1_ACCEPTANCE_FINAL_VERIFICATION_DOCKER.json": "16606ec89d60af5b07fbd38b5b38d071226a0fd8c15a0b8cb9299020bcaae1e2",
+    "M1_ACCEPTANCE_REVIEW.md": "31830064d673f5d0a3570270aafdaf70967c37cefa1434e502e89ff6dfc75934",
+    "M1_ACCEPTANCE_UI_RECHECK.json": "b42137a398b6d6c413158b8c478ba0a47adc3e2954623717f7a5ee863fb41fe7",
+    "M1_ACCEPTANCE_BASELINE.json": "b32b20ea6ba536ef21554de6009843d1908e2168ee9793fef06045d1c4c60649"
+  },
+  "decisions": [
+    {
+      "criterion": "AC-02",
+      "requirement": "Retain Docker read/write/network isolation for worker and acceptance exports.",
+      "decision": "INDEPENDENTLY_ACCEPTED",
+      "frozen_historical_status": "pending",
+      "evidence_cases": [
+        "paired-isolation"
+      ]
+    },
+    {
+      "criterion": "AC-03",
+      "requirement": "Only one branch/workspace owner and one consumed start survive failure, races and recovery.",
+      "decision": "INDEPENDENTLY_ACCEPTED",
+      "frozen_historical_status": "pending",
+      "evidence_cases": [
+        "acceptance-after_start_exit",
+        "acceptance-before_start_exit",
+        "acceptance-race-execute",
+        "acceptance-race-launch",
+        "acceptance-start_refusal_log_failure",
+        "exclusive-branch",
+        "exclusive-workspace",
+        "worker-after_start_exit",
+        "worker-before_start_exit",
+        "worker-race-execute",
+        "worker-race-launch",
+        "worker-start_refusal_log_failure"
+      ]
+    }
+  ],
+  "verification": {
+    "full_passed": 544,
+    "full_skipped": 1,
+    "approval_passed": 46,
+    "isolated_previously_skipped_ui_passed": 1,
+    "distinct_regression_cases_passed": 591,
+    "docker_cases_passed": 13,
+    "source_hashes_unchanged": true,
+    "required_checks_passed": true,
+    "basedpyright_green": false,
+    "basedpyright_m5": {
+      "filesAnalyzed": 3,
+      "errorCount": 4,
+      "warningCount": 1454,
+      "informationCount": 0,
+      "timeInSec": 0.952
+    },
+    "basedpyright_owned": {
+      "filesAnalyzed": 4,
+      "errorCount": 0,
+      "warningCount": 687,
+      "informationCount": 0,
+      "timeInSec": 1.173
+    }
+  },
+  "canonical_head": {
+    "sequence": 2,
+    "hash": "5e1f221812eaabd3666f40d4c003a046840ee01e4a51cba0e1881a19e1546bf7"
+  },
+  "defaults": {
+    "resources_enabled": false,
+    "harness_enabled": false,
+    "real_task_role_project_api_budgets_usd": 0,
+    "hardware": "UNVERIFIED",
+    "hardware_manual_ingestion_enabled": false
+  },
+  "limitations": [
+    "Trusted coordinator, Docker/image/kernel and host filesystem; declared actors",
+    "Bounded software evidence; no exhaustive isolation/security or hardware proof",
+    "Windows Tk complete-run skip retained; unchanged case passed separately; issue #4 remains open",
+    "BasedPyright remains non-green with errors/warnings recorded, no suppression",
+    "No output apply, provider/credential/connector transport, paid workers or deployment enabled",
+    "Frozen statuses/approval/contracts/packets and historical evidence remain unchanged",
+    "M6 not implemented"
+  ]
+}
