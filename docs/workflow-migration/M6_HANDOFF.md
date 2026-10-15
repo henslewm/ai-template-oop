@@ -17,7 +17,8 @@ review and final complete verification: 544 passed/1 tracked Tk skip, 46 approva
 passes, and the skipped unchanged Tk case passed alone. All 13 real-Docker
 campaign cases passed. Ruff/format/ty, ACTIVE/Journal/boundary and preservation
 passed. BasedPyright remains non-green: existing 4 errors/1454 warnings; new
-test/tools 0 errors/687 warnings. Consult the acceptance record and final PR
+test/tools 0 errors/687 warnings. Consult the acceptance record and
+[PR #7](https://github.com/henslewm/ai-template-oop/pull/7)'s final coordinator
 comment for actual delivery state. The source-changing pre-final run is retained separately
 in M1_ACCEPTANCE_VERIFICATION.json and cannot replace final-source verification.
 All delivered production source/config/existing tests/tools are unchanged.

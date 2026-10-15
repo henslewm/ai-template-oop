@@ -6,7 +6,7 @@ Scope: acceptance of the delivered M5 software baseline
 criterion-level closure decisions are supported by fresh separate review and
 completed final-source verification. Machine-readable decisions and exact
 evidence digests are in M1_ACCEPTANCE_DECISIONS.json. Actual remote delivery is
-recorded in the linked PR and its final coordinator comment; this evidence
+recorded in [PR #7](https://github.com/henslewm/ai-template-oop/pull/7) and its final coordinator comment; this evidence
 does not itself claim a future push or merge has occurred.
 
 The frozen requirements, their historical pending statuses, foundation approval,
@@ -105,3 +105,29 @@ count was 84 instead of 76; that assertion was corrected before the initial
 124 per export. New static errors were corrected through qualified fixture
 imports, dispatch-ID narrowing, JSON annotations and the actual Python
 environment, before the final source run.
+
+## Dated Git delivery record
+
+Entry was clean on retained feature/workflow-migration at delivered M5
+5f83ac755369f850af74ee8f17e6b566b871f769. Initial and pre-delivery fetches used
+--no-prune; normal merges of origin/main reported already up to date. No reset,
+force-push, branch deletion or protected-checkout write occurred.
+
+Implementation/evidence commit b5b198281e0a42a32e5da9f0c991c4d8a0da723f was
+committed and pushed non-force. PR #7 is open and ready at preparation of this
+following documentation-only record. Final local gates, exact reviewed source
+and evidence bindings passed before its creation. Inspect the live final head
+and coordinator comments for actual remote delivery and synchronization; this
+dated pre-merge entry does not claim future actions have occurred.
+
+Hosting inspection reports delete_branch_on_merge=false, rebase-only merge,
+no branch protection/rulesets or required tests, and no repository test workflow.
+The dynamic Copilot cloud agent and Dependency Graph workflows are not required
+test passes. No manual bot/paid worker was enabled. Under the owner's explicit
+commit/comment/push/delivery instruction, merge the exact final head using an
+allowed method, preserve every branch, and normally synchronize afterward.
+
+The protected local main stays f624e207276372d9386b669bf087a66b44aba714 with its
+staged plan deletion. The donor stays d6e582b7edeae24345a175f36639230726dbdead
+with all eight untracked entries. The final coordinator comment records actual
+post-delivery ref and preservation checks. Stop before M6.
