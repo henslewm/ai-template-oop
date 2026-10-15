@@ -23,6 +23,17 @@ comment for actual delivery state. The source-changing pre-final run is retained
 in M1_ACCEPTANCE_VERIFICATION.json and cannot replace final-source verification.
 All delivered production source/config/existing tests/tools are unchanged.
 
+Read M1_POST_DELIVERY_REVIEW.md for the later automated portability finding and
+independent triage. The M1/M4/M5 preservation tools audit this original migration
+checkout, recorded protected sibling checkouts, raw indexes/statuses and retained
+canonical/archive paths. Their raw-byte snapshots deliberately retain the
+original LF/CRLF representations, including the mixed-ending Dockerfile; they
+are not a portable fresh-checkout test gate. Git line-ending conversion can
+change raw bytes while preserving a clean-filter Git object. Keep both identity
+claims distinct. Do not normalize or refresh these frozen raw snapshots to make
+a different checkout pass; any portable identity checker needs separate scope
+and cannot replace this original-checkout byte-preservation guarantee.
+
 Also read M5_HANDOFF.md and its final M4/M3 references, especially
 M3_RESUME_VERIFICATION.json; CLAUDE.md, PROMPTS.md, BRANCH_RETENTION.md;
 the frozen docs/workflow-migration/ARCHITECTURE.md and
