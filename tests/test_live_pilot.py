@@ -63,6 +63,7 @@ def checkout(tmp_path):
         "-c",
         "user.email=fixture@example.invalid",
         "commit",
+        "--allow-empty",
         "-qm",
         "Fixture pilot",
     )
