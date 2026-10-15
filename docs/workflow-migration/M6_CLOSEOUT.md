@@ -93,3 +93,13 @@ head and checks. No inherited donor automatic-merge authority is used.
 The migration checkout also contains unrelated `Original_plan.md` and
 `ORIGINAL_GOALS_HANDOFF.md` work. It is preserved and excluded from M6 delivery.
 Work stops after M6; no actual task integration or deployment is performed.
+
+Implementation commit `2a3a26bd796847db76c3bbfd956b39772730a578` was pushed normally
+to the retained feature branch and delivered in
+[PR #9](https://github.com/henslewm/ai-template-oop/pull/9). The subsequent
+[dated delivery snapshot](M6_DELIVERY.json) records the exact observed head,
+current base, empty required-check rules, preserved branches and passing
+post-delivery preservation. CodeRabbit's SUCCESS explicitly means review skipped;
+GitHub has no submitted PR review. The following evidence-only commit adds this
+snapshot without changing any frozen source. Reobserve the live exact head before
+a separate integration decision.
