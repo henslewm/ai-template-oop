@@ -76,6 +76,50 @@ hosting facts are **synthetic fixture inputs**. No live task PR, independent
 human review or real hosting approval is claimed by this result. Integration
 and deployment remained `NOT_ESTABLISHED`; merge/execution authority was false.
 
+## Committed clean-checkout replay and review
+
+The complete implementation was frozen as
+`b331bb9725af4c2bfc91acc9790366ee9da2517a`. A second independent clone at
+`C:\Users\hensl\AppData\Local\Temp\operator-workflow-29lg7q3j\replay`
+then replayed that exact committed source. Actual setup commands, from the
+temporary parent and then the replay root respectively:
+
+```powershell
+git clone --no-hardlinks --branch feature/operator-quickstart --single-branch clean replay
+git -C replay rev-parse HEAD
+git -C replay status --short
+python -m venv replay/.venv
+# From replay:
+& '.venv/Scripts/python.exe' -m pip install -e '.[dev]'
+& '.venv/Scripts/python.exe' -m pip check
+git status --short
+$env:WORKFLOW_TEST_IMAGE='sha256:61526e68966dc3330c3801cbed8740c62710376b0b01b15c960b60c66b6cae1e'
+& '.venv/Scripts/python.exe' -B -m pytest -q -s -rs -p no:cacheprovider -o addopts= tests/test_operator_workflow.py --basetemp='../proof-committed'
+& '.venv/Scripts/python.exe' -B -m pytest -q -rs -p no:cacheprovider -o addopts= tests/test_contract_auth.py tests/test_contract_data.py tests/test_boundaries.py tests/test_headless_imports.py
+& '.venv/Scripts/python.exe' -B tools/check_workflow_approval.py
+```
+
+Checkout/install left `git status --short` empty; dependency check passed.
+The committed operator proof passed **1 in 47.53s**, no skips; focused tests
+passed **43 in 2.71s**, no skips; approval projection passed **46 in 2.30s**,
+preserving clone receipt SHA256 `28803d74d76b27272145cad0f0cc000ba50723cee463ce8f7af39564140cb5d2`.
+The foundation/directory/approval inspections, boundary validator, Ruff, format
+check, scoped ty using `.venv/Scripts/python.exe`, and `git diff --check` also
+passed in this committed clone. This replay uses exactly the quickstart's
+in-checkout `.venv` installation layout. Later evidence-note edits change no
+test, controller or runtime source.
+
+The Short Circuit fresh-context read-only reviewer inspected the actual diff,
+existing fixture/controller seams, logs and both quickstart documents. It found
+one clarity issue: inherited packet descriptions still concerned a parser while
+the task/checks required a constant replacement. The fixture-only descriptions
+and source references were corrected before the committed replay; the domain
+remains synthetic and `UNVERIFIED_ON_HARDWARE`. The reviewer inspected exact
+commit `b331bb9725af4c2bfc91acc9790366ee9da2517a` and reported no remaining
+actionable findings. This scoped code review is separate from the proof's
+synthetic readiness review declaration. The report remains at
+`C:\Users\hensl\AppData\Local\Temp\operator-workflow-29lg7q3j\review.md`.
+
 ## Preservation and limits
 
 The clone's raw receipt SHA256 is
@@ -89,6 +133,12 @@ The staged `Original_plan.md` blob/absent working file, untracked original-goals
 brief, native index, protected checkout indexes/HEADs/status and canonical state
 were inventoried separately from delivery. Donor working files were not read;
 only Git/index metadata was inspected. Permanent branches remain retained.
+Before delivery, every comparison passed: retained HEAD/raw native index/status/
+staged blob, local brief, ACTIVE receipt, the complete canonical state file
+inventory and raw hashes, permanent local refs, all protected checkout
+HEADs/status/index hashes, and all six unchanged frozen M6 source hashes.
+Normal post-merge synchronization is a separate intentional ref/index update;
+these comparisons describe the implementation and verification interval.
 
 Broad M1–M6 campaigns, GUI execution, image rebuild, full repository typing,
 live provider transport, physical hardware and deployment were deliberately
