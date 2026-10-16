@@ -146,6 +146,16 @@ def _hosting_holds(live, head, review):
         for c in latest_checks.values()
     ):
         blockers.append("HOSTING_CHECK_PENDING_OR_FAILED")
+    latest_statuses = {}
+    for status in live["statuses"]:
+        context = status["context"]
+        if (
+            context not in latest_statuses
+            or status["id"] > latest_statuses[context]["id"]
+        ):
+            latest_statuses[context] = status
+    if any(status["state"] != "success" for status in latest_statuses.values()):
+        blockers.append("HOSTING_STATUS_PENDING_OR_FAILED")
     return sorted(set(blockers))
 
 

@@ -675,6 +675,18 @@ def test_pilot_review_policy_requires_exact_independent_evidence(monkeypatch):
     with pytest.raises(ValueError, match="unresolved check or review-history"):
         delivery.verify_merged(ROOT, 1, head, {}, review=proof)
     live["checks"] = []
+    for status in ("pending", "failure", "error"):
+        live["statuses"] = [{"id": 1, "context": "legacy CI", "state": status}]
+        assert (
+            "HOSTING_STATUS_PENDING_OR_FAILED"
+            in delivery.gates(ROOT, 1, head, {}, review=proof)[0]
+        )
+        with pytest.raises(ValueError, match="unresolved check or review-history"):
+            delivery.verify_merged(ROOT, 1, head, {}, review=proof)
+    live["statuses"].append({"id": 2, "context": "legacy CI", "state": "success"})
+    assert delivery.gates(ROOT, 1, head, {}, review=proof)[0] == []
+    delivery.verify_merged(ROOT, 1, head, {}, review=proof)
+    live["statuses"] = []
     live["reviews"] = [
         {"id": 1, "user": {"login": "reviewer"}, "state": "CHANGES_REQUESTED"}
     ]
