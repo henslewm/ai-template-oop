@@ -89,10 +89,34 @@ def verify_candidate(root, state, commit):
         raise ValueError("Delivery commit differs from independently accepted bundle")
 
 
-def gates(root, number, head, baseline):
+def _exact_review(review, head):
+    """Host-saved independent evidence; mutable hosting summaries add no authority."""
+    return (
+        isinstance(review, dict)
+        and review.get("head") == head
+        and review.get("verdict") == "APPROVE"
+        and review.get("blocking_findings") == []
+        and isinstance(review.get("actor"), str)
+        and bool(review["actor"].strip())
+        and isinstance(review.get("implementer", "Bootstrap implementer"), str)
+        and bool(review.get("implementer", "Bootstrap implementer").strip())
+        and review["actor"].strip().casefold()
+        != review.get("implementer", "Bootstrap implementer").strip().casefold()
+        and authority.approval.hex_digest(review.get("report_sha256"), 64)
+    )
+
+
+def gates(root, number, head, baseline, *, review=None):
     live = closeout.hosting(root, number)
     blockers = closeout._checks(live)
-    blockers.extend(closeout.review_history(live)["blockers"])
+    approved = _exact_review(review, head)
+    history = closeout.review_history(live, allow_unverified=approved)
+    blockers.extend(history["blockers"])
+    live["automated_review_history"] = (
+        "UNVERIFIED" if history["ambiguous"] else "OBSERVED"
+    )
+    if not approved:
+        blockers.append("INDEPENDENT_EXACT_REVIEW_REQUIRED")
     if live["head"] != head or live["remote_branches"].get(live["branch"]) != head:
         blockers.append("EXACT_PR_HEAD_CHANGED")
     if (
@@ -158,7 +182,11 @@ def gates(root, number, head, baseline):
     return sorted(set(blockers)), live
 
 
-def verify_merged(root, number, head, baseline):
+def verify_merged(root, number, head, baseline, *, review=None):
+    if not _exact_review(review, head):
+        raise ValueError(
+            "Saved independent approval of the exact candidate is required"
+        )
     pull = closeout.gh(f"repos/{closeout.REPO}/pulls/{number}")
     if (
         not pull["merged"]
@@ -176,7 +204,7 @@ def verify_merged(root, number, head, baseline):
     live = closeout.hosting(root, number)
     if (
         closeout._checks(live)
-        or closeout.review_history(live)["blockers"]
+        or closeout.review_history(live, allow_unverified=True)["blockers"]
         or live["unresolved"]
         or live["more_threads"]
     ):
@@ -213,10 +241,26 @@ def deliver(operator):
     if state["phase"] != "ACCEPTED":
         raise ValueError("Independent acceptance required before delivery")
     if state["delivery"] is None:
+        from scripts.acceptance import pilot_review
+
+        attempt = state["reviews"][-1]
+        report = attempt["result"]["report"]
+        pilot_review(state, report, attempt)
+        commit = candidate(operator.root, state)
+        proof = {
+            "head": commit,
+            "actor": attempt["actor"],
+            "implementer": state["attempts"][-1]["actor"],
+            "verdict": report["verdict"],
+            "blocking_findings": [],
+            "report_sha256": h.sha(report),
+            "bundle_sha256": h.sha(state["bundle"]),
+        }
         saved = {
-            "commit": candidate(operator.root, state),
+            "commit": commit,
             "branch": BRANCH,
             "retained": retained(operator.root),
+            "review": proof,
         }
         operator.event("DELIVERY_PREPARED", saved)
         state = operator.state()
@@ -306,11 +350,19 @@ def deliver(operator):
     if pull["headRefOid"] != head:
         raise ValueError("Existing delivery PR head differs")
     if pull["state"] == "MERGED":
-        verify_merged(operator.root, pull["number"], head, saved["retained"])
+        verify_merged(
+            operator.root,
+            pull["number"],
+            head,
+            saved["retained"],
+            review=saved["review"],
+        )
         synchronize(operator.root)
         operator.event("DELIVERY", saved)
         return saved
-    blockers, live = gates(operator.root, pull["number"], head, saved["retained"])
+    blockers, live = gates(
+        operator.root, pull["number"], head, saved["retained"], review=saved["review"]
+    )
     if blockers:
         operator.event(
             "DELIVERY_HOLD",
@@ -323,7 +375,9 @@ def deliver(operator):
         )
         return None
     # Reobserve immediately before the merge; gh also compares the exact head.
-    blockers, second = gates(operator.root, pull["number"], head, saved["retained"])
+    blockers, second = gates(
+        operator.root, pull["number"], head, saved["retained"], review=saved["review"]
+    )
     if blockers or second != live:
         operator.event(
             "DELIVERY_HOLD",
@@ -344,7 +398,9 @@ def deliver(operator):
             head,
         ],
     )
-    verify_merged(operator.root, pull["number"], head, saved["retained"])
+    verify_merged(
+        operator.root, pull["number"], head, saved["retained"], review=saved["review"]
+    )
     synchronize(operator.root)
     operator.event("DELIVERY", saved)
     return saved

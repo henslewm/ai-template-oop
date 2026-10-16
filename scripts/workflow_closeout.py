@@ -461,7 +461,7 @@ def _validation(
     }
 
 
-def review_history(live):
+def review_history(live, *, allow_unverified=False):
     """Shared automated-review history gates for offline and live delivery."""
     blockers = []
     rounds = [
@@ -495,7 +495,7 @@ def review_history(live):
         )
         for comment in live.get("comments", [])
     )
-    if ambiguous_round_history:
+    if ambiguous_round_history and not allow_unverified:
         blockers.append("AUTOMATED_REVIEW_HISTORY_UNVERIFIABLE")
     if round_count > REVIEW_CAP:
         blockers.append("REVIEW_ROUND_CAP_EXCEEDED")

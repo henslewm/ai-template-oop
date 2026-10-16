@@ -94,6 +94,13 @@ Docker until accepted. Delivery creates Git objects for exactly that bundle,
 publishes a separate PR and reobserves hosting facts before an exact-head merge.
 Branches are permanent; there is no deletion or force push.
 
+The owner-approved pilot merge policy uses a saved independent approval bound
+to the exact candidate, successful hosting checks, and no unresolved findings.
+Mutable automated-review summaries do not confer authority or block a reviewed
+candidate by their presence alone. Their history remains explicitly unverified;
+observed review-round caps and every other hosting gate still apply. This adds
+no model call or user-facing review summary. Offline closeout retains its default.
+
 Report total usage-derived API cost, failed-attempt cost, context bytes and
 cost per accepted change. No savings comparison with an unmeasured chat baseline
 is supported. The detailed [Windows offline proof](WINDOWS_QUICKSTART.md) remains

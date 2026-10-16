@@ -564,11 +564,123 @@ def test_deleted_delivery_branch_prevents_merged_receipt(monkeypatch):
     )
     monkeypatch.setattr(delivery.closeout, "_checks", lambda live: [])
     monkeypatch.setattr(
-        delivery.closeout, "review_history", lambda live: {"blockers": []}
+        delivery.closeout, "review_history", lambda live, **kwargs: {"blockers": []}
     )
     monkeypatch.setattr(delivery, "retained", lambda root: {"local": {}, "origin": {}})
     with pytest.raises(ValueError, match="not retained"):
-        delivery.verify_merged(ROOT, 1, head, {})
+        delivery.verify_merged(
+            ROOT,
+            1,
+            head,
+            {},
+            review={
+                "head": head,
+                "actor": "Independent",
+                "verdict": "APPROVE",
+                "blocking_findings": [],
+                "report_sha256": "f" * 64,
+            },
+        )
+
+
+def test_pilot_review_policy_requires_exact_independent_evidence(monkeypatch):
+    head = "a" * 40
+    live = {
+        "head": head,
+        "base": "b" * 40,
+        "repository": "henslewm/ai-template-oop",
+        "head_repository": "henslewm/ai-template-oop",
+        "base_repository": "henslewm/ai-template-oop",
+        "branch": delivery.BRANCH,
+        "base_branch": "main",
+        "delete_branch_on_merge": False,
+        "state": "open",
+        "draft": False,
+        "mergeable": True,
+        "mergeable_state": "clean",
+        "required_policy": "NONE_CONFIGURED",
+        "required": [],
+        "statuses": [],
+        "checks": [],
+        "unsupported_rules": [],
+        "unresolved": 0,
+        "more_threads": False,
+        "reviews": [],
+        "comments": [
+            {
+                "user": {"login": "chatgpt-codex-connector[bot]"},
+                "body": "codex-pull-request-review-summary",
+            }
+        ],
+        "remote_branches": {delivery.BRANCH: head, "main": "b" * 40},
+    }
+    monkeypatch.setattr(
+        delivery.closeout, "hosting", lambda *args: json.loads(json.dumps(live))
+    )
+    monkeypatch.setattr(
+        delivery,
+        "retained",
+        lambda root: {
+            "local": {delivery.BRANCH: head},
+            "origin": {delivery.BRANCH: head},
+        },
+    )
+    monkeypatch.setattr(delivery, "_git", lambda *args, **kwargs: b"")
+    proof = {
+        "head": head,
+        "actor": "Independent",
+        "verdict": "APPROVE",
+        "blocking_findings": [],
+        "report_sha256": "f" * 64,
+    }
+    assert "INDEPENDENT_EXACT_REVIEW_REQUIRED" in delivery.gates(ROOT, 1, head, {})[0]
+    blockers, observed = delivery.gates(ROOT, 1, head, {}, review=proof)
+    assert blockers == []
+    assert observed["automated_review_history"] == "UNVERIFIED"
+    for invalid in (
+        {**proof, "head": "c" * 40},
+        {**proof, "implementer": "Independent"},
+        {**proof, "report_sha256": None},
+    ):
+        assert (
+            "INDEPENDENT_EXACT_REVIEW_REQUIRED"
+            in delivery.gates(ROOT, 1, head, {}, review=invalid)[0]
+        )
+    live["checks"] = [
+        {
+            "id": 1,
+            "name": "CI",
+            "app": {"id": 1},
+            "head_sha": head,
+            "status": "completed",
+            "conclusion": "failure",
+        }
+    ]
+    assert (
+        "HOSTING_CHECK_PENDING_OR_FAILED"
+        in delivery.gates(ROOT, 1, head, {}, review=proof)[0]
+    )
+    live["checks"] = []
+    live["unresolved"] = 1
+    assert (
+        "UNRESOLVED_OR_UNOBSERVED_REVIEW_THREADS"
+        in delivery.gates(ROOT, 1, head, {}, review=proof)[0]
+    )
+    live["unresolved"] = 0
+    live["reviews"] = [
+        {
+            "id": n,
+            "user": {"login": "chatgpt-codex-connector[bot]"},
+            "commit_id": head,
+            "body": "observed round",
+            "state": "COMMENTED",
+        }
+        for n in range(5)
+    ]
+    assert (
+        "REVIEW_ROUND_CAP_EXCEEDED"
+        in delivery.gates(ROOT, 1, head, {}, review=proof)[0]
+    )
 
 
 def test_explicit_incomplete_check_reconciliation_preserves_failures(
