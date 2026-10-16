@@ -1,0 +1,563 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Acceptance policy, gate records, and reviewer report",
+  "description": "Canonical shapes for the independent acceptance controller. Reviewer identity and model family are recorded declarations, not authentication. Runtime adds gate-floor rules, contract references, independence checks, and ledger bindings. Deterministic check output is independently observed evidence; everything a worker or reviewer asserts remains a source assertion.",
+  "$ref": "#/$defs/config",
+  "$defs": {
+    "identifier": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 80,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,79}(?![\\s\\S])"
+    },
+    "sha256": {
+      "type": "string",
+      "minLength": 64,
+      "maxLength": 64,
+      "pattern": "^[a-f0-9]{64}(?![\\s\\S])"
+    },
+    "bounded_text": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2000,
+      "pattern": "\\S"
+    },
+    "summary": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4000,
+      "pattern": "\\S"
+    },
+    "evidence": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 20,
+      "items": {
+        "$ref": "#/$defs/bounded_text"
+      }
+    },
+    "gate": {
+      "type": "string",
+      "enum": [
+        "deterministic",
+        "model_review",
+        "cross_family_review",
+        "architect_review",
+        "user_decision"
+      ]
+    },
+    "gate_list": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/gate"
+      },
+      "minItems": 0,
+      "uniqueItems": true
+    },
+    "config": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "policy"
+      ],
+      "properties": {
+        "schema_version": {
+          "type": "string",
+          "const": "1.0"
+        },
+        "policy": {
+          "$ref": "#/$defs/policy"
+        }
+      }
+    },
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "max_review_attempts",
+        "check_timeout_seconds",
+        "check_output_max_chars",
+        "review_packet_max_chars",
+        "review_report_max_bytes",
+        "artifact_max_chars",
+        "workspace_digest_max_files",
+        "additional_gates"
+      ],
+      "properties": {
+        "max_review_attempts": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2
+        },
+        "check_timeout_seconds": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 300
+        },
+        "check_output_max_chars": {
+          "type": "integer",
+          "minimum": 200,
+          "maximum": 100000
+        },
+        "review_packet_max_chars": {
+          "type": "integer",
+          "minimum": 1000,
+          "maximum": 40000
+        },
+        "review_report_max_bytes": {
+          "type": "integer",
+          "minimum": 200,
+          "maximum": 1000000
+        },
+        "artifact_max_chars": {
+          "type": "integer",
+          "minimum": 200,
+          "maximum": 200000
+        },
+        "workspace_digest_max_files": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 128
+        },
+        "additional_gates": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "low",
+            "medium",
+            "high",
+            "critical"
+          ],
+          "properties": {
+            "low": {
+              "$ref": "#/$defs/gate_list"
+            },
+            "medium": {
+              "$ref": "#/$defs/gate_list"
+            },
+            "high": {
+              "$ref": "#/$defs/gate_list"
+            },
+            "critical": {
+              "$ref": "#/$defs/gate_list"
+            }
+          },
+          "description": "Project-wide gates added per risk tier above the protocol floor. Nothing here can remove a floor gate; loosening is structurally impossible."
+        }
+      },
+      "description": "Bounded acceptance-controller policy. Limits constrain local control flow and recorded evidence size; they authorize no execution beyond architect-declared validation commands."
+    },
+    "reviewer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "actor",
+        "model_family",
+        "tier"
+      ],
+      "properties": {
+        "actor": {
+          "$ref": "#/$defs/bounded_text"
+        },
+        "model_family": {
+          "$ref": "#/$defs/bounded_text"
+        },
+        "tier": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4
+        }
+      },
+      "description": "Recorded reviewer identity declaration. The controller enforces independence against declared implementers; it cannot verify which model actually produced a report."
+    },
+    "implementers": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 20,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "actor",
+          "model_family"
+        ],
+        "properties": {
+          "actor": {
+            "$ref": "#/$defs/bounded_text"
+          },
+          "model_family": {
+            "$ref": "#/$defs/bounded_text"
+          }
+        }
+      }
+    },
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "reference",
+        "content",
+        "sha256"
+      ],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "diff",
+            "files",
+            "reference"
+          ]
+        },
+        "reference": {
+          "$ref": "#/$defs/bounded_text"
+        },
+        "content": {
+          "type": "string"
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      },
+      "description": "What is being reviewed: bounded diff or file text with its digest, or an external reference by exact commit/path plus digest when content exceeds the bound. Supplied by the dispatching operator and recorded, not independently fetched."
+    },
+    "open_questions": {
+      "type": "array",
+      "minItems": 0,
+      "maxItems": 20,
+      "items": {
+        "$ref": "#/$defs/bounded_text"
+      }
+    },
+    "check_result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "validation_id",
+        "machine_runnable",
+        "passed",
+        "argv",
+        "exit_code",
+        "duration_seconds",
+        "timed_out",
+        "stdout",
+        "stderr",
+        "output_truncated",
+        "output_sha256"
+      ],
+      "properties": {
+        "validation_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "machine_runnable": {
+          "type": "boolean"
+        },
+        "passed": {
+          "type": "boolean"
+        },
+        "argv": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/bounded_text"
+          },
+          "minItems": 0,
+          "maxItems": 50
+        },
+        "exit_code": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "duration_seconds": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "timed_out": {
+          "type": "boolean"
+        },
+        "stdout": {
+          "type": "string"
+        },
+        "stderr": {
+          "type": "string"
+        },
+        "output_truncated": {
+          "type": "boolean"
+        },
+        "output_sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      },
+      "description": "One independently observed check execution. Runtime requires argv to equal the contract's declared command, passed to equal a zero exit without timeout, and refuses recorded output containing credential-like material."
+    },
+    "checks": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "workspace",
+        "workspace_digest",
+        "workspace_files",
+        "results"
+      ],
+      "properties": {
+        "workspace": {
+          "$ref": "#/$defs/bounded_text"
+        },
+        "workspace_digest": {
+          "$ref": "#/$defs/sha256"
+        },
+        "workspace_files": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "results": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/check_result"
+          },
+          "minItems": 1,
+          "maxItems": 1000
+        }
+      }
+    },
+    "attestation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "validation_id",
+        "operator",
+        "evidence"
+      ],
+      "properties": {
+        "validation_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "operator": {
+          "$ref": "#/$defs/bounded_text"
+        },
+        "evidence": {
+          "$ref": "#/$defs/evidence"
+        }
+      },
+      "description": "Operator-recorded evidence for a validation the contract declares no command for. Permitted only where the latest check run recorded the validation as not machine-runnable; an operator may not attest over a runnable check."
+    },
+    "waiver": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "operator",
+        "reason"
+      ],
+      "properties": {
+        "operator": {
+          "$ref": "#/$defs/bounded_text"
+        },
+        "reason": {
+          "$ref": "#/$defs/summary"
+        }
+      },
+      "description": "Explicit recorded waiver of the cross-family requirement, stating why a cross-family reviewer was not practical. It becomes part of the acceptance evidence and is cleared by resubmission."
+    },
+    "user_decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "decider",
+        "decision",
+        "reason"
+      ],
+      "properties": {
+        "decider": {
+          "$ref": "#/$defs/bounded_text"
+        },
+        "decision": {
+          "type": "string",
+          "enum": [
+            "approve",
+            "reject"
+          ]
+        },
+        "reason": {
+          "$ref": "#/$defs/summary"
+        }
+      }
+    },
+    "review_open": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "review_id",
+        "gate",
+        "reviewer"
+      ],
+      "properties": {
+        "review_id": {
+          "$ref": "#/$defs/sha256"
+        },
+        "gate": {
+          "type": "string",
+          "enum": [
+            "model_review",
+            "architect_review"
+          ]
+        },
+        "reviewer": {
+          "$ref": "#/$defs/reviewer"
+        }
+      }
+    },
+    "criterion_finding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "criterion_id",
+        "status",
+        "evidence"
+      ],
+      "properties": {
+        "criterion_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "met",
+            "not_met",
+            "cannot_determine"
+          ]
+        },
+        "evidence": {
+          "$ref": "#/$defs/evidence"
+        }
+      }
+    },
+    "contract_failure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "failed_ref",
+        "kind",
+        "what_failed",
+        "evidence",
+        "corrective_action"
+      ],
+      "properties": {
+        "failed_ref": {
+          "$ref": "#/$defs/bounded_text"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "criterion",
+            "validation",
+            "scope"
+          ]
+        },
+        "what_failed": {
+          "$ref": "#/$defs/bounded_text"
+        },
+        "evidence": {
+          "$ref": "#/$defs/evidence"
+        },
+        "corrective_action": {
+          "$ref": "#/$defs/bounded_text"
+        }
+      },
+      "description": "One specific contract failure. failed_ref must name an existing acceptance criterion, validation, or scope/architecture rule, and corrective_action must be performable inside the current contract; work that needs a wider contract is an escalation, never a corrective action."
+    },
+    "missing_evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "validation_id",
+        "evidence_required",
+        "reason"
+      ],
+      "properties": {
+        "validation_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "evidence_required": {
+          "$ref": "#/$defs/bounded_text"
+        },
+        "reason": {
+          "$ref": "#/$defs/bounded_text"
+        }
+      }
+    },
+    "report": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "review_id",
+        "reviewer",
+        "verdict",
+        "summary",
+        "criteria",
+        "contract_failures",
+        "missing_evidence",
+        "escalation_reason"
+      ],
+      "properties": {
+        "schema_version": {
+          "type": "string",
+          "const": "1.0"
+        },
+        "review_id": {
+          "$ref": "#/$defs/sha256"
+        },
+        "reviewer": {
+          "$ref": "#/$defs/reviewer"
+        },
+        "verdict": {
+          "type": "string",
+          "enum": [
+            "APPROVE",
+            "REJECT_BOUNDED",
+            "NEEDS_EVIDENCE",
+            "NEEDS_ESCALATION",
+            "ARCHITECTURE_CONFLICT"
+          ]
+        },
+        "summary": {
+          "$ref": "#/$defs/summary"
+        },
+        "criteria": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/criterion_finding"
+          },
+          "minItems": 1,
+          "maxItems": 100
+        },
+        "contract_failures": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/contract_failure"
+          },
+          "minItems": 0,
+          "maxItems": 20
+        },
+        "missing_evidence": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/missing_evidence"
+          },
+          "minItems": 0,
+          "maxItems": 20
+        },
+        "escalation_reason": {
+          "type": "string",
+          "maxLength": 4000
+        }
+      },
+      "description": "One reviewer report against one review packet. Runtime requires exactly one finding per contract acceptance criterion, verdict-dependent field consistency, a review_id and reviewer identity matching the opened review, and evidence citing the packet rather than outside context."
+    }
+  }
+}

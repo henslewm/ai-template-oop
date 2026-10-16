@@ -1,0 +1,18 @@
+{
+  "schema_version": "1.0",
+  "policy": {
+    "max_review_attempts": 2,
+    "check_timeout_seconds": 120,
+    "check_output_max_chars": 2000,
+    "review_packet_max_chars": 40000,
+    "review_report_max_bytes": 64000,
+    "artifact_max_chars": 200000,
+    "workspace_digest_max_files": 128,
+    "additional_gates": {
+      "low": [],
+      "medium": [],
+      "high": [],
+      "critical": []
+    }
+  }
+}

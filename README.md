@@ -9,6 +9,11 @@ The demo app is a Tk window with login/register and a numeric batch
 processor, backed by SQLite in production and by in-memory mocks during UI
 development.
 
+For the existing offline operator workflow, start with the
+[Windows quickstart](docs/workflow-migration/WINDOWS_QUICKSTART.md). It covers
+clean setup, a disposable Docker worker, independent acceptance, handoff/resume
+and integration-readiness inspection without enabling live resources.
+
 ## Layout
 
 ```
@@ -44,12 +49,60 @@ CLAUDE.md             Rules every session gets automatically
 ```
 python main.py --mock     # in-memory services, log in with demo / demo1234
 python main.py            # SQLite in ./app.db, register a user first
-python -m pytest          # 50-ish tests: contracts x {mock, sql}, UI, linter
-python tools/validate_boundaries.py
 ```
 
-Requires Python 3.11+ with `tkinter` (included in the standard installers).
-`pytest` is the only dev dependency.
+The demo requires Python 3.11+ with `tkinter`. Windows workflow tools require
+Python 3.12+ for junction checks. Install the declared development dependencies
+(`pytest` and the pinned `jsonschema`) from the repository root:
+
+```powershell
+python -m pip install -e ".[dev]"
+```
+
+## Checks without Tk
+
+Shared mocks, contract tests and workflow test collection do not require Tk.
+The public `from src.ui import MainWindow` export loads the toolkit only when
+the window class is requested. GUI tests remain separate and require Tk.
+
+For focused contract, boundary and Tk-free collection checks:
+
+```powershell
+python -B -m pytest -q -rs -p no:cacheprovider -o addopts= tests/test_contract_auth.py tests/test_contract_data.py tests/test_boundaries.py tests/test_headless_imports.py
+python -B tools/validate_boundaries.py
+```
+
+To collect all non-UI regression tests, excluding the separate frozen approval
+module:
+
+```powershell
+python -B -m pytest --collect-only -q -p no:cacheprovider -o addopts= --ignore=tests/test_ui.py --ignore=tests/test_workflow_approval.py
+```
+
+Remove `--collect-only` to execute that selection. Some workflow cases require
+the verified Docker image selected by `WORKFLOW_TEST_IMAGE`; without it their
+skips remain visible. Running the focused checks does not establish the full
+Docker campaign or GUI behavior. On a Tk-equipped machine, run the GUI tests
+separately:
+
+```powershell
+python -B -m pytest -q -rs -p no:cacheprovider -o addopts= tests/test_ui.py
+```
+
+The ACTIVE foundation retains frozen tests for the original inactive approval
+state. Run their existing disposable projection instead of running that module
+directly against the ACTIVE package:
+
+```powershell
+python -B tools/check_workflow_approval.py
+```
+
+The approval runner preserves the real receipt and does not launch workers.
+See [M6 operations](docs/workflow-migration/M6_OPERATIONS.md) and
+[final verification](docs/workflow-migration/M6_CLOSEOUT.md) for the delivered
+offline foundation and its verification limits. Use the Windows quickstart for
+the disposable end-to-end operator proof. A full template release procedure
+remains separate.
 
 ## How the pattern works
 

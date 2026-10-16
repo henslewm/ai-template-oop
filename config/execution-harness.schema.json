@@ -1,0 +1,176 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://henslewm.github.io/ai-template-oop/config/execution-harness.schema.json",
+  "title": "Bounded execution harness configuration",
+  "description": "Docker-only offline dispatch. No environment, endpoints, provider transport or credentials.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "enabled",
+    "limits",
+    "harnesses",
+    "bindings"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "enabled": {
+      "type": "boolean",
+      "description": "Dispatch preparation is refused while false."
+    },
+    "limits": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "brief_max_chars",
+        "report_max_bytes",
+        "chars_per_token",
+        "context_growth_reserve_tokens"
+      ],
+      "properties": {
+        "brief_max_chars": {
+          "type": "integer",
+          "minimum": 1000,
+          "maximum": 40000
+        },
+        "report_max_bytes": {
+          "type": "integer",
+          "minimum": 200,
+          "maximum": 1048576
+        },
+        "chars_per_token": {
+          "const": 1
+        },
+        "context_growth_reserve_tokens": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1000000,
+          "description": "Tokens reserved for the run's own growth after the first prompt: tool results, file reads, command output and repeated iterations. The capacity check covers the opening prompt only, so without this reserve a dispatch that fits at the first turn can still exhaust the window later. Calibrate it from observed runs of comparable packets."
+        },
+        "startup_max_chars": {
+          "type": "integer",
+          "minimum": 1000,
+          "maximum": 200000,
+          "description": "Cap on instruction text embedded in a worker brief: the bounded worker rules plus the contract's worker_instructions. Defaults to 12000. Governing documents are recorded by digest only and do not count. Exceeding it refuses the dispatch before a reservation is spent."
+        }
+      }
+    },
+    "harnesses": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 20,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "adapter",
+          "command",
+          "argv",
+          "context_overhead_tokens",
+          "description"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/$defs/identifier"
+          },
+          "adapter": {
+            "const": "docker"
+          },
+          "command": {
+            "enum": [
+              "python",
+              "sh",
+              "cline"
+            ]
+          },
+          "argv": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 40,
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 400
+            }
+          },
+          "context_overhead_tokens": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1000000,
+            "description": "Tokens this harness consumes before the brief: its own system prompt, tool definitions and scaffolding. Measure it against the installed harness version."
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          }
+        }
+      }
+    },
+    "bindings": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 50,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "resource_id",
+          "harness_id",
+          "provider",
+          "model",
+          "api_base",
+          "credential_env",
+          "served_context_window",
+          "image"
+        ],
+        "properties": {
+          "resource_id": {
+            "$ref": "#/$defs/identifier"
+          },
+          "harness_id": {
+            "$ref": "#/$defs/identifier"
+          },
+          "provider": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 60
+          },
+          "model": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "api_base": {
+            "type": "null"
+          },
+          "credential_env": {
+            "type": "null"
+          },
+          "served_context_window": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1,
+            "maximum": 1000000000,
+            "description": "Context window this resource is actually served in, when it differs from the window the router configuration declares. A provider may serve a model in a smaller window than its family declares. Null uses the routed declaration; a value above it is refused."
+          },
+          "image": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "identifier": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,99}$"
+    }
+  }
+}

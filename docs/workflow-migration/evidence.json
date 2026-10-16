@@ -1,0 +1,355 @@
+{
+  "recorded_at": "2026-10-12T01:02:36.533008+00:00",
+  "status": {
+    "implemented": true,
+    "locally_tested": true,
+    "independently_accepted": false,
+    "integrated": false,
+    "deployed": false
+  },
+  "destination_base": "a3dafc636054a85eeed6eaeb4c10e1fcb9d020a4",
+  "destination_branch": "feature/workflow-migration",
+  "source_commit": "d6e582b7edeae24345a175f36639230726dbdead",
+  "runtime_image": "sha256:61526e68966dc3330c3801cbed8740c62710376b0b01b15c960b60c66b6cae1e",
+  "runtime_probe": {
+    "unprivileged": true,
+    "shell_host_read_denied_0": true,
+    "shell_host_read_denied_1": true,
+    "shell_host_read_denied_2": true,
+    "shell_host_read_denied_3": true,
+    "shell_host_read_denied_4": true,
+    "shell_host_read_denied_5": true,
+    "shell_host_read_denied_6": true,
+    "shell_host_read_denied_7": true,
+    "contract_write_denied": true,
+    "unowned_write_denied": true,
+    "allowed_input_readable": true,
+    "owned_write_allowed": true,
+    "symlink_host_read_denied": true,
+    "public_network_denied": true,
+    "host_network_denied": true,
+    "python_startup": true,
+    "python_version": "Python 3.12.15",
+    "shell_startup": true,
+    "cline_startup": true,
+    "cline_version": "3.0.70",
+    "cline_help_startup": true
+  },
+  "probe_state": {
+    "Status": "exited",
+    "Running": false,
+    "Paused": false,
+    "Restarting": false,
+    "OOMKilled": false,
+    "Dead": false,
+    "Pid": 0,
+    "ExitCode": 0,
+    "Error": "",
+    "StartedAt": "2026-10-12T00:37:37.153446102Z",
+    "FinishedAt": "2026-10-12T00:37:38.767074889Z"
+  },
+  "probe_host_config": {
+    "Binds": null,
+    "ContainerIDFile": "",
+    "LogConfig": {
+      "Type": "local",
+      "Config": {}
+    },
+    "NetworkMode": "none",
+    "PortBindings": {},
+    "RestartPolicy": {
+      "Name": "no",
+      "MaximumRetryCount": 0
+    },
+    "AutoRemove": false,
+    "VolumeDriver": "",
+    "VolumesFrom": null,
+    "ConsoleSize": [
+      0,
+      0
+    ],
+    "CapAdd": null,
+    "CapDrop": [
+      "ALL"
+    ],
+    "CgroupnsMode": "private",
+    "Dns": null,
+    "DnsOptions": [],
+    "DnsSearch": [],
+    "ExtraHosts": null,
+    "GroupAdd": null,
+    "IpcMode": "private",
+    "Cgroup": "",
+    "Links": null,
+    "OomScoreAdj": 0,
+    "PidMode": "",
+    "Privileged": false,
+    "PublishAllPorts": false,
+    "ReadonlyRootfs": true,
+    "SecurityOpt": [
+      "no-new-privileges"
+    ],
+    "Tmpfs": {
+      "/out": "rw,noexec,nosuid,nodev,uid=1000,gid=1000,size=67108864",
+      "/tmp": "rw,noexec,nosuid,nodev,size=67108864"
+    },
+    "UTSMode": "",
+    "UsernsMode": "",
+    "ShmSize": 67108864,
+    "Runtime": "runc",
+    "Isolation": "",
+    "CpuShares": 0,
+    "Memory": 536870912,
+    "NanoCpus": 1000000000,
+    "CgroupParent": "",
+    "BlkioWeight": 0,
+    "BlkioWeightDevice": [],
+    "BlkioDeviceReadBps": [],
+    "BlkioDeviceWriteBps": [],
+    "BlkioDeviceReadIOps": [],
+    "BlkioDeviceWriteIOps": [],
+    "CpuPeriod": 0,
+    "CpuQuota": 0,
+    "CpuRealtimePeriod": 0,
+    "CpuRealtimeRuntime": 0,
+    "CpusetCpus": "",
+    "CpusetMems": "",
+    "Devices": [],
+    "DeviceCgroupRules": null,
+    "DeviceRequests": null,
+    "MemoryReservation": 0,
+    "MemorySwap": 1073741824,
+    "MemorySwappiness": null,
+    "OomKillDisable": null,
+    "PidsLimit": 64,
+    "Ulimits": null,
+    "CpuCount": 0,
+    "CpuPercent": 0,
+    "IOMaximumIOps": 0,
+    "IOMaximumBandwidth": 0,
+    "Mounts": [
+      {
+        "Type": "volume",
+        "Target": "/work"
+      }
+    ],
+    "MaskedPaths": [
+      "/proc/acpi",
+      "/proc/asound",
+      "/proc/interrupts",
+      "/proc/kcore",
+      "/proc/keys",
+      "/proc/latency_stats",
+      "/proc/sched_debug",
+      "/proc/scsi",
+      "/proc/timer_list",
+      "/proc/timer_stats",
+      "/sys/devices/virtual/powercap",
+      "/sys/firmware"
+    ],
+    "ReadonlyPaths": [
+      "/proc/bus",
+      "/proc/fs",
+      "/proc/irq",
+      "/proc/sys",
+      "/proc/sysrq-trigger"
+    ]
+  },
+  "tests": {
+    "full_suite": {
+      "passed": 139,
+      "skipped": 0,
+      "seconds": 37.75
+    },
+    "cli_roundtrip": {
+      "passed": 1,
+      "seconds": 6.11
+    },
+    "focused_host_symlink": {
+      "passed": 1,
+      "seconds": 0.46
+    },
+    "boundary_checker": "Boundaries OK",
+    "previous_full_suite": {
+      "passed": 137,
+      "skipped": 1,
+      "seconds": 29.55
+    }
+  },
+  "original_checkout_status": "# branch.oid f624e207276372d9386b669bf087a66b44aba714\n# branch.head main\n# branch.upstream origin/main\n# branch.ab +1 -2\n1 D. N... 100644 000000 000000 9e771558f3c032c37727dbb6ed461c78e3905114 0000000000000000000000000000000000000000 revised-plan-and-quickstart-2026-10-12-0011Z.md",
+  "source_checkout_status": "# branch.oid d6e582b7edeae24345a175f36639230726dbdead\n# branch.head claude/layered-code-pattern\n# branch.upstream origin/claude/layered-code-pattern\n# branch.ab +0 -0\n? config/codex.toml\n? config/field_encryption_key\n? config/secret_key\n? docs/projects/\n? examples/layered-app/\n? scripts/validate_boundaries.py\n? tests/test_validate_boundaries.py\n? windows-preflight.ps1",
+  "branch_refs": [
+    "refs/heads/feature/workflow-migration a3dafc636054a85eeed6eaeb4c10e1fcb9d020a4",
+    "refs/heads/main f624e207276372d9386b669bf087a66b44aba714",
+    "refs/remotes/origin/HEAD a3dafc636054a85eeed6eaeb4c10e1fcb9d020a4",
+    "refs/remotes/origin/copilot/restore-merged-feature-branches 9683d58ef201cdc825605a144bd4d0c7a0cf60fd",
+    "refs/remotes/origin/main a3dafc636054a85eeed6eaeb4c10e1fcb9d020a4",
+    "refs/remotes/origin/policy/preserve-feature-branches 60a848dfc7396b7b2b578a007b9be6aafec1fd83"
+  ],
+  "delivery_directory": "C:\\Users\\hensl\\AppData\\Local\\ai-template-workflow\\305e980a31665052aeec61623e4baeb216a6867cda0cf51297253375180a8247\\delivery-20261012T010237Z",
+  "delivery_patch": "C:\\Users\\hensl\\AppData\\Local\\ai-template-workflow\\305e980a31665052aeec61623e4baeb216a6867cda0cf51297253375180a8247\\delivery-20261012T010237Z\\migration.patch",
+  "delivery_inventory": "C:\\Users\\hensl\\AppData\\Local\\ai-template-workflow\\305e980a31665052aeec61623e4baeb216a6867cda0cf51297253375180a8247\\delivery-20261012T010237Z\\inventory.json",
+  "delivery_manifest": "C:\\Users\\hensl\\AppData\\Local\\ai-template-workflow\\305e980a31665052aeec61623e4baeb216a6867cda0cf51297253375180a8247\\delivery-20261012T010237Z\\manifest.json",
+  "limitations": [
+    "offline only; no model call",
+    "no independent acceptance",
+    "local coordinator account/repository worktrees only",
+    "no application contract or approval workflow changes",
+    "no candidate application or integration",
+    "transitive dependencies not fully locked"
+  ],
+  "diff_whitespace_check": "passed",
+  "live_remote_heads": [
+    "9683d58ef201cdc825605a144bd4d0c7a0cf60fd\trefs/heads/copilot/restore-merged-feature-branches",
+    "a3dafc636054a85eeed6eaeb4c10e1fcb9d020a4\trefs/heads/main",
+    "60a848dfc7396b7b2b578a007b9be6aafec1fd83\trefs/heads/policy/preserve-feature-branches"
+  ],
+  "final_exported_worker": {
+    "run_directory": "C:\\Users\\hensl\\AppData\\Local\\ai-template-workflow\\503d561e7fc9252850cf33b22887af1cdd40985c182c51cfb914d79987a7757b\\run-e1ee8e993fa147df9a8206ae4d8c254c",
+    "container": "85c3876f13b963f6bdc5619aecdb4b397d27954e84455266fc505b7605008aee",
+    "user": "1000:1000",
+    "image": "sha256:61526e68966dc3330c3801cbed8740c62710376b0b01b15c960b60c66b6cae1e",
+    "state": {
+      "Status": "exited",
+      "Running": false,
+      "Paused": false,
+      "Restarting": false,
+      "OOMKilled": false,
+      "Dead": false,
+      "Pid": 0,
+      "ExitCode": 0,
+      "Error": "",
+      "StartedAt": "2026-10-12T01:00:57.367968677Z",
+      "FinishedAt": "2026-10-12T01:00:57.454604428Z"
+    },
+    "host_config": {
+      "Binds": null,
+      "ContainerIDFile": "",
+      "LogConfig": {
+        "Type": "local",
+        "Config": {
+          "max-file": "2",
+          "max-size": "1m"
+        }
+      },
+      "NetworkMode": "none",
+      "PortBindings": {},
+      "RestartPolicy": {
+        "Name": "no",
+        "MaximumRetryCount": 0
+      },
+      "AutoRemove": false,
+      "VolumeDriver": "",
+      "VolumesFrom": null,
+      "ConsoleSize": [
+        0,
+        0
+      ],
+      "CapAdd": null,
+      "CapDrop": [
+        "ALL"
+      ],
+      "CgroupnsMode": "private",
+      "Dns": null,
+      "DnsOptions": [],
+      "DnsSearch": [],
+      "ExtraHosts": null,
+      "GroupAdd": null,
+      "IpcMode": "private",
+      "Cgroup": "",
+      "Links": null,
+      "OomScoreAdj": 0,
+      "PidMode": "",
+      "Privileged": false,
+      "PublishAllPorts": false,
+      "ReadonlyRootfs": true,
+      "SecurityOpt": [
+        "no-new-privileges"
+      ],
+      "Tmpfs": {
+        "/out": "rw,noexec,nosuid,nodev,uid=1000,gid=1000,size=67108864",
+        "/tmp": "rw,noexec,nosuid,nodev,size=67108864"
+      },
+      "UTSMode": "",
+      "UsernsMode": "",
+      "ShmSize": 67108864,
+      "Runtime": "runc",
+      "Isolation": "",
+      "CpuShares": 0,
+      "Memory": 536870912,
+      "NanoCpus": 1000000000,
+      "CgroupParent": "",
+      "BlkioWeight": 0,
+      "BlkioWeightDevice": [],
+      "BlkioDeviceReadBps": [],
+      "BlkioDeviceWriteBps": [],
+      "BlkioDeviceReadIOps": [],
+      "BlkioDeviceWriteIOps": [],
+      "CpuPeriod": 0,
+      "CpuQuota": 0,
+      "CpuRealtimePeriod": 0,
+      "CpuRealtimeRuntime": 0,
+      "CpusetCpus": "",
+      "CpusetMems": "",
+      "Devices": [],
+      "DeviceCgroupRules": null,
+      "DeviceRequests": null,
+      "MemoryReservation": 0,
+      "MemorySwap": 1073741824,
+      "MemorySwappiness": null,
+      "OomKillDisable": null,
+      "PidsLimit": 64,
+      "Ulimits": [
+        {
+          "Name": "fsize",
+          "Hard": 2097152,
+          "Soft": 2097152
+        }
+      ],
+      "CpuCount": 0,
+      "CpuPercent": 0,
+      "IOMaximumIOps": 0,
+      "IOMaximumBandwidth": 0,
+      "Mounts": [
+        {
+          "Type": "volume",
+          "Source": "workflow-4eea540d5e464e4fb9c84bbf202efcb6",
+          "Target": "/session"
+        }
+      ],
+      "MaskedPaths": [
+        "/proc/acpi",
+        "/proc/asound",
+        "/proc/interrupts",
+        "/proc/kcore",
+        "/proc/keys",
+        "/proc/latency_stats",
+        "/proc/sched_debug",
+        "/proc/scsi",
+        "/proc/timer_list",
+        "/proc/timer_stats",
+        "/sys/devices/virtual/powercap",
+        "/sys/firmware"
+      ],
+      "ReadonlyPaths": [
+        "/proc/bus",
+        "/proc/fs",
+        "/proc/irq",
+        "/proc/sys",
+        "/proc/sysrq-trigger"
+      ]
+    },
+    "mounts": [
+      {
+        "Type": "volume",
+        "Name": "workflow-4eea540d5e464e4fb9c84bbf202efcb6",
+        "Source": "/var/lib/docker/volumes/workflow-4eea540d5e464e4fb9c84bbf202efcb6/_data",
+        "Destination": "/session",
+        "Driver": "local",
+        "Mode": "z",
+        "RW": true,
+        "Propagation": ""
+      }
+    ]
+  }
+}

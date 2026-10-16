@@ -1,0 +1,21 @@
+{
+  "recorded_at": "2026-10-15T02:11:47.155308+00:00",
+  "argv": [
+    "C:\\Users\\hensl\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+    "-B",
+    "-m",
+    "pytest",
+    "-q",
+    "-rs",
+    "-p",
+    "no:cacheprovider",
+    "-o",
+    "addopts=",
+    "tests/test_ui.py::test_bad_login_stays_on_login_screen"
+  ],
+  "exit_code": 0,
+  "seconds": 0.532,
+  "output": ".                                                                        [100%]\n1 passed in 0.08s\n",
+  "source_hashes_unchanged": true,
+  "scope": "Only unchanged tracked Tk skip recheck; complete run retains its recorded skip and issue 4 remains separate."
+}

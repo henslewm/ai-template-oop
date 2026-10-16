@@ -1,0 +1,43 @@
+{
+  "command": "uvx --offline basedpyright --outputjson scripts/acceptance.py scripts/acceptance_report.py scripts/acceptance_runtime.py",
+  "exit_code": 1,
+  "summary": {
+    "filesAnalyzed": 3,
+    "errorCount": 4,
+    "warningCount": 1454,
+    "informationCount": 0,
+    "timeInSec": 0.899
+  },
+  "errors": [
+    {
+      "file": "c:\\Users\\hensl\\Documents\\GitHub\\ai-template\\ai-template-oop-workflow-migration\\scripts\\acceptance.py",
+      "severity": "error",
+      "message": "Cycle detected in import chain\n  c:\\Users\\hensl\\Documents\\GitHub\\ai-template\\ai-template-oop-workflow-migration\\scripts\\acceptance.py\n  c:\\Users\\hensl\\Documents\\GitHub\\ai-template\\ai-template-oop-workflow-migration\\scripts\\acceptance_report.py\n  c:\\Users\\hensl\\Documents\\GitHub\\ai-template\\ai-template-oop-workflow-migration\\scripts\\execution_harness.py\n  c:\\Users\\hensl\\Documents\\GitHub\\ai-template\\ai-template-oop-workflow-migration\\scripts\\feedback.py",
+      "rule": "reportImportCycles"
+    },
+    {
+      "file": "c:\\Users\\hensl\\Documents\\GitHub\\ai-template\\ai-template-oop-workflow-migration\\scripts\\acceptance.py",
+      "severity": "error",
+      "message": "Cycle detected in import chain\n  c:\\Users\\hensl\\Documents\\GitHub\\ai-template\\ai-template-oop-workflow-migration\\scripts\\acceptance.py\n  c:\\Users\\hensl\\Documents\\GitHub\\ai-template\\ai-template-oop-workflow-migration\\scripts\\acceptance_runtime.py",
+      "rule": "reportImportCycles"
+    },
+    {
+      "file": "c:\\Users\\hensl\\Documents\\GitHub\\ai-template\\ai-template-oop-workflow-migration\\scripts\\acceptance.py",
+      "severity": "error",
+      "message": "Cycle detected in import chain\n  c:\\Users\\hensl\\Documents\\GitHub\\ai-template\\ai-template-oop-workflow-migration\\scripts\\acceptance.py\n  c:\\Users\\hensl\\Documents\\GitHub\\ai-template\\ai-template-oop-workflow-migration\\scripts\\execution_harness.py\n  c:\\Users\\hensl\\Documents\\GitHub\\ai-template\\ai-template-oop-workflow-migration\\scripts\\feedback.py",
+      "rule": "reportImportCycles"
+    },
+    {
+      "file": "c:\\Users\\hensl\\Documents\\GitHub\\ai-template\\ai-template-oop-workflow-migration\\scripts\\acceptance.py",
+      "severity": "error",
+      "message": "Cycle detected in import chain\n  c:\\Users\\hensl\\Documents\\GitHub\\ai-template\\ai-template-oop-workflow-migration\\scripts\\acceptance.py\n  c:\\Users\\hensl\\Documents\\GitHub\\ai-template\\ai-template-oop-workflow-migration\\scripts\\acceptance_runtime.py\n  c:\\Users\\hensl\\Documents\\GitHub\\ai-template\\ai-template-oop-workflow-migration\\scripts\\execution_harness.py\n  c:\\Users\\hensl\\Documents\\GitHub\\ai-template\\ai-template-oop-workflow-migration\\scripts\\feedback.py",
+      "rule": "reportImportCycles"
+    }
+  ],
+  "source_sha256": {
+    "scripts/acceptance.py": "7fd67c6eb39b8c0f4945d9338e659dd8a6e5aab2b5f08966d98c85c410340ef9",
+    "scripts/acceptance_report.py": "ca8d6e39e2d7002eeda66db932ea08ece935d10222eabf203096b56513102545",
+    "scripts/acceptance_runtime.py": "d84a1b62f74e415824277d85f01fd1cf545e6234f4995238e8a60e7dd1af27b1"
+  },
+  "stderr": ""
+}

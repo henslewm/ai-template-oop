@@ -46,3 +46,7 @@ python main.py            # run with SQLite (app.db)
 python -m pytest          # contract tests + UI tests + boundary linter
 python tools/validate_boundaries.py
 ```
+
+## Branch retention
+
+Never delete feature branches locally or on origin, including after merge. Keep automatic branch deletion disabled. Read BRANCH_RETENTION.md; this overrides any inherited cleanup instruction.

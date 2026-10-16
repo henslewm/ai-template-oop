@@ -1,0 +1,629 @@
+{
+  "schema_version": "destination-workflow-approval/1.0",
+  "state": "ACTIVE",
+  "autonomy_enabled": true,
+  "approval": {
+    "approved": true,
+    "approved_by": "Winston",
+    "approved_at": "2026-10-14T02:07:06Z",
+    "architecture_fingerprint": "8e75e71b3561eaec4ad5cf71e37a1dec9f2c7dce0d07e0be46346daacfc90481",
+    "decision": "APPROVE 8e75e71b3561eaec4ad5cf71e37a1dec9f2c7dce0d07e0be46346daacfc90481"
+  },
+  "destination": {
+    "repository": "ai-template-oop",
+    "branch": "feature/workflow-migration",
+    "base_commit": "a3dafc636054a85eeed6eaeb4c10e1fcb9d020a4"
+  },
+  "source": {
+    "repository": "henslewm/universal-ai-project-template",
+    "commit": "d6e582b7edeae24345a175f36639230726dbdead",
+    "checkout": "../universal-ai-project-template"
+  },
+  "authority": {
+    "approval_scope": "bounded_offline_implementation",
+    "live_workers_enabled": false,
+    "provider_egress": "none",
+    "credential_delivery": "none",
+    "publication_authorized": false,
+    "merge_authorized": false,
+    "delegation_authorized": false,
+    "activation_requires": "explicit_owner_receipt",
+    "contract_changes_require": "owner_and_linked_ui"
+  },
+  "components": {
+    "bootstrap": "Destination receipt and document/config hashes replace donor ACTIVE approval; validator is read-only.",
+    "routing": "Adapt model_router route/record/verify; retain floors, expected cost ranking and context headroom; all resources disabled.",
+    "feedback": "Adapt replay/apply/reserve/complete/review/diagnose over canonical journal; lifetime IDs, failures and caps preserved.",
+    "bounded_attempts": "Worker default 2, reviewer overall 2, tier min caps, deadline and explicit holds; no reset on repair or resubmission.",
+    "budgets": "Live caps zero; later metered enablement needs new foundation. Hold unknown liability and reserve all cost caps atomically.",
+    "dispatch_report_ingestion": "Adapt harness prepare/validate/ingest and launcher preflight to Docker-only execution; bind exact reservation/scope/image/bundle.",
+    "independent_acceptance": "Adapt acceptance gates and replay; rerun deterministic checks in separate Docker export; implementer cannot accept; exact candidate binding.",
+    "durable_shared_state": "Separate control.sqlite3 journal from ownership.sqlite3; canonical Git-common identity, durable transactions, idempotent cross-store reconciliation and derived views.",
+    "branch_preserving_closeout": "Adapt readiness only; exclude donor cleanup and auto-merge authority; permanent feature branches, exact heads and later owner merge gate."
+  },
+  "policy": {
+    "worker_max_attempts": 2,
+    "reviewer_max_attempts": 2,
+    "max_attempts_by_tier": {
+      "0": 3,
+      "1": 3,
+      "2": 2,
+      "3": 2,
+      "4": 1
+    },
+    "repeated_failure_per_tier": 2,
+    "repeated_failure_total": 3,
+    "max_contract_repairs": 1,
+    "max_blocker_resumptions": 3,
+    "max_architect_diagnoses": 5,
+    "attempt_timeout_seconds": 600,
+    "automated_pr_review_max_rounds": 4,
+    "max_context_chars": 40000,
+    "max_history_entries": 5,
+    "task_api_budget_usd": 0,
+    "role_api_budget_usd": 0,
+    "project_api_budget_usd": 0,
+    "risk_floor": {
+      "low": 0,
+      "medium": 1,
+      "high": 3,
+      "critical": 4
+    },
+    "complexity_floor": {
+      "low": 0,
+      "medium": 2,
+      "high": 3
+    },
+    "review_floors": {
+      "low": [
+        "deterministic"
+      ],
+      "medium": [
+        "deterministic",
+        "model_review"
+      ],
+      "high": [
+        "cross_family_review",
+        "deterministic",
+        "model_review"
+      ],
+      "critical": [
+        "architect_review",
+        "cross_family_review",
+        "deterministic",
+        "model_review",
+        "user_decision"
+      ]
+    },
+    "resources_enabled": false,
+    "unknown_cost_action": "HOLD",
+    "budget_accounting": "settled_plus_pending_ceiling",
+    "unmeasured_worker_cost": "unverified_liability"
+  },
+  "boundary": {
+    "runtime": "Docker Desktop Linux",
+    "network": "none",
+    "uid_gid": "1000:1000",
+    "read_only_root": true,
+    "capabilities": "drop_all",
+    "no_new_privileges": true,
+    "host_bind_mounts": false,
+    "git_objects": false,
+    "host_credentials": false,
+    "control_state_visible": false,
+    "scope": "enumerated_files_only",
+    "acceptance_execution": "separate_scoped_docker_export",
+    "image": "sha256:61526e68966dc3330c3801cbed8740c62710376b0b01b15c960b60c66b6cae1e"
+  },
+  "state_layout": {
+    "identity": "git_common_directory",
+    "root": "LOCALAPPDATA/ai-template-workflow/<identity>",
+    "ownership": "ownership.sqlite3",
+    "task_review_project": "control.sqlite3",
+    "evidence": "run-*/",
+    "views": "derived_only",
+    "alternate_state": "refused",
+    "journal_durability": "sqlite_full_synchronous_transactions",
+    "launch_authority": "commit_consumed_before_docker_start",
+    "cross_store_recovery": "idempotent_reconciliation_no_implicit_restart",
+    "branch_retention": "permanent_local_and_origin"
+  },
+  "source_dependencies": {
+    "config/acceptance.schema.json": {
+      "git_blob": "c1bd6a31a96b5191ffa459d42d985786e5086239",
+      "sha256_lf": "2ee6953bb1df492e418153106986ba3fc91ef7fdf7788ba9bd3bd67589d270cb",
+      "disposition": "adapt"
+    },
+    "config/bootstrap.schema.json": {
+      "git_blob": "d205e2403a851e2d967631df45864856e5dcc307",
+      "sha256_lf": "96ac2151e1e297aa3c4d1fd6dc7c4e648e110050451688beb36347668169d57c",
+      "disposition": "reference_only"
+    },
+    "config/domains/software-hardware.schema.json": {
+      "git_blob": "69aeda438e5002c1237f343e56b959c554698396",
+      "sha256_lf": "9159c2714fa03b85d8997bec475b2bc95283947eb711d04aa89cc6365efe7d76",
+      "disposition": "preserve_exact"
+    },
+    "config/execution-harness.schema.json": {
+      "git_blob": "a0e33efd1189ce791229b845f63169b2d68857f6",
+      "sha256_lf": "20f014a42658d877e3538beea732a42d7d3a55f3f44c71aa0cf5fdeba5d9c716",
+      "disposition": "adapt"
+    },
+    "config/feedback.schema.json": {
+      "git_blob": "4d0b10aaf31889ce6d102233f297105d194a7768",
+      "sha256_lf": "909c475e2646721aaa578024dfcd66612b2c4ef74f238b3809f5bed441bd4178",
+      "disposition": "adapt"
+    },
+    "config/model-router.schema.json": {
+      "git_blob": "b4348b0d85b3ae7b388121e0dbc0a44284706ada",
+      "sha256_lf": "1170f18f3e450491b7954f56512c13d0dcfd4094667de136bac3f64625966f17",
+      "disposition": "adapt"
+    },
+    "config/work-packet.schema.json": {
+      "git_blob": "335fc690a1dcebc028617d103b78edb2c5122a1f",
+      "sha256_lf": "7b29db518868b79b58ce72d2c29f44c3b1e43726d3805de046bf6ef50c838126",
+      "disposition": "preserve_exact"
+    },
+    "examples/work-packets/software-hardware.contract.json": {
+      "git_blob": "4394cfa7f2ed24f1d74bf27d77e9a84dc097d902",
+      "sha256_lf": "3086d5b76f638f2fda048099e637658d090601f292ddbdcd7bce19d830f04e0e",
+      "disposition": "preserve_exact"
+    },
+    "requirements-work-packets.txt": {
+      "git_blob": "589d38521a92937b1bce05805414283fa39ba2dd",
+      "sha256_lf": "d14d43468e34a9b5d7d44e59d61a68ce4b20ca003ae41b0e07b76ae9d7fb39fc",
+      "disposition": "preserve_exact"
+    },
+    "scripts/acceptance.py": {
+      "git_blob": "b826da523d1f7175eaeeb2944c3df1ed7c919bdf",
+      "sha256_lf": "2a24720d4a44eebc2e86eb7691ccc8ca834ff5f199aa69c31a39e00d66b6e729",
+      "disposition": "adapt"
+    },
+    "scripts/bootstrap_gate.py": {
+      "git_blob": "fc81dac9631599d740d2324a923443622f067166",
+      "sha256_lf": "2075eaec7ed05ccf5c2826ee54c22cbbb3bc8604b37f60810b205d140e66ffbc",
+      "disposition": "reference_only"
+    },
+    "scripts/cli_colors.py": {
+      "git_blob": "e9ef9b4dc08b4f72bc852ce097ec439679381657",
+      "sha256_lf": "50ab6f833e8ddf79b4d7c3a54dcb40354046df3a2a9bff2803911e88c38c4292",
+      "disposition": "adapt"
+    },
+    "scripts/cli_exit.py": {
+      "git_blob": "8f2cb6dd19bde63d32abfa509d39016e49096217",
+      "sha256_lf": "a92b54cff0d8a4a5117fe74e8be4703e6bb9e942467505530c03601976b56dad",
+      "disposition": "preserve_exact"
+    },
+    "scripts/closeout.py": {
+      "git_blob": "2cbcdae887493783f9ede86f4b6dcc0c408a8333",
+      "sha256_lf": "5b50da6d019e654ea308fb4d35b5f238e8e3358311139672f088f96acc3cf848",
+      "disposition": "reference_only"
+    },
+    "scripts/execution_harness.py": {
+      "git_blob": "22c85fa6bb667f7c3a6c2d75575006e7b9f6ea8d",
+      "sha256_lf": "bbe20af277b7247f4a20335beaf7f10cf04ac235f105baddd69e617d58651f58",
+      "disposition": "adapt"
+    },
+    "scripts/feedback.py": {
+      "git_blob": "9780ea87c0c9de64d39ae7e9943edf552d03aee8",
+      "sha256_lf": "85bdd8165a139ee61a32f2511d91cf6b5c827b7f41797168be188cf57ba63526",
+      "disposition": "adapt"
+    },
+    "scripts/model_router.py": {
+      "git_blob": "7898889de86e0b675b107974fd568d727981d3d5",
+      "sha256_lf": "3f4905a1d5be4701b7d67568e633c16f15b60dac63b5c2e42ac4ecb27d4587c0",
+      "disposition": "adapt"
+    },
+    "scripts/progress.py": {
+      "git_blob": "f9768984eb3032d5dec8a741a6c57aaba1af1870",
+      "sha256_lf": "b48a2c6f1a0284254fe6de7a14e0731f5fe04b85476828ab0d070da2c19dfa6c",
+      "disposition": "adapt"
+    },
+    "scripts/software_hardware.py": {
+      "git_blob": "fa3d29487390750614f58d1b26d41a35008217fb",
+      "sha256_lf": "1f110a96379e6314a1ed62a8a002ef68b0ecf16fa9031165f2b303f37f10afe4",
+      "disposition": "preserve_exact"
+    },
+    "scripts/validate_bootstrap.py": {
+      "git_blob": "ba3cab3a57bd15e415148d043316f978c4a3cd16",
+      "sha256_lf": "461c54f605c480facd161bad63bc143b22f1f027e6cdc2e527186b7ac2458d9a",
+      "disposition": "adapt"
+    },
+    "scripts/work_packet.py": {
+      "git_blob": "2b7a18394aa63b301545713ea2622a0575ca51ad",
+      "sha256_lf": "6431caa53b5e9141ca82e903cbd7c51251c524c675ce587cbaa2e020f5183ba2",
+      "disposition": "preserve_exact"
+    },
+    "scripts/worker_launcher.py": {
+      "git_blob": "31441c2a4a593eb2c6c2d3460636593bbad9c0e4",
+      "sha256_lf": "4436903e273c1362011872659c901430cb059e2d166107e6fc756f3622776720",
+      "disposition": "adapt"
+    },
+    "templates/acceptance/REVIEWER_RULES.md": {
+      "git_blob": "a3a2f6f19d9771d495567148dee9d83b99a5219f",
+      "sha256_lf": "0a390a000a0a64692cf9eb9b0d37ca054e856e4329719ba9a264f503254503da",
+      "disposition": "reference_only"
+    },
+    "templates/harness/BOUNDED_WORKER_RULES.md": {
+      "git_blob": "ea03a4508baa173df649cc44106149450731ae03",
+      "sha256_lf": "9f98fc6c825136991abb4e9cddce462732a574ec757ec8c0e045695f596668c4",
+      "disposition": "reference_only"
+    },
+    "tests/test_acceptance.py": {
+      "git_blob": "a7aa399d434876914f4be935eb82232b4158fabe",
+      "sha256_lf": "49324064adf0e75f479c680295a729d4d7d08665fa14302f61b212f4a2004ec6",
+      "disposition": "reference_only"
+    },
+    "tests/test_bootstrap.py": {
+      "git_blob": "25fd8e1ab35b0ff4e2c83c6079988cb80fdfc4d6",
+      "sha256_lf": "c1ce0694540ded6bd22e96e1d8303ea33a9f747ad4ba074eae31969ec2676023",
+      "disposition": "reference_only"
+    },
+    "tests/test_bootstrap_gate.py": {
+      "git_blob": "b9b2a6c8a36aec8a5ca28b913f2b43487327fb7c",
+      "sha256_lf": "3ad5581ecf51d57cd2af1f2d69be14dbf6386a36a8f523772d8e5b4c392aeede",
+      "disposition": "reference_only"
+    },
+    "tests/test_closeout.py": {
+      "git_blob": "4c307570c88825bb785758404926e82a81163c42",
+      "sha256_lf": "2c952dc822284ddab7b66b6a17eb86f51be436eab9e3d031938f8435c98c6e02",
+      "disposition": "reference_only"
+    },
+    "tests/test_execution_harness.py": {
+      "git_blob": "0e67d5dd08ad27bee2761e2b7908a0ec714e4a6f",
+      "sha256_lf": "1fc6adc60aa46b6b8ef39867071d8770b650a3da51d73c5cd9ff5457d6134e8a",
+      "disposition": "reference_only"
+    },
+    "tests/test_feedback.py": {
+      "git_blob": "8255311bf81addf41f3d2c01b673a2a4b433bf2a",
+      "sha256_lf": "8388ea329a430f50423fd5690a4c491a399f304a692f6fae0b273ec371c3c647",
+      "disposition": "reference_only"
+    },
+    "tests/test_model_router.py": {
+      "git_blob": "35b8e15b17557c85e65326973aa6cc6788bf8d37",
+      "sha256_lf": "7cbc09df70477ed08f5b9dd930d6601341ccf028b659f08ebe1af9d86ddbced4",
+      "disposition": "reference_only"
+    },
+    "tests/test_work_packet.py": {
+      "git_blob": "cc7b5b8f87d9223917f8c9d816fb1f082326d075",
+      "sha256_lf": "9401217376a0903e3fbf0515f65b31b54cfc9c949b5601fd7b3f4d5f0d8930e1",
+      "disposition": "preserve_exact"
+    },
+    "tests/test_worker_launcher.py": {
+      "git_blob": "69df6337fb00634e2ef85a08bfcea23770009d2a",
+      "sha256_lf": "72cc7ea2ff571247005661451c35bc2978ab53f876be6774b9cadd747eeb869c",
+      "disposition": "reference_only"
+    }
+  },
+  "milestones": [
+    {
+      "id": "M1",
+      "owner": "Isolation maintainer",
+      "depends_on": [],
+      "criteria": [
+        "AC-02",
+        "AC-03"
+      ],
+      "paths": [
+        "scripts/workflow_scope.py",
+        "scripts/workflow_runtime.py",
+        "tests/test_workflow_runtime_startup.py"
+      ]
+    },
+    {
+      "id": "M2",
+      "owner": "Coordinator and journal maintainer",
+      "depends_on": [
+        "M1"
+      ],
+      "criteria": [
+        "AC-01",
+        "AC-09"
+      ],
+      "paths": [
+        "scripts/validate_workflow_approval.py",
+        "scripts/workflow_state.py",
+        "config/workflow-bootstrap.json",
+        "tests/test_workflow_state.py"
+      ]
+    },
+    {
+      "id": "M3",
+      "owner": "Routing and feedback maintainer",
+      "depends_on": [
+        "M2"
+      ],
+      "criteria": [
+        "AC-04",
+        "AC-05",
+        "AC-06"
+      ],
+      "paths": [
+        "scripts/model_router.py",
+        "scripts/feedback.py",
+        "config/model-router.schema.json",
+        "config/feedback.schema.json",
+        "tests/test_model_router.py",
+        "tests/test_feedback.py"
+      ]
+    },
+    {
+      "id": "M4",
+      "owner": "Execution maintainer",
+      "depends_on": [
+        "M3"
+      ],
+      "criteria": [
+        "AC-02",
+        "AC-03",
+        "AC-07"
+      ],
+      "paths": [
+        "scripts/execution_harness.py",
+        "scripts/worker_launcher.py",
+        "config/execution-harness.schema.json",
+        "tests/test_execution_harness.py",
+        "tests/test_worker_launcher.py"
+      ]
+    },
+    {
+      "id": "M5",
+      "owner": "Independent acceptance owner",
+      "depends_on": [
+        "M4"
+      ],
+      "criteria": [
+        "AC-08",
+        "AC-11"
+      ],
+      "paths": [
+        "scripts/acceptance.py",
+        "config/acceptance.schema.json",
+        "tests/test_acceptance.py"
+      ]
+    },
+    {
+      "id": "M6",
+      "owner": "Coordinator and integrator",
+      "depends_on": [
+        "M5"
+      ],
+      "criteria": [
+        "AC-10",
+        "AC-11",
+        "AC-12"
+      ],
+      "paths": [
+        "scripts/workflow_handoff.py",
+        "scripts/workflow_closeout.py",
+        "docs/workflow-migration/README.md",
+        "tests/test_workflow_closeout.py"
+      ]
+    }
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC-01",
+      "requirement": "Foundation approval binds destination, source, policies and files; inactive or stale approval refuses dispatch.",
+      "evidence": [
+        "Positive package validation and exact fingerprint",
+        "Inactive, forged, altered-file, altered-policy and changed-anchor refusals",
+        "Owner receipt only after explicit later approval"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AC-02",
+      "requirement": "Retain Docker read/write/network isolation for worker and acceptance exports.",
+      "evidence": [
+        "Denied host/sibling/Git/socket/credential/link/network access and immutable writes",
+        "Allowed scoped task succeeds",
+        "Image ID and Docker inspect evidence for both worker and acceptance"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AC-03",
+      "requirement": "Only one branch/workspace owner and one consumed start survive failure, races and recovery.",
+      "evidence": [
+        "Startup refusal plus failed logging cannot reuse token",
+        "Concurrent execute permits at most one Docker start",
+        "Restart after consumed-start commit refuses retry",
+        "Expiry recovery requires stopped tree and preserved output; old token refused"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AC-04",
+      "requirement": "Routing preserves role/risk/complexity floors, eligibility, expected-cost ranking and context bounds.",
+      "evidence": [
+        "Source routing tests ported with disabled resources",
+        "Risk/tier/provider-unavailable/context-negative cases",
+        "Decision replay reproduces selected resource and reasons from saved config"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AC-05",
+      "requirement": "Attempts, repeated failures, repairs, resumptions and review caps remain cumulative and bounded.",
+      "evidence": [
+        "Worker cap 2 and reviewer cap 2; tier caps and deadlines enforced",
+        "Contract repair/resume/resubmission never reset counts",
+        "Repeated worker and reviewer fingerprints escalate or hold; exhausted budgets refuse"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AC-06",
+      "requirement": "Budget accounting retains settled spend and pending liability and refuses unknown metered cost.",
+      "evidence": [
+        "Concurrent reservations fit task/role/project caps",
+        "Missing/zero/positive unmeasured cost remains held; measured cache usage priced conservatively",
+        "Abandoned possibly charged run never becomes free",
+        "Zero budgets and disabled resources prevent live API calls"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AC-07",
+      "requirement": "Dispatch and ingestion bind one reservation to the exact scoped run and report.",
+      "evidence": [
+        "Duplicate reservation/start/RESULT and changed brief/binding/deadline refusals",
+        "Wrong dispatch/check IDs/types/oversized report/path escape/link/stale bundle refusals",
+        "Crash between reserve/render/claim/start/result reconciles without implicit launch"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AC-08",
+      "requirement": "Independent acceptance checks the current candidate and preserves source gate floors.",
+      "evidence": [
+        "Worker PASS cannot accept; same actor and reviewer-tier/family shortfalls refused",
+        "Fresh isolated deterministic checks bound to candidate/image",
+        "Changed artifact/reference/commit/interface invalidates earlier gates",
+        "Hardware evidence missing means unverified; feedback sync is bound and idempotent"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AC-09",
+      "requirement": "One canonical durable journal survives Windows interruption across all repository worktrees.",
+      "evidence": [
+        "Thread/process append collision and actual process-kill/restart tests",
+        "Alternate-state, gap, digest mismatch and stale stream-head refusals",
+        "One-time source chain import retains IDs/head/counts/spend",
+        "Backup/restore verifies journal and referenced evidence before dispatch"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AC-10",
+      "requirement": "A fresh session resumes from bounded coordinator/worker handoffs without widening scope.",
+      "evidence": [
+        "Clean-start and interrupted-run resume identify objective/scope/base/diff/interface/pending spend/blocker/next action",
+        "Stale derived view refused; exact missing-context proposal yields smallest revised scope",
+        "UTC timestamps and measured/estimated/unknown context usage accurately labeled"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AC-11",
+      "requirement": "Acceptance, integration and deployment remain distinct; interfaces and live required checks gate promotion.",
+      "evidence": [
+        "Exact feature/UI/base candidate identities and contract/boundary tests",
+        "Approved interface change links UI and mocks; internal-only change requires no UI work",
+        "Changed head invalidates checks; missing/failing live required checks block promotion",
+        "No deployment or hardware success inferred from tests"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AC-12",
+      "requirement": "Closeout preserves original/source work and every permanent feature branch locally and on origin.",
+      "evidence": [
+        "No donor cleanup/delete/reset/force-push/rename path imported",
+        "Before authorized merge verify delete_branch_on_merge=false and exact reviewed head",
+        "Two successive releases from retained branch preserve history and avoid duplicate changes",
+        "Protected statuses/indexes and unrelated branch refs preserved"
+      ],
+      "status": "pending"
+    }
+  ],
+  "blockers": [
+    "Launch prerequisite: durably consume startup authority; retry/race/restart defect remains unrepaired.",
+    "Rollout prerequisite: implement journal, controllers, Docker dispatch and independent acceptance adapters in milestone order.",
+    "Acceptance prerequisite: independent exact-candidate and Windows crash/concurrency evidence; historical tests are insufficient.",
+    "Outside scope: real model resources, prices, provider-only egress, credentials, paid-worker authority and Git publication require a new owner-reviewed proposal."
+  ],
+  "bound_files": {
+    "BRANCH_RETENTION.md": "e4d292de02d20b708d15978316848ce1e938197439c3e8d5b851779b8340ebc0",
+    "CLAUDE.md": "daf9cb1022872dc5d43002ff0c6ff10de9799252eb60472dd56d414a2fecf07e",
+    "PROMPTS.md": "e57c0c219339d03740bc0e6d762097c896df48a3a392e544e9d4cbc7b736022d",
+    "config/domains/software-hardware.schema.json": "9159c2714fa03b85d8997bec475b2bc95283947eb711d04aa89cc6365efe7d76",
+    "config/work-packet.schema.json": "7b29db518868b79b58ce72d2c29f44c3b1e43726d3805de046bf6ef50c838126",
+    "docs/workflow-migration/ARCHITECTURE.md": "f301cb70f5f1adc6182210f68c78f6ed192a6e2c7885f6a58bf5b7f0e5f8a927",
+    "docs/workflow-migration/BOOTSTRAP_REVIEW.md": "a6e6129fd2967e120ca63db152b04a2b2ae3d7039dd37e6120f0646306d0f997",
+    "examples/work-packets/software-hardware.contract.json": "3086d5b76f638f2fda048099e637658d090601f292ddbdcd7bce19d830f04e0e",
+    "pyproject.toml": "0f8cc1ea044ee733122637fd2675f9522e7316f1d6304d81656540c1dbf7aa56",
+    "requirements-work-packets.txt": "d14d43468e34a9b5d7d44e59d61a68ce4b20ca003ae41b0e07b76ae9d7fb39fc",
+    "scripts/cli_exit.py": "a92b54cff0d8a4a5117fe74e8be4703e6bb9e942467505530c03601976b56dad",
+    "scripts/software_hardware.py": "1f110a96379e6314a1ed62a8a002ef68b0ecf16fa9031165f2b303f37f10afe4",
+    "scripts/validate_workflow_approval.py": "1a58184ddf24dd8ea78c2cc9566a66b421abe6b202228395aee4b98aeaedd2ca",
+    "scripts/work_packet.py": "6431caa53b5e9141ca82e903cbd7c51251c524c675ce587cbaa2e020f5183ba2",
+    "tests/test_work_packet.py": "9401217376a0903e3fbf0515f65b31b54cfc9c949b5601fd7b3f4d5f0d8930e1",
+    "tests/test_workflow_approval.py": "5149c9ecf48278bb3b79e4bc81e8419e084014b6d50cd881d7bd1767c863cc32",
+    "tools/prepare_workflow_approval.py": "ce37acd86620b9ff0f1a57a442e670935d8069edeb1da805ec7163dc8d081f04"
+  },
+  "baseline_files": {
+    ".gitignore": "b1cba6444c04afe6bc060b796ce022095af4ee9ef3fc5435261cd2d9fae2cf88",
+    "README.md": "e79096ea7bfcb1f0f264c261978033c90f29a6ed9f3b91412a05fa24255b609b",
+    "contracts/__init__.py": "1b7b315e440d34759d2058aded7a0682f0ed4e281fdb265ca9d1bd91b311a455",
+    "contracts/auth.py": "1145ef99aa0d47998deb129b66393ecbce05557c08f264d9c053efdb692bf57a",
+    "contracts/data.py": "a1cf3db22927686c82e132d79f90e0d5bd7bd02611ee87799c45255e7045f986",
+    "contracts/errors.py": "2882ef8980cd0d2591fa261a44ef728035f139f983543e0f31c05ba66a08ca44",
+    "docs/workflow-migration/HANDOFF.md": "8934d7c5e171efcf5738ffb2d073f7f169771112d8b511cc3d951bf317c777aa",
+    "docs/workflow-migration/README.md": "78aa6b384eb53ace8827270ebac259767d56e542f8176d988e670aafe0798800",
+    "docs/workflow-migration/SOURCES.md": "423d466c327c6c14721af6ee4674062c470dabcc846b5d01d02d9d5b211ed666",
+    "docs/workflow-migration/evidence.json": "09a8366ab35c7c2ea6a980c50aac43d9b8fbd7d47b45dbec4896c105ffa4d75f",
+    "main.py": "126066b0db0e597d626a0238f38509eb6331c8b35073f2dfee372447f905745c",
+    "runtime/workflow/Dockerfile": "13deaf804f22501a0333551fb058973d7fe2d4af8905a5a550024197e3215e5a",
+    "runtime/workflow/probe.py": "40581664852e3611bc2b2537e1e9374d0d53b9089fb0c9ae9fc32b7c08af8806",
+    "scripts/workflow_runtime.py": "9de5dcda705c9c449e8cd9a09d4d6f36a649d4dc636211ed8b38013c957da926",
+    "scripts/workflow_scope.py": "8aa5fdbf6a7a714947c200a19eb903e41e28e2f13f687cffe2d238315e1fad5d",
+    "src/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "src/container/__init__.py": "081d4b1b06ee34334b23c27c27044d2459a1b3dfefec1d0d92df1dc5cae75cad",
+    "src/container/wiring.py": "697c2c2edf5f0ebe51d26b99a13d7d57cae4f825a3389057488959f5f6779bd1",
+    "src/features/__init__.py": "2d388d7e48ba125f8de860166c3f3f53c7e99a1a8b567371afd3f14a965d6c59",
+    "src/features/auth.py": "4c51b1fa11b5e71226fa88f5dc1bc713e2cebce052af6d7d4f56f16925768479",
+    "src/features/data.py": "e5a7b63bf85ac7b376d51d5a2ec062af3d203e58a754fc84444edecd2cce92a9",
+    "src/ui/__init__.py": "7b046c6e6808c72e63901b88a531ef3e523432a2b6710d25f194aa24228341e0",
+    "src/ui/errors.py": "49d84ccd61e9f7febbcfac751f08e1190b49e7da0e30157ac1bf773ab7906a31",
+    "src/ui/main_window.py": "2ec92e62d3590201bffcd29add3beca6504c8fadfb46c5db60aa3a593e485b16",
+    "src/ui/mocks.py": "5bec36eda6e73fb44966e4650663ddbab89a38d9021b86a0e091b45726bfec84",
+    "tests/conftest.py": "68108db545a42d409f3a0cdd7c899a216df254ada3da55dffd17c9795725d857",
+    "tests/test_boundaries.py": "f6cf3e39715ebfd5f2d198f2916bad27ca0c61925dce108e033ffe6626d26bc9",
+    "tests/test_contract_auth.py": "b768c9677d359dc75e135d41dd7a28ae4c6d36bfa463c410278b9b62e4d4f856",
+    "tests/test_contract_data.py": "38e87aefcb4304cbefd2d1fb17449d38902178fe2bf06d0323b3bac3af1814f4",
+    "tests/test_ui.py": "443a804b4071af15bfad58b68198d9a1933e3f6d08e4165cf79ffd8627cfbd94",
+    "tests/test_workflow_runtime_startup.py": "cdde4e290771cf2f32854d9ac30020ed5500c6e20e97ec03a564075daf8b2328",
+    "tests/test_workflow_scope.py": "47de1a16aa4c11398ade825c05f598a30b575b8203c96efe1a5d6a5fec289277",
+    "tools/validate_boundaries.py": "33fb393ac1490f5823eeedda84f8482e6be8d5f6e60731dea5a6e84cf121e7cc"
+  },
+  "preserved_state": {
+    "refs": {
+      "refs/heads/feature/workflow-migration": "a3dafc636054a85eeed6eaeb4c10e1fcb9d020a4",
+      "refs/heads/main": "f624e207276372d9386b669bf087a66b44aba714",
+      "refs/remotes/origin/HEAD": "a3dafc636054a85eeed6eaeb4c10e1fcb9d020a4",
+      "refs/remotes/origin/copilot/restore-merged-feature-branches": "9683d58ef201cdc825605a144bd4d0c7a0cf60fd",
+      "refs/remotes/origin/main": "a3dafc636054a85eeed6eaeb4c10e1fcb9d020a4",
+      "refs/remotes/origin/policy/preserve-feature-branches": "60a848dfc7396b7b2b578a007b9be6aafec1fd83"
+    },
+    "original": {
+      "status": [
+        "# branch.oid f624e207276372d9386b669bf087a66b44aba714",
+        "# branch.head main",
+        "# branch.upstream origin/main",
+        "# branch.ab +1 -2",
+        "1 D. N... 100644 000000 000000 9e771558f3c032c37727dbb6ed461c78e3905114 0000000000000000000000000000000000000000 revised-plan-and-quickstart-2026-10-12-0011Z.md"
+      ],
+      "index_sha256": "fe7124042405022bf442485ce5e340489d0b292f2bbaa8a8935321b6653ec39b"
+    },
+    "source": {
+      "status": [
+        "# branch.oid d6e582b7edeae24345a175f36639230726dbdead",
+        "# branch.head claude/layered-code-pattern",
+        "# branch.upstream origin/claude/layered-code-pattern",
+        "# branch.ab +0 -0",
+        "? config/codex.toml",
+        "? config/field_encryption_key",
+        "? config/secret_key",
+        "? docs/projects/",
+        "? examples/layered-app/",
+        "? scripts/validate_boundaries.py",
+        "? tests/test_validate_boundaries.py",
+        "? windows-preflight.ps1"
+      ],
+      "index_sha256": "ac3c6beb7fe41745ede3543cac4f368aa310f6fd83a5dacceaef15042f5f4e25"
+    }
+  }
+}

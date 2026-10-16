@@ -1,0 +1,31 @@
+{
+  "tool_sha256": "3e5ed711a52a318c60e72fd365bda3fa35a4fbd4214eea63192adc92095c0439",
+  "cases": [
+    {
+      "bad_hash_call": null,
+      "exit_code": 0,
+      "source_hashes_unchanged": true,
+      "required_gates_passed": true,
+      "all_fourteen_check_hash_pairs_retained": true,
+      "private_root": "C:\\Users\\hensl\\AppData\\Local\\Temp\\m6-review-recorder-final-rqqbxm8i"
+    },
+    {
+      "bad_hash_call": 2,
+      "exit_code": 1,
+      "source_hashes_unchanged": false,
+      "required_gates_passed": false,
+      "all_fourteen_check_hash_pairs_retained": true,
+      "private_root": "C:\\Users\\hensl\\AppData\\Local\\Temp\\m6-review-recorder-final-cvgux4g3"
+    },
+    {
+      "bad_hash_call": 3,
+      "exit_code": 1,
+      "source_hashes_unchanged": false,
+      "required_gates_passed": false,
+      "all_fourteen_check_hash_pairs_retained": true,
+      "private_root": "C:\\Users\\hensl\\AppData\\Local\\Temp\\m6-review-recorder-final-f1gj9bdd"
+    }
+  ],
+  "all_passed": true,
+  "scope": "Synthetic recorder tests only; subprocesses mocked, ROOT disposable"
+}

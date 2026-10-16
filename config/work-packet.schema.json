@@ -1,0 +1,643 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Canonical work packet",
+  "description": "The latest revision_history snapshot is the sole current contract. Runtime validation additionally checks tier ordering, criterion references, contract hashes, the chained lifecycle, and dependency DAG semantics.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "task_id",
+    "domain_profile",
+    "state",
+    "revision_history",
+    "events"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "1.0"
+    },
+    "task_id": {
+      "$ref": "#/$defs/identifier"
+    },
+    "domain_profile": {
+      "type": "string",
+      "enum": [
+        "software-hardware"
+      ]
+    },
+    "state": {
+      "$ref": "#/$defs/state"
+    },
+    "revision_history": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/revision"
+      },
+      "minItems": 1
+    },
+    "events": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/event"
+      },
+      "minItems": 1
+    }
+  },
+  "$defs": {
+    "nonblank": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S"
+    },
+    "identifier": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 80,
+      "not": {
+        "pattern": "[^A-Za-z0-9._-]"
+      },
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$"
+    },
+    "sha256": {
+      "type": "string",
+      "minLength": 64,
+      "maxLength": 64,
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "timestamp": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S",
+      "format": "date-time"
+    },
+    "state": {
+      "type": "string",
+      "enum": [
+        "PROPOSED",
+        "ARCHITECTED",
+        "READY",
+        "IN_PROGRESS",
+        "VALIDATING",
+        "REVIEW",
+        "ACCEPTED",
+        "MERGED",
+        "VERIFIED",
+        "BLOCKED",
+        "ESCALATED",
+        "NEEDS_DECISION",
+        "ARCHITECTURE_CONFLICT",
+        "FAILED",
+        "SUPERSEDED"
+      ]
+    },
+    "tier": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 4
+    },
+    "review_gate": {
+      "type": "string",
+      "enum": [
+        "deterministic",
+        "model_review",
+        "cross_family_review",
+        "architect_review",
+        "user_decision"
+      ]
+    },
+    "named_description": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "description"
+      ],
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/nonblank"
+        },
+        "description": {
+          "$ref": "#/$defs/nonblank"
+        }
+      }
+    },
+    "contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "title",
+        "parent",
+        "goal",
+        "non_goals",
+        "scope",
+        "inputs",
+        "outputs",
+        "interface",
+        "dependencies",
+        "assumptions",
+        "sources",
+        "acceptance_criteria",
+        "validation",
+        "complexity",
+        "risk",
+        "routing",
+        "retry_budget",
+        "escalation_path",
+        "context_scope",
+        "architecture_boundaries",
+        "domain"
+      ],
+      "properties": {
+        "title": {
+          "$ref": "#/$defs/nonblank"
+        },
+        "parent": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "objective",
+            "milestone"
+          ],
+          "properties": {
+            "objective": {
+              "$ref": "#/$defs/nonblank"
+            },
+            "milestone": {
+              "$ref": "#/$defs/nonblank"
+            }
+          }
+        },
+        "goal": {
+          "$ref": "#/$defs/nonblank"
+        },
+        "non_goals": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/nonblank"
+          },
+          "minItems": 1
+        },
+        "scope": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "allowed",
+            "prohibited"
+          ],
+          "properties": {
+            "allowed": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/nonblank"
+              },
+              "minItems": 1
+            },
+            "prohibited": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/nonblank"
+              },
+              "minItems": 1
+            }
+          }
+        },
+        "inputs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/named_description"
+          },
+          "minItems": 1
+        },
+        "outputs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/named_description"
+          },
+          "minItems": 1
+        },
+        "interface": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "name",
+            "version",
+            "description"
+          ],
+          "properties": {
+            "name": {
+              "$ref": "#/$defs/nonblank"
+            },
+            "version": {
+              "$ref": "#/$defs/nonblank"
+            },
+            "description": {
+              "$ref": "#/$defs/nonblank"
+            }
+          }
+        },
+        "dependencies": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/identifier"
+          },
+          "minItems": 0,
+          "uniqueItems": true
+        },
+        "assumptions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/nonblank"
+          },
+          "minItems": 0
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "reference",
+              "authority"
+            ],
+            "properties": {
+              "id": {
+                "$ref": "#/$defs/identifier"
+              },
+              "reference": {
+                "$ref": "#/$defs/nonblank"
+              },
+              "authority": {
+                "$ref": "#/$defs/nonblank"
+              }
+            }
+          },
+          "minItems": 1
+        },
+        "acceptance_criteria": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "description"
+            ],
+            "properties": {
+              "id": {
+                "$ref": "#/$defs/identifier"
+              },
+              "description": {
+                "$ref": "#/$defs/nonblank"
+              }
+            }
+          },
+          "minItems": 1
+        },
+        "validation": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "description",
+              "criterion_ids",
+              "evidence_required"
+            ],
+            "properties": {
+              "id": {
+                "$ref": "#/$defs/identifier"
+              },
+              "description": {
+                "$ref": "#/$defs/nonblank"
+              },
+              "criterion_ids": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/identifier"
+                },
+                "minItems": 1
+              },
+              "evidence_required": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/nonblank"
+                },
+                "minItems": 1
+              },
+              "command": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "argv"
+                ],
+                "properties": {
+                  "argv": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/$defs/nonblank"
+                    },
+                    "minItems": 1,
+                    "maxItems": 50
+                  },
+                  "timeout_seconds": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 3600
+                  },
+                  "cwd": {
+                    "$ref": "#/$defs/nonblank"
+                  }
+                },
+                "description": "Optional architect-declared command that independently re-executes this validation in the reviewed workspace. Absent means the check is not machine-runnable and acceptance requires recorded operator attestation instead. Runtime refuses a cwd that escapes the workspace."
+              }
+            }
+          },
+          "minItems": 1
+        },
+        "complexity": {
+          "type": "string",
+          "enum": [
+            "low",
+            "medium",
+            "high"
+          ]
+        },
+        "risk": {
+          "type": "string",
+          "enum": [
+            "low",
+            "medium",
+            "high",
+            "critical"
+          ]
+        },
+        "routing": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "min_tier",
+            "max_tier",
+            "reasoning_effort",
+            "reviewer_tier"
+          ],
+          "properties": {
+            "min_tier": {
+              "$ref": "#/$defs/tier"
+            },
+            "max_tier": {
+              "$ref": "#/$defs/tier"
+            },
+            "reasoning_effort": {
+              "type": "string",
+              "enum": [
+                "low",
+                "medium",
+                "high",
+                "very_high"
+              ]
+            },
+            "reviewer_tier": {
+              "$ref": "#/$defs/tier"
+            }
+          }
+        },
+        "retry_budget": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "max_attempts"
+          ],
+          "properties": {
+            "max_attempts": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 20
+            },
+            "max_attempts_by_tier": {
+              "type": "object",
+              "additionalProperties": false,
+              "minProperties": 1,
+              "propertyNames": {
+                "pattern": "^[0-4](?![\\s\\S])"
+              },
+              "properties": {
+                "0": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 20
+                },
+                "1": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 20
+                },
+                "2": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 20
+                },
+                "3": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 20
+                },
+                "4": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 20
+                }
+              },
+              "description": "Optional per-tier attempt caps frozen when the feedback controller initializes. Runtime rejects tiers outside the worker minimum plus escalation path and caps above the global max_attempts."
+            }
+          }
+        },
+        "escalation_path": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/tier"
+          },
+          "minItems": 0,
+          "uniqueItems": true
+        },
+        "context_scope": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/nonblank"
+          },
+          "minItems": 1
+        },
+        "worker_instructions": {
+          "type": "array",
+          "maxItems": 8,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 260,
+            "not": {
+              "pattern": "(^[/\\\\])|(^|[/\\\\])\\.\\.?([/\\\\]|$)|:|[\\x00-\\x1f<>\"|?*]"
+            }
+          },
+          "description": "Optional repository-relative instruction files the architect selects for this packet's worker, in reading order (for example a module's local AGENTS.md or an interface note). The execution harness embeds their full text, with digests, in the worker brief under startup_max_chars; governing documents are not listed here because a worker receives only their digests."
+        },
+        "architecture_boundaries": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/nonblank"
+          },
+          "minItems": 1
+        },
+        "review": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "required_gates"
+          ],
+          "properties": {
+            "required_gates": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/review_gate"
+              },
+              "minItems": 1,
+              "uniqueItems": true
+            }
+          },
+          "description": "Optional packet-assigned acceptance gates. Runtime refuses a gate set below the floor its risk tier requires: a packet may add gates or raise the reviewer tier, never loosen."
+        },
+        "domain": {
+          "type": "object",
+          "additionalProperties": true,
+          "description": "Profile-specific extension data; the runtime enforces the common contract independently."
+        }
+      },
+      "description": "Canonical immutable contract snapshot. Reused for create input and every revision; version belongs to revision history, not this object."
+    },
+    "revision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "version",
+        "contract",
+        "hash",
+        "actor",
+        "timestamp",
+        "reason"
+      ],
+      "properties": {
+        "version": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "contract": {
+          "$ref": "#/$defs/contract"
+        },
+        "hash": {
+          "$ref": "#/$defs/sha256"
+        },
+        "actor": {
+          "$ref": "#/$defs/nonblank"
+        },
+        "timestamp": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "reason": {
+          "$ref": "#/$defs/nonblank"
+        }
+      }
+    },
+    "event": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sequence",
+        "kind",
+        "from",
+        "to",
+        "revision",
+        "contract_hash",
+        "actor",
+        "role",
+        "timestamp",
+        "reason",
+        "evidence"
+      ],
+      "properties": {
+        "sequence": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "create",
+            "transition",
+            "revision"
+          ]
+        },
+        "from": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "enum": [
+            "PROPOSED",
+            "ARCHITECTED",
+            "READY",
+            "IN_PROGRESS",
+            "VALIDATING",
+            "REVIEW",
+            "ACCEPTED",
+            "MERGED",
+            "VERIFIED",
+            "BLOCKED",
+            "ESCALATED",
+            "NEEDS_DECISION",
+            "ARCHITECTURE_CONFLICT",
+            "FAILED",
+            "SUPERSEDED",
+            null
+          ]
+        },
+        "to": {
+          "$ref": "#/$defs/state"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "contract_hash": {
+          "$ref": "#/$defs/sha256"
+        },
+        "actor": {
+          "$ref": "#/$defs/nonblank"
+        },
+        "role": {
+          "type": "string",
+          "enum": [
+            "architect",
+            "worker",
+            "reviewer",
+            "integrator"
+          ]
+        },
+        "timestamp": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "reason": {
+          "$ref": "#/$defs/nonblank"
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/nonblank"
+          },
+          "minItems": 0
+        }
+      }
+    }
+  }
+}

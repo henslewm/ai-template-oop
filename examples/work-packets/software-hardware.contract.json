@@ -1,0 +1,135 @@
+{
+  "dependencies": [],
+  "complexity": "low",
+  "risk": "low",
+  "routing": {
+    "min_tier": 1,
+    "max_tier": 3,
+    "reasoning_effort": "medium",
+    "reviewer_tier": 3
+  },
+  "retry_budget": {
+    "max_attempts": 2
+  },
+  "escalation_path": [
+    2,
+    3
+  ],
+  "title": "Parse synthetic virtual-device frames",
+  "parent": {
+    "objective": "Demonstrate independently testable protocol components using fictional devices.",
+    "milestone": "Produce a deterministic parser against synthetic input fixtures."
+  },
+  "goal": "Convert synthetic byte frames into normalized readings and reject malformed frames deterministically.",
+  "non_goals": [
+    "Communicate with physical hardware.",
+    "Change transport protocols or deployment settings."
+  ],
+  "scope": {
+    "allowed": [
+      "Implement the fixture-only frame parser and its tests.",
+      "Document parser input and output examples."
+    ],
+    "prohibited": [
+      "Edit hardware adapters, firmware, or production configuration.",
+      "Infer physical-device compatibility from these fixtures."
+    ]
+  },
+  "inputs": [
+    {
+      "name": "Synthetic frame specification",
+      "description": "Fictional format: tag 0xA1 followed by one unsigned payload byte; all other lengths or tags are invalid."
+    },
+    {
+      "name": "Frame samples",
+      "description": "Valid [161, 0] and [161, 255]; invalid [], [161], [160, 7], and [161, 7, 8]."
+    }
+  ],
+  "outputs": [
+    {
+      "name": "Parser result",
+      "description": "A reading with value 0 through 255, or a deterministic invalid-frame result."
+    },
+    {
+      "name": "Verification record",
+      "description": "Sample identifiers, observed results, and test outcome for every declared fixture."
+    }
+  ],
+  "interface": {
+    "name": "parse_synthetic_frame",
+    "version": "1.0",
+    "description": "Accept a byte sequence; return a normalized reading or invalid-frame result without side effects."
+  },
+  "assumptions": [
+    "All frame examples are synthetic and establish no real hardware behavior."
+  ],
+  "sources": [
+    {
+      "id": "SRC-SYNTH-FRAMES",
+      "reference": "The fictional format and sample list embedded in this contract inputs.",
+      "authority": "Synthetic test specification only; not a manufacturer specification."
+    }
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC-VALID",
+      "description": "Both valid frames produce the exact unsigned payload value."
+    },
+    {
+      "id": "AC-INVALID",
+      "description": "Every listed invalid frame returns the documented error without an uncaught exception."
+    }
+  ],
+  "validation": [
+    {
+      "id": "VAL-FRAMES",
+      "description": "Execute table-driven checks for every embedded sample.",
+      "criterion_ids": [
+        "AC-VALID",
+        "AC-INVALID"
+      ],
+      "evidence_required": [
+        "Sample-by-sample expected and observed results.",
+        "Recorded automated test outcome."
+      ],
+      "command": {
+        "argv": [
+          "python",
+          "-m",
+          "unittest",
+          "discover",
+          "-s",
+          "tests",
+          "-p",
+          "test_parse_synthetic_frame*.py"
+        ],
+        "timeout_seconds": 120
+      }
+    }
+  ],
+  "context_scope": [
+    "This contract and its embedded fictional protocol.",
+    "The isolated parser implementation and its tests."
+  ],
+  "architecture_boundaries": [
+    "Keep parsing independent of transport and physical devices.",
+    "Do not change the specified input/output interface."
+  ],
+  "domain": {
+    "synthetic": true,
+    "component": "protocol_codec",
+    "hardware_status": "UNVERIFIED_ON_HARDWARE",
+    "hardware_assumptions": [
+      {
+        "assumption": "A physical device would emit tag 0xA1 followed by one payload byte. The fixture asserts this; no device has been observed.",
+        "source_id": "SRC-SYNTH-FRAMES"
+      }
+    ],
+    "protocol_references": [
+      "SRC-SYNTH-FRAMES"
+    ],
+    "validation_levels": {
+      "VAL-FRAMES": "unit"
+    }
+  }
+}

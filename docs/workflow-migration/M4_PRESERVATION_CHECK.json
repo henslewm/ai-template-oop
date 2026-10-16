@@ -1,0 +1,38 @@
+{
+  "protected": {
+    "ai-template-oop": {
+      "head": "f624e207276372d9386b669bf087a66b44aba714",
+      "index_sha256": "fe7124042405022bf442485ce5e340489d0b292f2bbaa8a8935321b6653ec39b",
+      "status": "1 D. N... 100644 000000 000000 9e771558f3c032c37727dbb6ed461c78e3905114 0000000000000000000000000000000000000000 revised-plan-and-quickstart-2026-10-12-0011Z.md\n",
+      "files": 26,
+      "matches": true
+    },
+    "universal-ai-project-template": {
+      "head": "d6e582b7edeae24345a175f36639230726dbdead",
+      "index_sha256": "ac3c6beb7fe41745ede3543cac4f368aa310f6fd83a5dacceaef15042f5f4e25",
+      "status": "? config/codex.toml\n? config/field_encryption_key\n? config/secret_key\n? docs/projects/\n? examples/layered-app/\n? scripts/validate_boundaries.py\n? tests/test_validate_boundaries.py\n? windows-preflight.ps1\n",
+      "files": 305,
+      "matches": true
+    }
+  },
+  "m3_files_preserved": 18,
+  "canonical_files_preserved": 31,
+  "archive_files_preserved": 14,
+  "existing_tracked_changes": [
+    "scripts/workflow_runtime.py",
+    "scripts/workflow_scope.py"
+  ],
+  "frozen_other_files_preserved": true,
+  "head": "8404a44eb9bad3c25627454cbafb311d2779b066",
+  "refs": {
+    "refs/heads/feature/workflow-migration": "8404a44eb9bad3c25627454cbafb311d2779b066",
+    "refs/heads/main": "f624e207276372d9386b669bf087a66b44aba714",
+    "refs/remotes/origin/HEAD": "63b61ff9fcd1dba6676c6fd5dfb7561eaa92aed8",
+    "refs/remotes/origin/copilot/restore-merged-feature-branches": "9683d58ef201cdc825605a144bd4d0c7a0cf60fd",
+    "refs/remotes/origin/feature/workflow-migration": "8404a44eb9bad3c25627454cbafb311d2779b066",
+    "refs/remotes/origin/main": "63b61ff9fcd1dba6676c6fd5dfb7561eaa92aed8",
+    "refs/remotes/origin/policy/preserve-feature-branches": "60a848dfc7396b7b2b578a007b9be6aafec1fd83"
+  },
+  "branch": "feature/workflow-migration",
+  "passed": true
+}
