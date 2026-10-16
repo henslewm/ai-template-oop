@@ -29,8 +29,10 @@ An independent clone of the same project retains its UUID but requires its own
 owner approval. A different generated project must receive a fresh UUID.
 
 `config/project-approval.json` is a versioned review package containing the
-identity, fixed offline policy and normalized SHA-256 inventory of control
-code/configuration. Scripts, tools, contracts, runtime files, configuration,
+identity, fixed offline policy and SHA-256 inventory of control code/configuration.
+Line endings are normalized only for allowlisted UTF-8 text formats without
+NUL bytes; binary and unknown inputs are hashed verbatim. Scripts, tools,
+contracts, runtime files, configuration,
 governing root files and the immutable pilot acceptance checks are covered.
 Untracked control inputs also count. Ordinary `src/` implementation changes,
 application tests, README edits and other documentation do not require control
@@ -111,7 +113,8 @@ controllers retain their historical foundation path. Its copied ACTIVE receipt
 still validates **as the historical offline foundation**, not as new-project
 approval. A focused tracked-files export test reproduces that distinction.
 
-Once project identity, project review package or host registration is present,
+Once project identity, project review package, host registration or an interrupted
+operation lock is present,
 the runtime adapter uses the project gate and refuses missing/stale approval.
 Deleting just the project identity cannot fall back to campaign authority.
 This is explicit initialization infrastructure; it does not automatically turn

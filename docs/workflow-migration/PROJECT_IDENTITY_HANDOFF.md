@@ -59,9 +59,9 @@ Passing checks are verification, not independent acceptance. The separate
 fresh-context reviewer inspected the actual candidate and its source hashes;
 the reviewer did not rerun tests. Review limitations are explicit in its report.
 
-## Exact implementation candidate
+## Initial implementation candidate
 
-Raw SHA-256, for an independent reviewer of the actual working files:
+Raw SHA-256 at initial acceptance, before the post-merge corrections below:
 
 | Path | SHA-256 |
 | --- | --- |
@@ -90,3 +90,25 @@ among existing tracked working files. No Pro-Se Engine file was accessed or edit
 Before/after inventory evidence is retained outside the repository under the
 session's `project-identity-*` temporary directory. Do not refresh historical
 preservation baselines or clean up unrelated staged/untracked work for delivery.
+
+## Post-merge review corrections
+
+PR #20 integrated the exact initially accepted tree. Its automated review was
+still running at merge; subsequent findings from PRs #19/#20 were verified and
+corrected in an isolated delivery checkout rather than editing the shared worktree.
+
+Binary inputs now hash verbatim, while known UTF-8 text retains line-ending
+portability. Missing/malformed identity returns a read-only approval blocker.
+An interrupted operation lock also selects the project gate, preventing the
+pre-registration crash window from restoring legacy authority.
+
+Four binary/status regressions and one pre-registration interruption regression
+failed before their corresponding fixes. The complete final lifecycle suite
+then passed **35 cases in 37.79s**. Scoped Ruff lint/format, ty and whitespace
+checks pass. No broad campaign or live execution was repeated.
+
+[The follow-up independent review](PROJECT_IDENTITY_FIX_REVIEW.json) approved all
+three corrections with no findings and binds the four current source hashes.
+The original report/hash table remains historical evidence; use the follow-up
+report for the corrected candidate. Application sources, contracts, pilot scope
+and canonical task/accounting records are unchanged by these corrections.

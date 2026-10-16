@@ -1,0 +1,33 @@
+{
+  "actor": "independent-bounded-acceptance-review",
+  "verdict": "APPROVE",
+  "blocking_findings": [],
+  "nonblocking_findings": [],
+  "source_sha256": {
+    "scripts/project_authority.py": "011b461420268b2b695519694714ab493d714bfb096644ab1a35844ad28a908f",
+    "scripts/workflow_state.py": "954214cc6d4be3e9a68e89ab81162e1cac4d85c9f0222307ffedf2f2afeafb08",
+    "tools/project_admin.py": "37880e974c62e4f5f9e1b250cb665dccea488d4ccc514a0a910857beadd407f8",
+    "tests/test_project_authority.py": "f112170339621ed7691024d603049737aa3d4f4af536ffba33b3682677a307f1"
+  },
+  "scope": {
+    "checkout": "C:/Users/hensl/AppData/Local/Temp/identity-release-87221b9b7f884e82b1ae33132db6a709/delivery",
+    "comparison": "Actual working-tree diff versus local origin/main, restricted to scripts/project_authority.py and tests/test_project_authority.py.",
+    "adjacent_code": "Read project identity, inventory, approval and status paths; workflow_state control_directory/active_anchor; project_admin CLI; validate_workflow_approval digest, JSON, safe-file and read-only Git helpers.",
+    "acceptance": [
+      "Unknown inputs use SHA-256 of original bytes. Allowlisted text suffixes and Dockerfile normalize line endings only after successful UTF-8 decoding and absence of NUL; invalid UTF-8 or NUL-containing inputs retain raw-byte hashing.",
+      "Binary CRLF-to-LF changes in runtime and config invalidate approval; known Python text CRLF-to-LF retains portability. Added tests check inventory and active approval behavior.",
+      "Identity parsing is inside the status exception boundary. Missing, malformed and interrupted identity returns AWAITING_APPROVAL with a blocker; status does not invoke registration, locking, state initialization or writes.",
+      "applies() now treats the checkout authority operation.lock as evidence of project authority even before identity registration. workflow_state.active_anchor therefore routes to the project gate and refuses missing project inputs instead of inheriting legacy approval.",
+      "The new historical-export regression establishes that legacy active_anchor initially succeeds, creates only the authority operation.lock before registration, then requires applies() to be true, active_anchor to raise, and status to return AWAITING_APPROVAL with a blocker while preserving the lock contents. This models the on-disk residue of a hard interruption; it does not simulate process termination.",
+      "The final diff adds six parameter-expanded cases plus an interrupted-status assertion without deleting or weakening prior assertions. Missing/malformed status tests cover direct and CLI results and repository/host authority file-byte preservation.",
+      "The reviewed two-file diff contains three narrow supporting-gate corrections and regression coverage. It does not widen paid, provider, publication, pilot, merge or deployment authority, change application code, or expand the reusable OOP architecture scope."
+    ]
+  },
+  "verification_limitations": [
+    "Static acceptance review only. No suites, providers, workers, Docker, source mutations or Git writes were performed. The only intentional file write was this report.",
+    "The independently running final 35-case lifecycle suite result was not observed and is not asserted here.",
+    "Invalid-UTF-8 and NUL-containing known-text fallback branches were inspected statically; the added regressions do not directly exercise those two branches.",
+    "The new pre-registration interruption regression asserts lock preservation, not a complete repository/host byte snapshot. Read-only behavior for that path was checked by source inspection.",
+    "Application-wide changes and broader architecture were outside this bounded review. origin/main was inspected as locally available without fetching. All four raw hashes were rechecked against the final observed source bytes before saving; the main agent must validate them before commit."
+  ]
+}
