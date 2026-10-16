@@ -164,6 +164,50 @@ def test_default_disabled_and_inspection_has_no_side_effects(checkout):
     assert not transport.calls
 
 
+@pytest.mark.parametrize("ignored", [False, True])
+def test_existing_untracked_output_refuses_before_paid_start(checkout, ignored):
+    path = checkout / "start.ps1"
+    content = path.read_bytes()
+    git(checkout, "rm", "start.ps1")
+    git(checkout, "commit", "-qm", "Fixture missing output")
+    approve(checkout)
+    if ignored:
+        (checkout / ".git/info/exclude").write_text("/start.ps1\n", encoding="utf-8")
+    path.write_bytes(content)
+    transport = FakeTransport(error=AssertionError("paid call"))
+    operator = pilot.Operator(checkout, transport=transport)
+    with pytest.raises(ValueError, match="[Uu]ntracked"):
+        operator.start(authority.OBJECTIVE)
+    assert path.read_bytes() == content
+    assert not operator.journal.db.exists()
+    assert not transport.calls
+
+
+def test_saved_untracked_baseline_cannot_be_delivered(service):
+    state = service.state()
+    git(service.root, "rm", "start.ps1")
+    git(service.root, "commit", "-qm", "Fixture delivery base missing accepted input")
+    state["scope"]["base_commit"] = git(service.root, "rev-parse", "HEAD")
+    state["bundle"] = {"changes": []}
+    # Simulate a legacy accepted snapshot containing an unchanged untracked file.
+    assert state["baseline"]["start.ps1"] is not None
+    with pytest.raises(ValueError, match="outside the delivery base"):
+        delivery.candidate(service.root, state)
+    with pytest.raises(ValueError, match="outside the delivery base"):
+        delivery.verify_candidate(service.root, state, state["scope"]["base_commit"])
+    # A genuinely absent new output remains eligible when its bytes are bundled.
+    state["baseline"]["start.ps1"] = None
+    state["bundle"]["changes"] = [
+        {
+            "path": "start.ps1",
+            "before_sha256": None,
+            "content_base64": "dGVzdAo=",
+        }
+    ]
+    commit = delivery.candidate(service.root, state)
+    assert git(service.root, "show", commit + ":start.ps1") == "test"
+
+
 def test_activation_binds_exact_rebased_tree(checkout, tmp_path, monkeypatch):
     from tools import pilot_admin
 
@@ -269,6 +313,46 @@ def test_profile_cannot_move_to_another_checkout(service, tmp_path):
     target.write_bytes((service.journal.directory / authority.PROFILE).read_bytes())
     with pytest.raises(ValueError, match="different checkout"):
         authority.load_profile(other)
+
+
+@pytest.mark.parametrize("cwd", ["", "scripts"])
+def test_completed_pilot_checks_bind_cwd_and_keep_legacy_root_receipts(service, cwd):
+    from scripts import acceptance_runtime as ar
+
+    state = service.state()
+    worker = h.sha("legacy check fixture")
+    state["attempts"] = [{"id": worker}]
+    state["bundle"] = {
+        "scope_sha256": SessionScope.load(state["scope"]).hash,
+        "base_commit": state["scope"]["base_commit"],
+        "changes": [
+            {
+                "path": "README.md",
+                "before_sha256": state["baseline"]["README.md"],
+                "content_base64": "dGVzdAo=",
+            }
+        ],
+    }
+    for check in h.f.wp.current(state["packet"])["contract"]["validation"]:
+        check["command"]["cwd"] = cwd
+        stream = "pilot-check:" + worker[:32] + ":" + check["id"]
+        service.journal.create(
+            stream, family="acceptance", binding={}, data={"check": check}
+        )
+        for kind, data in [
+            ("CHECK_PREPARED", {"runtime": {}}),
+            ("RESULT", {"id": check["id"], "passed": True}),
+        ]:
+            service.journal.append(
+                stream, kind, data, expected=service.journal.read(stream)[1]
+            )
+    heads = service.journal.verify()
+    if cwd:
+        with pytest.raises(ValueError, match="cwd differs"):
+            ar.pilot_checks(service.journal, state)
+    else:
+        assert len(ar.pilot_checks(service.journal, state)["checks"]) == 2
+    assert service.journal.verify() == heads
 
 
 def test_usage_rates_cache_and_request_contract():
