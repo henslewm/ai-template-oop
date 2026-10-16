@@ -66,6 +66,7 @@ class Docker:
                 "Env": ["PATH=/usr/bin"],
                 "Entrypoint": c.argv[:1],
                 "Cmd": c.argv[1:],
+                "WorkingDir": c.workdir,
             },
             "Mounts": [{"Type": "volume", "Name": c.volume, "Destination": "/session"}],
             "HostConfig": {
@@ -103,6 +104,9 @@ class Docker:
                 setup=name.endswith("-setup"),
                 volume=volume,
                 argv=argv,
+                workdir=args[args.index("--workdir") + 1]
+                if "--workdir" in args
+                else "",
                 exit_code=0,
             )
             return name.encode()
