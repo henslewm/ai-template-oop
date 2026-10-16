@@ -101,7 +101,7 @@ def apply(state, event):
     elif kind == "DELIVERY" and state["phase"] in {"ACCEPTED", "DELIVERED"}:
         if state["delivery"] is not None and state["delivery"] != data:
             raise ValueError("Conflicting duplicate delivery")
-        state.update(phase="DELIVERED", delivery=copy.deepcopy(data))
+        state.update(phase="DELIVERED", delivery=copy.deepcopy(data), blocker=None)
     elif kind == "RESUME_RECONCILED" and state["phase"] == "HELD":
         entries = state["attempts"] if data["role"] == "worker" else state["reviews"]
         if not entries or entries[-1]["id"] != data["dispatch_id"]:

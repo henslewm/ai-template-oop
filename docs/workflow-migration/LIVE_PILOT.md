@@ -57,6 +57,11 @@ evidence, `python -B tools/pilot_admin.py reconcile-provider --dispatch-id <id>
 anything. It preserves the attempt and then permits `resume --run` to consume
 that saved output. Missing cache/usage fields remain a hold.
 
+Independent checks also resume their original prepared or stopped container.
+For incomplete check preparation, `python -B tools/pilot_admin.py reconcile-checks`
+stops and preserves the named run and records a failed check. It cannot grant
+acceptance, reset an attempt, or silently relaunch a consumed check.
+
 ## Spending and evidence
 
 Worker defaults to `gpt-6-luna`, medium reasoning; one bounded repair can use

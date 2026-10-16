@@ -98,6 +98,7 @@ def main(argv=None):
     approval.add_argument("--review-report", type=Path, required=True)
     commands.add_parser("status")
     commands.add_parser("run")
+    commands.add_parser("reconcile-checks")
     recovery = commands.add_parser("reconcile-provider")
     recovery.add_argument("--dispatch-id", required=True)
     recovery.add_argument("--response-file", type=Path, required=True)
@@ -112,6 +113,11 @@ def main(argv=None):
             from scripts.pilot_controller import Operator
 
             service = Operator(args.root)
+            if args.command == "reconcile-checks":
+                authority.load_profile(args.root)
+                service._checks(reconcile=True)
+                print(json.dumps(asdict(service.status()), indent=2))
+                return 0
             if args.command == "reconcile-provider":
                 print(
                     json.dumps(

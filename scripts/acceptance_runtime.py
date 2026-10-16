@@ -7,6 +7,7 @@ import copy
 from dataclasses import asdict
 from datetime import timedelta
 import io
+import json
 from pathlib import Path
 import tarfile
 import time
@@ -56,92 +57,238 @@ class _CandidateScope:
         return output.getvalue(), baseline
 
 
-def pilot_checks(journal, state):
-    """Separate immutable Docker exports; worker check claims confer no acceptance."""
+def pilot_checks(journal, state, *, reconcile=False):
+    """Separate immutable checks; resume saved runs without resetting start authority."""
     from scripts import pilot_authority as authority
+    from scripts.workflow_scope import Ownership
+    import sqlite3
 
+    authority.load_profile(journal.root)
     original = h.SessionScope.load(state["scope"])
-    baseline = {
-        p: h.digest(b) if (original.root / p).exists() else None
-        for p, b in original.files().items()
-    }
-    h.verify_bundle(original, baseline, state["bundle"])
+    h.verify_baseline(original, state["baseline"])
+    h.verify_bundle(original, state["baseline"], state["bundle"])
     worker_id = state["attempts"][-1]["id"]
     checks = []
     for check in h.f.wp.current(state["packet"])["contract"]["validation"]:
         stream = "pilot-check:" + worker_id[:32] + ":" + check["id"]
-        if stream in journal.verify():
-            events, _ = journal.read(stream)
-            if events[-1]["kind"] != "RESULT":
-                raise ValueError(
-                    "Interrupted independent check; inspect and reconcile its existing run, never silently restart"
-                )
-            checks.append(events[-1]["data"])
-            continue
         command = check["command"]
         h.require(command["argv"][0] == "python", "Pilot check entry point differs")
-        scope = h.SessionScope.load(
-            {
-                **original.data,
-                "owner": "Independent-pilot-checks",
-                "run_id": "check-" + uuid.uuid4().hex,
-            }
-        )
-        journal.create(
-            stream,
-            family="acceptance",
-            binding={"worker": worker_id, "bundle_sha256": h.sha(state["bundle"])},
-            data={"check": check, "scope": scope.data},
-        )
-        run = runtime.prepare(
-            _CandidateScope(scope, {"bundle": state["bundle"]}),
-            state["packet"],
-            [],
-            journal.directory,
-            authority.IMAGE,
-            command["argv"],
-            immutable_workspace=True,
-            dispatch_stream=stream,
-        )
-        manifest = h.f.wp.read_json(run / "runtime.json")
-        saved = {p.name: h.digest(p.read_bytes()) for p in run.iterdir() if p.is_file()}
-        journal.append(
-            stream,
-            "CHECK_PREPARED",
-            {"run": run.name, "runtime": manifest, "files": saved},
-            expected=journal.read(stream)[1],
-        )
-        deadline = (h.f.instant(h.f.wp.now()) + timedelta(seconds=180)).isoformat()
-        journal.append(
-            stream,
-            "CHECK_LAUNCHING",
-            {"deadline": deadline},
-            expected=journal.read(stream)[1],
-        )
+        if stream not in journal.verify():
+            scope = h.SessionScope.load(
+                {
+                    **original.data,
+                    "owner": "Independent-pilot-checks",
+                    "run_id": "check-" + uuid.uuid4().hex,
+                }
+            )
+            run_name = "run-pilot-check-" + h.sha([worker_id, check["id"]])
+            journal.create(
+                stream,
+                family="acceptance",
+                binding={"worker": worker_id, "bundle_sha256": h.sha(state["bundle"])},
+                data={"check": check, "scope": scope.data, "run": run_name},
+            )
+        events, _ = journal.read(stream)
+        if events[-1]["kind"] == "RESULT":
+            checks.append(events[-1]["data"])
+            continue
+        initial = events[0]["data"]
+        h.require(initial["check"] == check, "Independent check contract changed")
+        scope = h.SessionScope.load(initial["scope"])
+        run = journal.directory / initial["run"]
+        aborted = False
+        if events[-1]["kind"] == "INIT":
+            if not run.exists():
+                runtime.prepare(
+                    _CandidateScope(scope, {"bundle": state["bundle"]}),
+                    state["packet"],
+                    [],
+                    journal.directory,
+                    authority.IMAGE,
+                    command["argv"],
+                    immutable_workspace=True,
+                    dispatch_stream=stream,
+                    run=run,
+                )
+            manifest_path = run / "runtime.json"
+            manifest = (
+                h.f.wp.read_json(manifest_path) if manifest_path.exists() else None
+            )
+            if manifest is None or manifest["status"] != "prepared":
+                if not reconcile:
+                    raise ValueError(
+                        "Interrupted check preparation; run python -B tools/pilot_admin.py reconcile-checks to stop/preserve and fail that existing check"
+                    )
+                # Only named objects from this trusted preparation are stopped; output survives.
+                if manifest is not None:
+                    for name in (manifest["container"], manifest["setup_container"]):
+                        found = json.loads(
+                            runtime.docker(
+                                "ps",
+                                "-a",
+                                "--filter",
+                                "name=^/" + name + "$",
+                                "--format",
+                                "json",
+                            ).decode()
+                            or "null"
+                        )
+                        if found:
+                            if runtime.inspect(name)["State"]["Running"]:
+                                runtime.docker("kill", name)
+                            h.require(
+                                runtime.stopped(name)
+                                or runtime.inspect(name)["State"]["Status"]
+                                == "created",
+                                "Interrupted check did not stop",
+                            )
+                    if (journal.directory / "ownership.sqlite3").exists():
+                        with sqlite3.connect(
+                            journal.directory / "ownership.sqlite3"
+                        ) as db:
+                            claims = db.execute(
+                                "SELECT token,container FROM runs WHERE scope_hash=? AND state='claimed'",
+                                (scope.hash,),
+                            ).fetchall()
+                        for token, container in claims:
+                            h.require(
+                                runtime.stopped(container)
+                                or runtime.inspect(container)["State"]["Status"]
+                                == "created",
+                                "Check owner remains active",
+                            )
+                            Ownership(journal.directory).finish(
+                                token,
+                                lambda c: (
+                                    runtime.stopped(c)
+                                    or runtime.inspect(c)["State"]["Status"]
+                                    == "created"
+                                ),
+                                lambda c: runtime.preserve(c, run, session=True),
+                            )
+                h.write_once(
+                    run / "stdout.log",
+                    b"Interrupted preparation explicitly abandoned; check did not pass.\n",
+                )
+                aborted = True
+            else:
+                saved = {
+                    name: h.digest(h.read_file(run / name))
+                    for name in (
+                        "scope.json",
+                        "packet.json",
+                        "baseline.json",
+                        "input.tar",
+                        "runtime.json",
+                    )
+                }
+                journal.append(
+                    stream,
+                    "CHECK_PREPARED",
+                    {"run": run.name, "runtime": manifest, "files": saved},
+                    expected=journal.read(stream)[1],
+                )
+                events, _ = journal.read(stream)
+        if not aborted:
+            prepared = next(e["data"] for e in events if e["kind"] == "CHECK_PREPARED")
+            manifest, saved = prepared["runtime"], prepared["files"]
+            if events[-1]["kind"] == "CHECK_PREPARED":
+                deadline = (
+                    h.f.instant(h.f.wp.now()) + timedelta(seconds=180)
+                ).isoformat()
+                journal.append(
+                    stream,
+                    "CHECK_LAUNCHING",
+                    {"deadline": deadline},
+                    expected=journal.read(stream)[1],
+                )
+                events, _ = journal.read(stream)
+            deadline = events[-1]["data"]["deadline"]
 
-        def preflight(_consumed):
-            authority.load_profile(journal.root)
-            if journal.read(stream)[0][-1]["kind"] != "CHECK_LAUNCHING":
-                raise ValueError("Independent check phase changed")
-            for name, expected in saved.items():
+            def preflight(_consumed):
+                authority.load_profile(journal.root)
                 h.require(
-                    h.digest(h.read_file(run / name)) == expected,
-                    "Independent check input changed",
+                    journal.read(stream)[0][-1]["kind"] == "CHECK_LAUNCHING",
+                    "Independent check phase changed",
+                )
+                for name, expected in saved.items():
+                    h.require(
+                        h.digest(h.read_file(run / name)) == expected,
+                        "Independent check input changed",
+                    )
+                actual = runtime.docker("cp", manifest["container"] + ":/session", "-")
+                h.require(
+                    launcher.archive_files(actual, prefix="session/")
+                    == launcher.archive_files(
+                        h.read_file(run / "input.tar"), prefix=""
+                    ),
+                    "Independent check volume changed",
                 )
 
-        outcome = runtime.execute(
-            run,
-            journal.directory,
-            min(180, command["timeout_seconds"]),
-            preflight=preflight,
-            absolute_deadline=deadline,
-        )
+            runtime.assert_boundary(
+                manifest["container"], manifest["volume"], authority.IMAGE
+            )
+            h.require(
+                runtime.inspect(manifest["container"])["Mounts"][0].get("RW") is False,
+                "Independent check mount changed",
+            )
+            info = runtime.inspect(manifest["container"])
+            if info["State"]["Status"] == "created" and not launcher.startup_attempted(
+                journal, manifest["ownership_token"]
+            ):
+                outcome = runtime.execute(
+                    run,
+                    journal.directory,
+                    min(180, command["timeout_seconds"]),
+                    preflight=preflight,
+                    absolute_deadline=deadline,
+                )
+            else:
+                if info["State"]["Running"]:
+                    if not reconcile and h.f.instant(h.f.wp.now()) < h.f.instant(
+                        deadline
+                    ):
+                        raise ValueError(
+                            "Interrupted check still runs; resume --run after "
+                            + deadline
+                            + " to stop/preserve it"
+                        )
+                    runtime.docker("kill", manifest["container"])
+                if info["State"]["Status"] == "created" and reconcile:
+                    aborted = True
+                h.require(
+                    runtime.stopped(manifest["container"]) or aborted,
+                    "Check start ambiguous; run python -B tools/pilot_admin.py reconcile-checks",
+                )
+                h.write_once(
+                    run / "stdout.log", runtime.docker("logs", manifest["container"])
+                )
+                with sqlite3.connect(journal.directory / "ownership.sqlite3") as db:
+                    claim = db.execute(
+                        "SELECT state FROM runs WHERE token=?",
+                        (manifest["ownership_token"],),
+                    ).fetchone()
+                if claim and claim[0] == "claimed":
+                    Ownership(journal.directory).finish(
+                        manifest["ownership_token"],
+                        lambda c: (
+                            runtime.stopped(c)
+                            or aborted
+                            and runtime.inspect(c)["State"]["Status"] == "created"
+                        ),
+                        lambda c: runtime.preserve(c, run, session=True),
+                    )
+                outcome = {
+                    "exit_code": runtime.inspect(manifest["container"])["State"][
+                        "ExitCode"
+                    ]
+                }
         evidence = journal.evidence(
             (run / "stdout.log").relative_to(journal.directory).as_posix()
         )
         result = {
             "id": check["id"],
-            "passed": outcome["exit_code"] == 0,
+            "passed": not aborted and outcome["exit_code"] == 0,
             "bundle_sha256": h.sha(state["bundle"]),
             "image": authority.IMAGE,
             "argv": command["argv"],

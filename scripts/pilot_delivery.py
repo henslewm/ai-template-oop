@@ -140,6 +140,13 @@ def gates(root, number, head, baseline):
     ):
         blockers.append("HOSTING_CHECK_PENDING_OR_FAILED")
     current = retained(root)
+    if (
+        current["local"].get(live["branch"]) != head
+        or current["origin"].get(live["branch"]) != head
+    ):
+        raise ValueError(
+            "Published delivery branch was not retained at its accepted head"
+        )
     for where, branches in baseline.items():
         for name, old in branches.items():
             new = current[where].get(name)
@@ -175,6 +182,10 @@ def verify_merged(root, number, head, baseline):
     ):
         raise ValueError("Merged PR still has unresolved check or review-history holds")
     current = retained(root)
+    if current["local"].get(BRANCH) != head or current["origin"].get(BRANCH) != head:
+        raise ValueError(
+            "Published delivery branch was not retained at its accepted head"
+        )
     for where, branches in baseline.items():
         for name, old in branches.items():
             if name not in current[where]:

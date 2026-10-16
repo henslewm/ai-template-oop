@@ -376,8 +376,10 @@ def test_candidate_only_changes_accepted_files_and_delivery_is_idempotent(servic
         },
     )
     before["phase"] = "ACCEPTED"
+    before["blocker"] = "old delivery hold"
     data = {"commit": commit}
     once = pilot_state.apply(before, {"kind": "DELIVERY", "data": data})
+    assert once["blocker"] is None
     assert pilot_state.apply(once, {"kind": "DELIVERY", "data": data}) == once
     with pytest.raises(ValueError, match="duplicate delivery"):
         pilot_state.apply(once, {"kind": "DELIVERY", "data": {"commit": "b" * 40}})
@@ -461,6 +463,27 @@ def test_origin_change_is_refused_before_any_delivery(service):
         authority.load_profile(service.root)
 
 
+def test_saved_over_ceiling_response_remains_held_after_interruption(
+    service, monkeypatch
+):
+    raw = response()
+    raw["usage"]["output_tokens"] = 8193
+    service.transport = FakeTransport(raw)
+    with monkeypatch.context() as patch:
+
+        def interrupted(*args, **kwargs):
+            raise KeyboardInterrupt()
+
+        patch.setattr(service, "event", interrupted)
+        with pytest.raises(KeyboardInterrupt):
+            service._paid("worker", "fixture", pilot.WORKER_SCHEMA)
+    attempt = service.state()["attempts"][-1]
+    with pytest.raises(ValueError, match="approved ceiling"):
+        service._saved_response(attempt)
+    assert service.state()["phase"] == "HELD"
+    assert service.status().liability_usd == 0
+
+
 def test_hosting_history_holds_are_shared():
     from scripts import workflow_closeout as c
 
@@ -478,6 +501,72 @@ def test_hosting_history_holds_are_shared():
         "more_threads": False,
     }
     assert "AUTOMATED_REVIEW_HISTORY_UNVERIFIABLE" in c.review_history(live)["blockers"]
+
+
+def test_deleted_delivery_branch_prevents_merged_receipt(monkeypatch):
+    head = "a" * 40
+    pull = {
+        "merged": True,
+        "head": {
+            "sha": head,
+            "ref": delivery.BRANCH,
+            "repo": {"full_name": "henslewm/ai-template-oop"},
+        },
+        "base": {"ref": "main", "repo": {"full_name": "henslewm/ai-template-oop"}},
+        "merge_commit_sha": "b" * 40,
+    }
+    monkeypatch.setattr(delivery.closeout, "gh", lambda endpoint: pull)
+    monkeypatch.setattr(delivery, "_git", lambda *args, **kwargs: b"")
+    monkeypatch.setattr(
+        delivery.closeout,
+        "hosting",
+        lambda *args: {"unresolved": 0, "more_threads": False},
+    )
+    monkeypatch.setattr(delivery.closeout, "_checks", lambda live: [])
+    monkeypatch.setattr(
+        delivery.closeout, "review_history", lambda live: {"blockers": []}
+    )
+    monkeypatch.setattr(delivery, "retained", lambda root: {"local": {}, "origin": {}})
+    with pytest.raises(ValueError, match="not retained"):
+        delivery.verify_merged(ROOT, 1, head, {})
+
+
+def test_explicit_incomplete_check_reconciliation_preserves_failures(
+    service, monkeypatch
+):
+    from scripts import acceptance_runtime as ar
+    from scripts import workflow_runtime as runtime
+
+    state = service.state()
+    state["attempts"] = [{"id": h.sha("fixture worker")}]
+    scope = SessionScope.load(state["scope"])
+    state["bundle"] = {
+        "scope_sha256": scope.hash,
+        "base_commit": scope.data["base_commit"],
+        "changes": [
+            {
+                "path": "README.md",
+                "before_sha256": state["baseline"]["README.md"],
+                "content_base64": "dGVzdAo=",
+            }
+        ],
+    }
+
+    def incomplete(*args, run, **kwargs):
+        run.mkdir()
+        raise KeyboardInterrupt()
+
+    monkeypatch.setattr(runtime, "prepare", incomplete)
+    with pytest.raises(KeyboardInterrupt):
+        ar.pilot_checks(service.journal, state)
+    with pytest.raises(ValueError, match="reconcile-checks"):
+        ar.pilot_checks(service.journal, state)
+    with pytest.raises(KeyboardInterrupt):
+        ar.pilot_checks(service.journal, state, reconcile=True)
+    checks = ar.pilot_checks(service.journal, state, reconcile=True)
+    assert len(checks["checks"]) == 2
+    assert all(not check["passed"] for check in checks["checks"])
+    assert ar.pilot_checks(service.journal, state) == checks
 
 
 def test_explicit_reconciliation_preserves_attempt(service):
@@ -519,7 +608,7 @@ def test_corrected_usage_retains_original_response(service):
     assert service.status().settled_usd == 0.000116
 
 
-def test_real_sandbox_stopped_replay_and_independent_rejection(service):
+def test_real_sandbox_stopped_replay_and_independent_rejection(service, monkeypatch):
     if os.environ.get("WORKFLOW_TEST_IMAGE") != authority.IMAGE:
         pytest.skip(
             reason="Exact WORKFLOW_TEST_IMAGE required; skipped Docker is not live pilot proof"
@@ -543,7 +632,29 @@ def test_real_sandbox_stopped_replay_and_independent_rejection(service):
     again = service._sandbox_worker(scope, state["packet"], proposal, attempt)
     assert again == first
     state["bundle"] = first["bundle"]
+    prepare = runtime.prepare
+
+    def interrupt_prepared(*args, **kwargs):
+        prepare(*args, **kwargs)
+        raise KeyboardInterrupt()
+
+    with monkeypatch.context() as patch:
+        patch.setattr(runtime, "prepare", interrupt_prepared)
+        with pytest.raises(KeyboardInterrupt):
+            ar.pilot_checks(service.journal, state)
+    append = service.journal.append
+
+    def interrupt_result(stream, kind, *args, **kwargs):
+        if stream.startswith("pilot-check:") and kind == "RESULT":
+            raise KeyboardInterrupt()
+        return append(stream, kind, *args, **kwargs)
+
+    with monkeypatch.context() as patch:
+        patch.setattr(service.journal, "append", interrupt_result)
+        with pytest.raises(KeyboardInterrupt):
+            ar.pilot_checks(service.journal, state)
     checks = ar.pilot_checks(service.journal, state)
+    assert ar.pilot_checks(service.journal, state) == checks
     assert not all(c["passed"] for c in checks["checks"])
     assert all(c["image"] == authority.IMAGE for c in checks["checks"])
     # Retain evidence; remove only this fixture's own confirmed stopped Docker objects.
