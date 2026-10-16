@@ -30,6 +30,71 @@ require = h.require
 sha = h.sha
 
 
+def pilot_view(journal):
+    """Compact read-only live handoff derived from canonical records, without API access."""
+    from contracts.operator import OperatorView
+    from scripts import pilot_authority, pilot_state
+
+    if not journal.db.is_file() or "pilot:onboarding" not in journal.verify():
+        return OperatorView(
+            pilot_authority.OBJECTIVE,
+            "NOT_STARTED",
+            0,
+            0,
+            0,
+            0,
+            0,
+            None,
+            (),
+            "Start the approved onboarding preset; live approval, API key and verified Docker image are required",
+        )
+    state, _ = journal.replay("pilot:onboarding", pilot_state.apply)
+    account, _ = journal.replay("pilot-budget:onboarding", budget.apply)
+    total = budget.totals(account)
+    entries = state["attempts"] + state["reviews"]
+    failed = sum(
+        account["entries"][a["id"]]["settled"]
+        for a in entries
+        if a.get("result") is not None
+        and (
+            not a["result"].get("passed", True)
+            or a["result"].get("report", {}).get("verdict", "APPROVE") != "APPROVE"
+        )
+    )
+    unresolved = [
+        a for a in account["entries"].values() if a["pending"] or a["unknown"]
+    ]
+    blockers = [state["blocker"]] if state["blocker"] else []
+    if unresolved:
+        blockers.append(
+            "Paid usage is unresolved; cost unknown. Liability is retained and no paid request may be resent"
+        )
+    phase = state["phase"]
+    accepted = int(phase in {"ACCEPTED", "DELIVERED"})
+    action = {
+        "READY": "resume --run to continue the existing bounded attempt sequence",
+        "WORKER_RUNNING": "resume --run can consume saved output; an ambiguous request or consumed sandbox needs explicit reconciliation",
+        "CHECKS": "resume --run to check the exact stopped candidate independently",
+        "REVIEW": "resume --run for the separate independent Sol review",
+        "REVIEW_RUNNING": "resume --run can consume a saved review response; never resend an ambiguous request",
+        "HELD": "Resolve the recorded blocker with the owner; attempts and spending cannot reset",
+        "ACCEPTED": "Deliver the exact accepted bundle through the hosting gates",
+        "DELIVERED": "Delivered; this preset's lifetime is complete",
+    }[phase]
+    return OperatorView(
+        state["objective"],
+        phase,
+        total["settled"],
+        total["liability"],
+        budget.upward(budget.money(failed)),
+        sum(a["context_bytes"] for a in entries),
+        accepted,
+        total["settled"] if accepted and not unresolved else None,
+        tuple(blockers),
+        action,
+    )
+
+
 def now() -> str:
     return datetime.now(timezone.utc).isoformat()
 
