@@ -179,6 +179,19 @@ def test_activation_binds_exact_rebased_tree(checkout, tmp_path, monkeypatch):
         "Rebased fixture",
     )
     assert integrated != reviewed
+    empty_tree = (
+        subprocess.run(
+            ["git", "-C", str(checkout), "mktree"],
+            input=b"",
+            capture_output=True,
+            check=True,
+        )
+        .stdout.decode()
+        .strip()
+    )
+    different = git(
+        checkout, "commit-tree", empty_tree, "-p", parent, "-m", "Different tree"
+    )
     git(checkout, "checkout", "-b", "feature/rebased-fixture", integrated)
     git(
         checkout,
@@ -202,7 +215,7 @@ def test_activation_binds_exact_rebased_tree(checkout, tmp_path, monkeypatch):
         "merged": True,
         "head": {"sha": reviewed},
         "base": {"ref": "main"},
-        "merge_commit_sha": parent,
+        "merge_commit_sha": different,
     }
     monkeypatch.setattr(pilot_admin.closeout, "gh", lambda endpoint: pull)
     original_git = ws.approval.git
