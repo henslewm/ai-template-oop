@@ -1,0 +1,26 @@
+"""A generated application contract; existing template contracts are unchanged."""
+
+from __future__ import annotations
+
+from abc import ABC, abstractmethod
+from dataclasses import dataclass, field
+
+from contracts.data import ProcessingResult
+
+
+@dataclass(frozen=True)
+class BatchRequest:
+    username: str
+    password: str = field(repr=False)
+    values: tuple[float, ...]
+    register: bool = False
+
+
+class BatchService(ABC):
+    @abstractmethod
+    def execute(self, request: BatchRequest) -> ProcessingResult:
+        """Optionally register, authenticate, process and close the session.
+
+        Returns raw data. Auth/processing/storage exceptions retain their
+        existing contracts. Session cleanup also occurs when processing fails.
+        """
