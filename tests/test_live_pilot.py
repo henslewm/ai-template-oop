@@ -414,6 +414,46 @@ def test_lifetime_attempts_are_bounded(service):
     assert len(service.state()["attempts"]) == 2
 
 
+def test_repair_keeps_unchanged_prior_candidate_files(service, monkeypatch):
+    state = service.state()
+    scope = SessionScope.load(state["scope"])
+    prior = {
+        "scope_sha256": scope.hash,
+        "base_commit": scope.data["base_commit"],
+        "changes": [
+            {
+                "path": "README.md",
+                "before_sha256": state["baseline"]["README.md"],
+                "content_base64": "cHJpb3IK",
+            }
+        ],
+    }
+    state["attempts"] = [{"result": {"bundle": prior}}, {"id": h.sha("repair")}]
+    monkeypatch.setattr(service, "state", lambda: state)
+    captured = []
+    monkeypatch.setattr(
+        service,
+        "_sandbox_worker",
+        lambda scope, packet, proposal, attempt: captured.append(proposal),
+    )
+    raw = response(
+        json.dumps(
+            {
+                "outcome": "IMPLEMENTED",
+                "summary": "one file repair",
+                "replacements": [
+                    {"path": "scripts/operator_cli.py", "content": "repair\n"}
+                ],
+            }
+        )
+    )
+    service._worker_result(raw, state["attempts"][-1])
+    assert {item["path"]: item["content"] for item in captured[0]["replacements"]} == {
+        "README.md": "prior\n",
+        "scripts/operator_cli.py": "repair\n",
+    }
+
+
 def test_missing_cache_usage_keeps_liability(service):
     raw = response()
     del raw["usage"]["input_tokens_details"]["cache_write_tokens"]
@@ -660,6 +700,69 @@ def test_real_sandbox_stopped_replay_and_independent_rejection(service, monkeypa
     # Retain evidence; remove only this fixture's own confirmed stopped Docker objects.
     for path in service.journal.directory.glob("run-*/runtime.json"):
         manifest = h.f.wp.read_json(path)
+        assert runtime.stopped(manifest["container"])
+        assert runtime.stopped(manifest["setup_container"])
+        runtime.docker("rm", manifest["container"], manifest["setup_container"])
+        runtime.docker("volume", "rm", manifest["volume"])
+
+
+def test_consumed_unstarted_check_never_passes_after_abandonment(service, monkeypatch):
+    if os.environ.get("WORKFLOW_TEST_IMAGE") != authority.IMAGE:
+        pytest.skip(
+            reason="Exact WORKFLOW_TEST_IMAGE required for interrupted-start proof"
+        )
+    from scripts import acceptance_runtime as ar
+    from scripts import workflow_runtime as runtime
+
+    state = service.state()
+    scope = SessionScope.load(state["scope"])
+    state["attempts"] = [{"id": h.sha("interrupted-start fixture")}]
+    state["bundle"] = {
+        "scope_sha256": scope.hash,
+        "base_commit": scope.data["base_commit"],
+        "changes": [
+            {
+                "path": "README.md",
+                "before_sha256": state["baseline"]["README.md"],
+                "content_base64": "dGVzdAo=",
+            }
+        ],
+    }
+    docker = runtime.docker
+
+    def interrupt_start(*args, **kwargs):
+        if args[0] == "start" and len(args) == 2:
+            raise KeyboardInterrupt()
+        return docker(*args, **kwargs)
+
+    with monkeypatch.context() as patch:
+        patch.setattr(runtime, "docker", interrupt_start)
+        with pytest.raises(KeyboardInterrupt):
+            ar.pilot_checks(service.journal, state)
+    with pytest.raises(ValueError, match="Consumed check start never executed"):
+        ar.pilot_checks(service.journal, state)
+    append = service.journal.append
+
+    def interrupt_abandonment(stream, kind, *args, **kwargs):
+        if stream.startswith("pilot-check:") and kind == "RESULT":
+            raise KeyboardInterrupt()
+        return append(stream, kind, *args, **kwargs)
+
+    with monkeypatch.context() as patch:
+        patch.setattr(service.journal, "append", interrupt_abandonment)
+        with pytest.raises(KeyboardInterrupt):
+            ar.pilot_checks(service.journal, state, reconcile=True)
+    checks = ar.pilot_checks(service.journal, state)
+    assert not checks["checks"][0]["passed"]
+    manifests = [
+        h.f.wp.read_json(path)
+        for path in service.journal.directory.glob("run-*/runtime.json")
+    ]
+    assert any(
+        runtime.inspect(item["container"])["State"]["Status"] == "created"
+        for item in manifests
+    )
+    for manifest in manifests:
         assert runtime.stopped(manifest["container"])
         assert runtime.stopped(manifest["setup_container"])
         runtime.docker("rm", manifest["container"], manifest["setup_container"])

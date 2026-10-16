@@ -599,6 +599,30 @@ class Operator(OperatorService):
             scope = SessionScope.load(state["scope"])
             verify_baseline(scope, state["baseline"])
             baseline = state["baseline"]
+            paths = [item["path"].casefold() for item in proposal["replacements"]]
+            if len(paths) != len(set(paths)):
+                raise ValueError("Duplicate repair replacement path")
+            merged = {}
+            if len(state["attempts"]) > 1:
+                prior = state["attempts"][-2].get("result", {}).get("bundle")
+                if prior:
+                    verify_bundle(scope, baseline, prior)
+                    merged = {
+                        item["path"]: base64.b64decode(
+                            item["content_base64"], validate=True
+                        ).decode()
+                        for item in prior["changes"]
+                    }
+            merged.update(
+                {item["path"]: item["content"] for item in proposal["replacements"]}
+            )
+            proposal = {
+                **proposal,
+                "replacements": [
+                    {"path": path, "content": content}
+                    for path, content in sorted(merged.items())
+                ],
+            }
             changes = [
                 {
                     "path": item["path"],
