@@ -25,6 +25,12 @@ OWNED_RECORDS = {
 FORBIDDEN = {
     value.casefold() for value in {"config/workflow-bootstrap.json", *OWNED_RECORDS}
 }
+PROJECT_INPUTS = {
+    "PROJECT_SPEC.json",
+    "INTAKE_REVIEW.json",
+    "PROJECT.md",
+    "tests/test_project_acceptance.py",
+}
 
 
 def _path(value: str) -> None:
@@ -125,7 +131,11 @@ def _plan(source: Path, slug: str) -> tuple[dict[str, bytes], list[dict], str]:
 
 
 def generate(
-    destination: Path, slug: str = "oop-example", *, source: Path = ROOT
+    destination: Path,
+    slug: str = "oop-example",
+    *,
+    source: Path = ROOT,
+    project_files: dict[str, bytes] | None = None,
 ) -> dict:
     approval.require(
         isinstance(slug, str)
@@ -148,6 +158,24 @@ def generate(
             "Destination must be missing or empty; existing work is never overwritten",
         )
     files, records, manifest_hash = _plan(source, slug)
+    for relative, content in (project_files or {}).items():
+        approval.require(
+            relative in PROJECT_INPUTS and isinstance(content, bytes),
+            "Only fixed intake document/test paths may supplement the example",
+        )
+        approval.require(
+            relative not in files, "Intake must not replace template files"
+        )
+        files[relative] = content
+        records.append(
+            {
+                "source": None,
+                "destination": relative,
+                "kind": "intake",
+                "source_sha256": hashlib.sha256(content).hexdigest(),
+                "output_sha256": hashlib.sha256(content).hexdigest(),
+            }
+        )
     revision = approval.git(source, "rev-parse", "HEAD").decode().strip()
     dirty = bool(
         approval.git(
