@@ -110,3 +110,37 @@ General intake is still incomplete: arbitrary domains, generated feature code,
 hardware projects, automated contract design and autonomous worker assignment
 require separate supported profiles/packages. No publication/deployment or
 physical-hardware verification is implied by passing these tests.
+
+## Recorded runnable proof
+
+The generated fictional project is at
+`C:\Users\hensl\Documents\GitHub\ai-template\generated-intake-classroom`.
+It has its own isolated `.venv`; from that directory run:
+
+```powershell
+.\.venv\Scripts\python.exe main.py --mock 1 2 3
+.\.venv\Scripts\python.exe -m pytest
+```
+
+- Final focused intake/B02 checks: **47 passed in 12.95s**.
+- Actual generated project: **57 passed in 2.01s** in its own isolated venv;
+  editable dev install and `pip check` passed.
+- Actual memory/SQLite runs returned totals **6**, **6**, then **15** across
+  separate invocations; generated boundary validation passed.
+- Scoped Ruff/format and ty checks passed. The repository has no basedpyright
+  gate; adding a broader toolchain/CI gate remains separate backlog work.
+- Source commit `5f8270a04f2692159aa5af4423415b1946d42c33` was clean at
+  generation. `GENERATION.json` records all 45 outputs, source digests and fresh
+  project UUID `a65edc78-ddac-4ad9-84cc-923802822d67`.
+- Status remained `AWAITING_APPROVAL`; the intake acknowledgment activates no
+  workflow authority. The completed sample contains only fictional requirements.
+- Existing contracts, `src/`, session rules, project metadata and foundation
+  receipt have no diff against the B02 base. No paid calls, workers, Docker or
+  broad migration campaigns were rerun.
+
+Raw proof commands/results are in
+`C:\Users\hensl\AppData\Local\Temp\oop-intake-proof-s_xjd6lo\verification.json`.
+Independent review **accepted** the exact source and all 45 outputs without
+findings; see `SOFTWARE_INTAKE_REVIEW.json`;
+Git history and the delivery pull request establish integration, not these test
+counts or the intake caller acknowledgment.
