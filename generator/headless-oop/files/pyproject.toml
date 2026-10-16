@@ -1,0 +1,14 @@
+[project]
+name = "headless-oop-sample"
+version = "0.1.0"
+description = "Generated contract-first OOP sample: typed interfaces, injected real/in-memory implementations, shared behavior tests."
+requires-python = ">=3.11"
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+addopts = "-q"

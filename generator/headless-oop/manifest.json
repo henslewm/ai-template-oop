@@ -1,0 +1,33 @@
+{
+  "schema_version": "headless-oop-manifest/1",
+  "description": "Headless contract-first OOP sample: typed auth/data contracts, SQLite and in-memory implementations, composition root, thin CLI and shared behavior tests.",
+  "copy": [
+    {"from": ".gitignore", "to": ".gitignore"},
+    {"from": "contracts/auth.py", "to": "contracts/auth.py"},
+    {"from": "contracts/data.py", "to": "contracts/data.py"},
+    {"from": "contracts/errors.py", "to": "contracts/errors.py"},
+    {"from": "src/__init__.py", "to": "src/__init__.py"},
+    {"from": "src/features/__init__.py", "to": "src/features/__init__.py"},
+    {"from": "src/features/auth.py", "to": "src/features/auth.py"},
+    {"from": "src/features/data.py", "to": "src/features/data.py"},
+    {"from": "src/ui/mocks.py", "to": "src/features/in_memory.py"},
+    {"from": "src/container/__init__.py", "to": "src/container/__init__.py"},
+    {"from": "src/ui/errors.py", "to": "src/cli/errors.py"},
+    {"from": "tests/test_contract_auth.py", "to": "tests/test_contract_auth.py"},
+    {"from": "tests/test_contract_data.py", "to": "tests/test_contract_data.py"},
+    {"from": "tests/test_boundaries.py", "to": "tests/test_boundaries.py"}
+  ],
+  "assets": [
+    {"from": "files/README.md", "to": "README.md"},
+    {"from": "files/pyproject.toml", "to": "pyproject.toml"},
+    {"from": "files/main.py", "to": "main.py"},
+    {"from": "files/contracts/__init__.py", "to": "contracts/__init__.py"},
+    {"from": "files/src/container/wiring.py", "to": "src/container/wiring.py"},
+    {"from": "files/src/cli/__init__.py", "to": "src/cli/__init__.py"},
+    {"from": "files/src/cli/app.py", "to": "src/cli/app.py"},
+    {"from": "files/tools/validate_boundaries.py", "to": "tools/validate_boundaries.py"},
+    {"from": "files/tests/conftest.py", "to": "tests/conftest.py"},
+    {"from": "files/tests/test_cli.py", "to": "tests/test_cli.py"},
+    {"from": "files/tests/test_headless.py", "to": "tests/test_headless.py"}
+  ]
+}
