@@ -124,8 +124,17 @@ class SessionScope:
             )
         if not isinstance(value, dict) or set(value) != SCOPE_KEYS:
             raise ValueError("Scope fields do not match schema version 1.0")
-        if value["schema_version"] != "1.0" or value["role"] not in {"feature", "ui"}:
+        if value["schema_version"] != "1.0" or value["role"] not in {
+            "feature",
+            "ui",
+            "maintenance",
+        }:
             raise ValueError("Unsupported scope version or role")
+        maintenance = None
+        if value["role"] == "maintenance":
+            from scripts.pilot_authority import load_profile
+
+            maintenance = load_profile(Path(value["workspace"]))
         for key in ("owner", "run_id", "feature_id"):
             if not isinstance(value[key], str) or not re.fullmatch(
                 r"[A-Za-z0-9][A-Za-z0-9._-]{0,79}", value[key]
@@ -163,9 +172,14 @@ class SessionScope:
                 raise ValueError("Duplicate or case-colliding scope paths")
             for path in paths:
                 checked_path(path)
-                if not belongs(
-                    path, value["feature_id"], value["role"], key == "write_paths"
-                ):
+                allowed = (
+                    path in maintenance[key]
+                    if maintenance is not None
+                    else belongs(
+                        path, value["feature_id"], value["role"], key == "write_paths"
+                    )
+                )
+                if not allowed:
                     raise ValueError("Path outside role ownership: " + path)
         if not set(value["write_paths"]).issubset(value["read_paths"]):
             raise ValueError("Writable files must be explicitly included in read scope")
