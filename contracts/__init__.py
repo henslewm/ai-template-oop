@@ -33,8 +33,11 @@ from contracts.data import (
     ProcessingResult,
 )
 from contracts.errors import AppError, StorageError
+from contracts.operator import OperatorService, OperatorView
 
 __all__ = [
+    "OperatorService",
+    "OperatorView",
     # errors
     "AppError",
     "StorageError",
