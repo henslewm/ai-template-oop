@@ -106,8 +106,8 @@ def _exact_review(review, head):
     )
 
 
-def gates(root, number, head, baseline, *, review=None):
-    live = closeout.hosting(root, number)
+def _hosting_holds(live, head, review):
+    """Review and check holds also apply when recovering an external merge."""
     blockers = closeout._checks(live)
     approved = _exact_review(review, head)
     history = closeout.review_history(live, allow_unverified=approved)
@@ -117,25 +117,8 @@ def gates(root, number, head, baseline, *, review=None):
     )
     if not approved:
         blockers.append("INDEPENDENT_EXACT_REVIEW_REQUIRED")
-    if live["head"] != head or live["remote_branches"].get(live["branch"]) != head:
-        blockers.append("EXACT_PR_HEAD_CHANGED")
-    if (
-        live["repository"] != closeout.REPO
-        or live["head_repository"] != closeout.REPO
-        or live["base_repository"] != closeout.REPO
-    ):
-        blockers.append("CROSS_REPOSITORY_DELIVERY")
-    if live["base_branch"] != "main" or not live["branch"].startswith("feature/"):
-        blockers.append("WRONG_DELIVERY_BRANCH")
     if live["delete_branch_on_merge"] is not False:
         blockers.append("BRANCH_DELETION_ENABLED")
-    if (
-        live["state"] != "open"
-        or live["draft"]
-        or live["mergeable"] is not True
-        or live["mergeable_state"] not in {"clean", "unstable"}
-    ):
-        blockers.append("PR_NOT_READY")
     if live["unsupported_rules"] or live["unresolved"] or live["more_threads"]:
         blockers.append("HOSTING_RULE_OR_REVIEW_THREADS_HELD")
     latest = {}
@@ -163,6 +146,29 @@ def gates(root, number, head, baseline, *, review=None):
         for c in latest_checks.values()
     ):
         blockers.append("HOSTING_CHECK_PENDING_OR_FAILED")
+    return sorted(set(blockers))
+
+
+def gates(root, number, head, baseline, *, review=None):
+    live = closeout.hosting(root, number)
+    blockers = _hosting_holds(live, head, review)
+    if live["head"] != head or live["remote_branches"].get(live["branch"]) != head:
+        blockers.append("EXACT_PR_HEAD_CHANGED")
+    if (
+        live["repository"] != closeout.REPO
+        or live["head_repository"] != closeout.REPO
+        or live["base_repository"] != closeout.REPO
+    ):
+        blockers.append("CROSS_REPOSITORY_DELIVERY")
+    if live["base_branch"] != "main" or not live["branch"].startswith("feature/"):
+        blockers.append("WRONG_DELIVERY_BRANCH")
+    if (
+        live["state"] != "open"
+        or live["draft"]
+        or live["mergeable"] is not True
+        or live["mergeable_state"] not in {"clean", "unstable"}
+    ):
+        blockers.append("PR_NOT_READY")
     current = retained(root)
     if (
         current["local"].get(live["branch"]) != head
@@ -202,12 +208,7 @@ def verify_merged(root, number, head, baseline, *, review=None):
         )
     _git(root, "fetch", "origin")
     live = closeout.hosting(root, number)
-    if (
-        closeout._checks(live)
-        or closeout.review_history(live, allow_unverified=True)["blockers"]
-        or live["unresolved"]
-        or live["more_threads"]
-    ):
+    if _hosting_holds(live, head, review):
         raise ValueError("Merged PR still has unresolved check or review-history holds")
     current = retained(root)
     if current["local"].get(BRANCH) != head or current["origin"].get(BRANCH) != head:

@@ -562,10 +562,7 @@ def test_deleted_delivery_branch_prevents_merged_receipt(monkeypatch):
         "hosting",
         lambda *args: {"unresolved": 0, "more_threads": False},
     )
-    monkeypatch.setattr(delivery.closeout, "_checks", lambda live: [])
-    monkeypatch.setattr(
-        delivery.closeout, "review_history", lambda live, **kwargs: {"blockers": []}
-    )
+    monkeypatch.setattr(delivery, "_hosting_holds", lambda *args: [])
     monkeypatch.setattr(delivery, "retained", lambda root: {"local": {}, "origin": {}})
     with pytest.raises(ValueError, match="not retained"):
         delivery.verify_merged(
@@ -637,6 +634,21 @@ def test_pilot_review_policy_requires_exact_independent_evidence(monkeypatch):
     blockers, observed = delivery.gates(ROOT, 1, head, {}, review=proof)
     assert blockers == []
     assert observed["automated_review_history"] == "UNVERIFIED"
+    monkeypatch.setattr(
+        delivery.closeout,
+        "gh",
+        lambda endpoint: {
+            "merged": True,
+            "head": {
+                "sha": head,
+                "ref": delivery.BRANCH,
+                "repo": {"full_name": "henslewm/ai-template-oop"},
+            },
+            "base": {"ref": "main", "repo": {"full_name": "henslewm/ai-template-oop"}},
+            "merge_commit_sha": "b" * 40,
+        },
+    )
+    delivery.verify_merged(ROOT, 1, head, {}, review=proof)
     for invalid in (
         {**proof, "head": "c" * 40},
         {**proof, "implementer": "Independent"},
@@ -660,7 +672,19 @@ def test_pilot_review_policy_requires_exact_independent_evidence(monkeypatch):
         "HOSTING_CHECK_PENDING_OR_FAILED"
         in delivery.gates(ROOT, 1, head, {}, review=proof)[0]
     )
+    with pytest.raises(ValueError, match="unresolved check or review-history"):
+        delivery.verify_merged(ROOT, 1, head, {}, review=proof)
     live["checks"] = []
+    live["reviews"] = [
+        {"id": 1, "user": {"login": "reviewer"}, "state": "CHANGES_REQUESTED"}
+    ]
+    assert (
+        "OUTSTANDING_CHANGES_REQUESTED"
+        in delivery.gates(ROOT, 1, head, {}, review=proof)[0]
+    )
+    with pytest.raises(ValueError, match="unresolved check or review-history"):
+        delivery.verify_merged(ROOT, 1, head, {}, review=proof)
+    live["reviews"] = []
     live["unresolved"] = 1
     assert (
         "UNRESOLVED_OR_UNOBSERVED_REVIEW_THREADS"
