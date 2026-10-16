@@ -57,7 +57,8 @@ approval material are unchanged.
 - `-k mock` contract tests: **20 passed**; `-k sql`: **20 passed**; full generated suite: **55 passed**; `tools/validate_boundaries.py`: `Boundaries OK.`
 - Host focused run (generation, boundaries, contracts, headless imports, project authority): **81 passed**. `ruff check`/`ruff format` are clean on the authored files. The derived `wiring.py`, `conftest.py` and validator keep host formatting.
 
-Raw SHA-256 at `b8e9b50`:
+Raw SHA-256 of working-tree bytes at `b8e9b50` in this checkout (`core.autocrlf` is on;
+blobs are LF in Git, so a fresh clone may produce CRLF bytes and different hashes):
 
 | Path | SHA-256 |
 | --- | --- |
@@ -70,6 +71,7 @@ Raw SHA-256 at `b8e9b50`:
 
 Windows Python 3.12+ with the template's dev dependencies (`pytest`, `jsonschema`).
 Point `LOCALAPPDATA` at a throwaway directory so registrations stay out of the real host state.
+The PowerShell variable lasts for the shell session; use a fresh shell or restore it afterward.
 
 ```powershell
 $T = Join-Path $env:TEMP "b02-review-$(Get-Random)"
@@ -92,7 +94,8 @@ python -B -m pytest -q -p no:cacheprovider -o addopts= tests/test_generate_proje
 - **Pre-existing, not B02:** `tests/test_workflow_approval.py` gives **4 failed, 42 passed**
   (inactive package, `<lambda>17`, receipt fields, CLI activation: receipt state is
   `ACTIVE` where tests expect `AWAITING_APPROVAL`). The identical result reproduces at
-  clean `29a0c25` with B02 files moved aside. B01 recorded 46 passed; this needs a
+  clean `29a0c25` with B02 files moved aside, and with an isolated empty `LOCALAPPDATA`
+  (so it is not caused by host receipt state). B01 recorded 46 passed; this needs a
   separately scoped look and was not changed here.
 - The generated project cannot `review`/`activate` itself. B01's inventory requires the
   workflow controller scripts, whose closure needs jsonschema and schemas. Activation, if
