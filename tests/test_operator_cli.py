@@ -136,6 +136,31 @@ class OperatorCliTests(unittest.TestCase):
         self.assertEqual(errors, '')
         self.assertEqual(fake.calls, [])
 
+    def test_untrusted_text_cannot_change_terminal_or_summary_lines(self):
+        payload = 'first\nProgress: SPOOFED\r\t\x1b[31m\x1b]0;title\x07\x9b31m\u202e last'
+        fake = FakeService()
+        fake.view = replace(fake.view, objective=payload, blockers=(payload,),
+                            next_action=payload)
+        code, output, errors = self.invoke(['status'], fake)
+        self.assertEqual(code, 0)
+        self.assertEqual(errors, '')
+        self.assertEqual([line for line in output.splitlines()
+                          if line.startswith('Progress:')], ['Progress: HELD'])
+        self.assertEqual(len([line for line in output.splitlines()
+                              if line.startswith('  - ')]), 1)
+        self.assertNotIn('first\nProgress: SPOOFED', output)
+        for control in ('\r', '\t', '\x1b', '\x07', '\x9b', '\u202e'):
+            self.assertNotIn(control, output)
+
+    def test_error_text_is_one_line_without_terminal_controls(self):
+        fake = FakeService(error=RuntimeError('missing\n\x1b]0;title\x07\u202e setup'))
+        code, output, errors = self.invoke(['status'], fake)
+        self.assertEqual(code, 1)
+        self.assertEqual(output, '')
+        self.assertEqual(len(errors.splitlines()), 1)
+        for control in ('\x1b', '\x07', '\u202e'):
+            self.assertNotIn(control, errors)
+
     def test_default_argv_still_uses_injected_service(self):
         fake = FakeService()
         with patch.object(sys, 'argv', ['operator_cli', 'resume']):

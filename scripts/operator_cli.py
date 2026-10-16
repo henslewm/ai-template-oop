@@ -10,6 +10,11 @@ from scripts.operator_service import open_service
 USAGE = ('Usage: .\\start.ps1 "objective" | status | resume [--run]')
 
 
+def _one_line(value) -> str:
+    """Keep untrusted summaries from changing terminal state or output structure."""
+    return " ".join("".join(char if char.isprintable() else " " for char in str(value)).split())
+
+
 def _parse(argv):
     if argv == ["status"]:
         return "status", None
@@ -25,8 +30,8 @@ def _parse(argv):
 
 
 def _render(view: OperatorView) -> None:
-    print(f"Objective: {view.objective}")
-    print(f"Progress: {view.progress}")
+    print(f"Objective: {_one_line(view.objective)}")
+    print(f"Progress: {_one_line(view.progress)}")
     print(f"Settled USD: {view.settled_usd:.4f}")
     print(f"Pending liability USD: {view.liability_usd:.4f}")
     print(f"Failed attempt cost USD: {view.failed_attempt_usd:.4f}")
@@ -39,10 +44,10 @@ def _render(view: OperatorView) -> None:
     print("Blockers:")
     if view.blockers:
         for blocker in view.blockers:
-            print(f"  - {blocker}")
+            print(f"  - {_one_line(blocker)}")
     else:
         print("  none")
-    print(f"Next action: {view.next_action}")
+    print(f"Next action: {_one_line(view.next_action)}")
 
 
 def main(argv=None, *, service: OperatorService | None = None) -> int:
@@ -67,7 +72,7 @@ def main(argv=None, *, service: OperatorService | None = None) -> int:
         _render(view)
         return 0
     except Exception as exc:
-        detail = " ".join(str(exc).splitlines()) or type(exc).__name__
+        detail = _one_line(exc) or type(exc).__name__
         print(
             f"Operator error: {detail}. Check local setup and inspect with "
             ".\\start.ps1 status before retrying.",
