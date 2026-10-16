@@ -2,8 +2,12 @@
 
 Owner: Claude Code, sole implementation owner. Branch `feature/b02-generated-project`,
 base `29a0c25`. Candidate source commit: `b8e9b50`; this handoff and the backlog
-row follow in the next commit. Status: **implemented and locally verified; awaiting
-independent review.** Not pushed, published or merged. No paid call, worker or
+row follow in the next commit. Status: **superseded duplicate; not the B02 candidate.** A separate B02 implementation
+on `feature/generated-oop-example` (`819391b`, `tools/generate_example.py`) holds an
+independent APPROVE (`GENERATED_OOP_EXAMPLE_REVIEW.json`). This branch was built in
+parallel without knowledge of it. It is retained per BRANCH_RETENTION.md, not pushed,
+and is not submitted for review; reuse anything only through the accepted package.
+Original status: implemented and locally verified. Not pushed, published or merged. No paid call, worker or
 activation was used.
 
 ## Owned paths
