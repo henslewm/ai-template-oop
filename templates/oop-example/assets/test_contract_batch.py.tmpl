@@ -1,0 +1,66 @@
+"""Identical batch assertions exercise both real and in-memory dependencies."""
+
+from dataclasses import FrozenInstanceError
+
+import pytest
+
+from contracts import (
+    BatchRequest,
+    BatchService,
+    EmptyInputError,
+    InvalidCredentialsError,
+    SessionExpiredError,
+)
+from src.features import AuthenticatedBatchService
+
+
+def test_batch_uses_injected_services_and_records_result(services):
+    auth, processor = services
+    service = AuthenticatedBatchService(auth, processor)
+    assert isinstance(service, BatchService)
+    value = service.execute(BatchRequest("alice", "correct horse", (1, 2, 3), True))
+    assert (value.count, value.total, value.mean) == (3, 6, 2)
+    session = auth.login("alice", "correct horse")
+    assert processor.history(session) == [value]
+    auth.logout(session)
+
+
+@pytest.mark.parametrize("values", [(1.0,), ()])
+def test_batch_closes_session_on_success_and_processing_failure(
+    services, monkeypatch, values
+):
+    auth, processor = services
+    auth.register("alice", "correct horse")
+    login = auth.login
+    sessions = []
+
+    def observe_login(username, password):
+        session = login(username, password)
+        sessions.append(session)
+        return session
+
+    monkeypatch.setattr(auth, "login", observe_login)
+    service = AuthenticatedBatchService(auth, processor)
+    request = BatchRequest("alice", "correct horse", values)
+    if values:
+        service.execute(request)
+    else:
+        with pytest.raises(EmptyInputError):
+            service.execute(request)
+    with pytest.raises(SessionExpiredError):
+        auth.current_user(sessions[0])
+
+
+def test_batch_preserves_authentication_errors(services):
+    auth, processor = services
+    with pytest.raises(InvalidCredentialsError):
+        AuthenticatedBatchService(auth, processor).execute(
+            BatchRequest("nobody", "incorrect", (1,))
+        )
+
+
+def test_request_is_immutable_and_does_not_display_password():
+    request = BatchRequest("alice", "private-value", (1,))
+    assert "private-value" not in repr(request)
+    with pytest.raises(FrozenInstanceError):
+        request.username = "other"

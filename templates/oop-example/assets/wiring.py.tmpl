@@ -1,0 +1,33 @@
+"""Composition root: construct concrete services and inject their dependencies."""
+
+from __future__ import annotations
+
+from dataclasses import dataclass
+from pathlib import Path
+
+from contracts import BatchService, DataProcessor, UserAuthenticator
+from src.features import (
+    AuthenticatedBatchService,
+    ProductionAuthenticator,
+    SQLDataProcessor,
+)
+from src.testing.fakes import MockAuthenticator, MockDataProcessor
+
+
+@dataclass(frozen=True)
+class Services:
+    authenticator: UserAuthenticator
+    processor: DataProcessor
+    batch: BatchService
+
+
+def build_mock() -> Services:
+    auth = MockAuthenticator()
+    processor = MockDataProcessor(auth)
+    return Services(auth, processor, AuthenticatedBatchService(auth, processor))
+
+
+def build_production(db_path: str | Path) -> Services:
+    auth = ProductionAuthenticator(db_path)
+    processor = SQLDataProcessor(db_path, auth)
+    return Services(auth, processor, AuthenticatedBatchService(auth, processor))
