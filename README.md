@@ -14,7 +14,8 @@ From the repository root:
 
 The quoted objective uses the approved bounded preset, not arbitrary project
 execution. Limits remain **$1 per task / $5 per pilot**. Before running work,
-complete the local activation and provider-key setup, start Docker Desktop,
+complete the [local pilot activation](docs/workflow-migration/LIVE_PILOT.md#bootstrap-and-operation)
+and provider-key setup, start Docker Desktop,
 and set `WORKFLOW_TEST_IMAGE` to the already verified local worker image.
 Python 3.12+ and Git must be installed. The launcher creates an isolated
 `.venv` and installs declared development dependencies only when it is absent;
