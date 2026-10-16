@@ -51,6 +51,7 @@ def activate(root, commit, number, report_path):
         raise ValueError(
             "Integrated bootstrap tree differs from the reviewed candidate"
         )
+    ws.approval.git(root, "merge-base", "--is-ancestor", integrated, "origin/main")
     implementation = authority.inventory(root, commit)
     if implementation != authority.inventory(root):
         raise ValueError("Executing implementation differs from the reviewed bootstrap")

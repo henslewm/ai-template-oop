@@ -216,6 +216,10 @@ def test_activation_binds_exact_rebased_tree(checkout, tmp_path, monkeypatch):
     with pytest.raises(ValueError, match="Integrated bootstrap tree differs"):
         pilot_admin.activate(checkout, reviewed, 1, report)
     pull["merge_commit_sha"] = integrated
+    git(checkout, "update-ref", "refs/remotes/origin/main", parent)
+    with pytest.raises((ValueError, subprocess.CalledProcessError)):
+        pilot_admin.activate(checkout, reviewed, 1, report)
+    git(checkout, "update-ref", "refs/remotes/origin/main", integrated)
     pilot_admin.activate(checkout, reviewed, 1, report)
     profile = authority.load_profile(checkout)
     assert profile["implementation_commit"] == integrated
