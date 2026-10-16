@@ -149,16 +149,18 @@ def test_rerun_replaces_the_archive(project):
     assert list((project / web_setup.OUTPUT).glob(".building-*")) == []
 
 
-@pytest.mark.parametrize("client", sorted(web_setup.CLIENTS))
-def test_archives_are_ignored_by_git(client):
+def test_archives_are_ignored_by_git():
     if shutil.which("git") is None:
         pytest.skip("git is not available")
-    path = f"{web_setup.OUTPUT}/web-setup-{client}.zip"
-    ignored = subprocess.run(["git", "check-ignore", "-q", "--no-index", path], cwd=ROOT, check=False)
-    assert ignored.returncode == 0
-    kept = subprocess.run(["git", "check-ignore", "-q", "--no-index", f"{web_setup.OUTPUT}/.gitignore"],
-                          cwd=ROOT, check=False)
-    assert kept.returncode == 1
+    archives = [f"{web_setup.OUTPUT}/web-setup-{client}.zip" for client in sorted(web_setup.CLIENTS)]
+    kept = f"{web_setup.OUTPUT}/.gitignore"
+    # One call; -v names the deciding rule per path, and a "!" rule or no rule ("::") means not ignored.
+    result = subprocess.run(["git", "check-ignore", "-v", "--non-matching", "--no-index", *archives, kept],
+                            cwd=ROOT, capture_output=True, text=True, check=False)
+    rules = dict(reversed(line.split("\t", 1)) for line in result.stdout.splitlines())
+    assert set(rules) == {*archives, kept}
+    ignored = {path for path, rule in rules.items() if not rule.startswith("::") and ":!" not in rule}
+    assert ignored == set(archives)
 
 
 def test_clipboard_copy_uses_the_platform_tool():

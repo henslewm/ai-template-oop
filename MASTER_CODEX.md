@@ -6,9 +6,7 @@ Codex reads `AGENTS.md`. Treat that file as the startup router and this file as 
 
 ## Foundation gate
 
-Before autonomous substantive work in every session, run `python -B scripts/validate_workflow_approval.py --fingerprint --require-active` from the repository root. Continue autonomously only when it prints `FOUNDATION VALID: ACTIVE`. That receipt covers bounded offline implementation; it enables no live workers and no paid calls. A failure, or an unavailable runtime, means no autonomous execution: report it and continue only with reading and commit-ready proposals.
-
-Once the gate passes, routine work within the session's owned paths and existing permissions may proceed without approval for each step. Contract changes, approval-frozen files and consequential external actions keep their explicit-authority requirements (`MASTER_INSTRUCTIONS.md`).
+Apply `MASTER_INSTRUCTIONS.md` → "Foundation gate" exactly as stated there; it is deliberately not restated here.
 
 ## Execution rules
 
