@@ -176,7 +176,8 @@ def load_profile(root: Path) -> dict:
         review, {"head", "actor", "verdict", "report_sha256", "pr"}, "pilot review"
     )
     approval.require(
-        review["head"] == commit
+        approval.hex_digest(review["head"], 40)
+        and inventory(root, review["head"]) == profile["implementation"]
         and review["verdict"] == "APPROVE"
         and review["actor"] != "Bootstrap implementer"
         and approval.hex_digest(review["report_sha256"], 64)

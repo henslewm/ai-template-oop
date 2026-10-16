@@ -92,6 +92,9 @@ Docker input archives, inspected boundaries, stopped output and independent
 check logs are retained. Generated code executes only in network-disabled
 Docker until accepted. Delivery creates Git objects for exactly that bundle,
 publishes a separate PR and reobserves hosting facts before an exact-head merge.
+The repository uses rebase merges. Activation and delivery verify that the
+integrated commit has exactly the reviewed file tree, retain the original PR
+head and review evidence, and require the integrated commit in main's ancestry.
 Branches are permanent; there is no deletion or force push.
 
 The owner-approved pilot merge policy uses a saved independent approval bound

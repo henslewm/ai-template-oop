@@ -164,6 +164,64 @@ def test_default_disabled_and_inspection_has_no_side_effects(checkout):
     assert not transport.calls
 
 
+def test_activation_binds_exact_rebased_tree(checkout, tmp_path, monkeypatch):
+    from tools import pilot_admin
+
+    reviewed = git(checkout, "rev-parse", "HEAD")
+    parent = git(checkout, "rev-parse", "HEAD^")
+    integrated = git(
+        checkout,
+        "commit-tree",
+        git(checkout, "rev-parse", "HEAD^{tree}"),
+        "-p",
+        parent,
+        "-m",
+        "Rebased fixture",
+    )
+    assert integrated != reviewed
+    git(checkout, "checkout", "-b", "feature/rebased-fixture", integrated)
+    git(
+        checkout,
+        "remote",
+        "set-url",
+        "origin",
+        "https://github.com/henslewm/ai-template-oop.git",
+    )
+    report = tmp_path / "review.json"
+    report.write_text(
+        json.dumps(
+            {
+                "head": reviewed,
+                "actor": "Independent",
+                "verdict": "APPROVE",
+                "blocking_findings": [],
+            }
+        )
+    )
+    pull = {
+        "merged": True,
+        "head": {"sha": reviewed},
+        "base": {"ref": "main"},
+        "merge_commit_sha": parent,
+    }
+    monkeypatch.setattr(pilot_admin.closeout, "gh", lambda endpoint: pull)
+    original_git = ws.approval.git
+    monkeypatch.setattr(
+        ws.approval,
+        "git",
+        lambda root, *args: (
+            b"" if args == ("fetch", "origin") else original_git(root, *args)
+        ),
+    )
+    with pytest.raises(ValueError, match="Integrated bootstrap tree differs"):
+        pilot_admin.activate(checkout, reviewed, 1, report)
+    pull["merge_commit_sha"] = integrated
+    pilot_admin.activate(checkout, reviewed, 1, report)
+    profile = authority.load_profile(checkout)
+    assert profile["implementation_commit"] == integrated
+    assert profile["review"]["head"] == reviewed
+
+
 def test_approval_isolation_and_immutable_controller(service):
     scope = service.state()["scope"]
     for path in (
@@ -556,6 +614,7 @@ def test_deleted_delivery_branch_prevents_merged_receipt(monkeypatch):
         "merge_commit_sha": "b" * 40,
     }
     monkeypatch.setattr(delivery.closeout, "gh", lambda endpoint: pull)
+    monkeypatch.setattr(delivery.closeout, "tree", lambda *args: {})
     monkeypatch.setattr(delivery, "_git", lambda *args, **kwargs: b"")
     monkeypatch.setattr(
         delivery.closeout,
@@ -648,7 +707,14 @@ def test_pilot_review_policy_requires_exact_independent_evidence(monkeypatch):
             "merge_commit_sha": "b" * 40,
         },
     )
+    monkeypatch.setattr(delivery.closeout, "tree", lambda *args: {})
     delivery.verify_merged(ROOT, 1, head, {}, review=proof)
+    with monkeypatch.context() as patch:
+        patch.setattr(
+            delivery.closeout, "tree", lambda root, commit: {"commit": commit}
+        )
+        with pytest.raises(ValueError, match="Integrated file tree differs"):
+            delivery.verify_merged(ROOT, 1, head, {}, review=proof)
     for invalid in (
         {**proof, "head": "c" * 40},
         {**proof, "implementer": "Independent"},

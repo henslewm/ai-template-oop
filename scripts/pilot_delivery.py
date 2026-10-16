@@ -217,6 +217,10 @@ def verify_merged(root, number, head, baseline, *, review=None):
             "Merged PR does not establish delivery of the exact candidate into main"
         )
     _git(root, "fetch", "origin")
+    if closeout.tree(root, head) != closeout.tree(root, pull["merge_commit_sha"]):
+        raise ValueError(
+            "Integrated file tree differs from the exact reviewed candidate"
+        )
     live = closeout.hosting(root, number)
     if _hosting_holds(live, head, review):
         raise ValueError("Merged PR still has unresolved check or review-history holds")
@@ -231,7 +235,6 @@ def verify_merged(root, number, head, baseline, *, review=None):
                 raise ValueError("Retained branch disappeared")
             _git(root, "merge-base", "--is-ancestor", old, current[where][name])
     main = live["remote_branches"]["main"]
-    _git(root, "merge-base", "--is-ancestor", head, main)
     _git(root, "merge-base", "--is-ancestor", pull["merge_commit_sha"], main)
 
 
@@ -404,7 +407,7 @@ def deliver(operator):
             "--repo",
             closeout.REPO,
             str(pull["number"]),
-            "--merge",
+            "--rebase",
             "--match-head-commit",
             head,
         ],

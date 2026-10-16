@@ -29,6 +29,7 @@ def activate(root, commit, number, report_path):
         not pull["merged"]
         or pull["head"]["sha"] != commit
         or pull["base"]["ref"] != "main"
+        or not pull["merge_commit_sha"]
     ):
         raise ValueError(
             "Activate only the exact reviewed bootstrap head after its PR is merged"
@@ -44,6 +45,12 @@ def activate(root, commit, number, report_path):
             "Independent review must approve the exact bootstrap head with no blocking findings"
         )
     # Both the reviewed objects and executing checkout must match before receipt creation.
+    ws.approval.git(root, "fetch", "origin")
+    integrated = pull["merge_commit_sha"]
+    if closeout.tree(root, commit) != closeout.tree(root, integrated):
+        raise ValueError(
+            "Integrated bootstrap tree differs from the reviewed candidate"
+        )
     implementation = authority.inventory(root, commit)
     if implementation != authority.inventory(root):
         raise ValueError("Executing implementation differs from the reviewed bootstrap")
@@ -53,7 +60,7 @@ def activate(root, commit, number, report_path):
         "approved_at": datetime.now(timezone.utc).isoformat(),
         "foundation": ws.active_anchor(root),
         "identity": journal.identity,
-        "implementation_commit": commit,
+        "implementation_commit": integrated,
         "implementation": implementation,
         "review": {
             "head": commit,
