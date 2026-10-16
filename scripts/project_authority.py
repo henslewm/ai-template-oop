@@ -39,6 +39,9 @@ ROOT_FILES = (
     "requirements-work-packets.txt",
     "tests/pilot_shell_checks.py",
 )
+TEXT_SUFFIXES = frozenset(
+    {".py", ".json", ".toml", ".md", ".txt", ".ini", ".yaml", ".yml", ".ps1", ".sh"}
+)
 require = approval.require
 
 
@@ -89,6 +92,7 @@ def applies(root: Path) -> bool:
             Path(root) / IDENTITY,
             Path(root) / PACKAGE,
             directory / "identity.json",
+            directory / "operation.lock",
         )
     )
 
@@ -212,6 +216,20 @@ def initialize(root: Path, slug: str) -> dict:
     return proposed
 
 
+def _input_digest(root: Path, relative: str) -> str:
+    content = approval.safe_file(root, relative).read_bytes()
+    path = Path(relative)
+    if path.suffix.casefold() in TEXT_SUFFIXES or path.name == "Dockerfile":
+        try:
+            content.decode("utf-8")
+        except UnicodeError:
+            pass
+        else:
+            if b"\0" not in content:
+                return approval.content_digest(content)
+    return hashlib.sha256(content).hexdigest()
+
+
 def inventory(root: Path) -> dict[str, str]:
     """Bind control code/config, including untracked inputs; application work stays unbound."""
     result = {}
@@ -236,15 +254,11 @@ def inventory(root: Path) -> dict[str, str]:
                 if relative == PACKAGE or path.suffix in {".pyc", ".pyo"}:
                     continue
                 _no_links(path)
-                result[relative] = approval.content_digest(
-                    approval.safe_file(root, relative).read_bytes()
-                )
+                result[relative] = _input_digest(root, relative)
     for relative in ROOT_FILES:
         if os.path.lexists(root / relative):
             _no_links(root / relative)
-            result[relative] = approval.content_digest(
-                approval.safe_file(root, relative).read_bytes()
-            )
+            result[relative] = _input_digest(root, relative)
     require(
         {
             IDENTITY,
@@ -410,8 +424,9 @@ def status(root: Path) -> dict:
     root = project_root(root)
     if not applies(root):
         return {"state": "UNINITIALIZED", "next_action": "init --slug <project-slug>"}
-    project = identity(root)
+    project = None
     try:
+        project = identity(root)
         fingerprint = active_anchor(root)
     except (OSError, ValueError, KeyError, TypeError) as exc:
         return {

@@ -227,6 +227,49 @@ def test_feature_work_does_not_require_control_plane_reapproval(repository):
     assert ws.active_anchor(repository) == fingerprint
 
 
+@pytest.mark.parametrize("relative", ["runtime/firmware.bin", "config/device.bin"])
+def test_byte_distinct_binary_control_inputs_invalidate_approval(repository, relative):
+    authority.initialize(repository, "example")
+    artifact = repository / relative
+    artifact.parent.mkdir(parents=True, exist_ok=True)
+    artifact.write_bytes(b"A\r\nB")
+    approve(repository)
+    before = authority.inventory(repository)[relative]
+    artifact.write_bytes(b"A\nB")
+    assert authority.inventory(repository)[relative] != before
+    with pytest.raises(ValueError, match="stale"):
+        ws.active_anchor(repository)
+
+
+def test_known_text_line_endings_retain_the_same_approval(repository):
+    authority.initialize(repository, "example")
+    script = repository / "scripts/component.py"
+    script.write_bytes(b"VALUE = 1\r\n")
+    fingerprint = approve(repository)
+    script.write_bytes(b"VALUE = 1\n")
+    assert ws.active_anchor(repository) == fingerprint
+
+
+@pytest.mark.parametrize("damage", ["missing", "malformed"])
+def test_status_reports_identity_damage_without_creating_or_resetting_state(
+    repository, damage, capsys
+):
+    authority.initialize(repository, "example")
+    record = repository / authority.IDENTITY
+    if damage == "missing":
+        record.unlink()
+    else:
+        record.write_text("{malformed")
+    before = contents(repository)
+    directory, _ = authority._location(repository)
+    host_before = contents(directory)
+    result = authority.status(repository)
+    assert result["state"] == "AWAITING_APPROVAL" and result["blocker"]
+    assert project_admin.main(["--root", str(repository), "status"]) == 0
+    assert json.loads(capsys.readouterr().out)["state"] == "AWAITING_APPROVAL"
+    assert contents(repository) == before and contents(directory) == host_before
+
+
 def test_removing_identity_in_a_copy_cannot_fall_back_to_legacy(repository, tmp_path):
     authority.initialize(repository, "example")
     approve(repository)
@@ -267,6 +310,9 @@ def test_interrupted_identity_write_remains_held(repository, monkeypatch):
         authority.initialize(repository, "replacement")
     with pytest.raises((ValueError, OSError)):
         ws.active_anchor(repository)
+
+    result = authority.status(repository)
+    assert result["state"] == "AWAITING_APPROVAL" and result["blocker"]
 
 
 def test_code_change_during_activation_does_not_record_approval(
@@ -408,6 +454,30 @@ def test_historical_active_copy_is_not_project_approval(repository, tmp_path):
     with pytest.raises((ValueError, OSError)):
         ws.active_anchor(snapshot)
     assert (snapshot / legacy.PACKAGE).read_bytes() == before
+
+
+def test_interrupted_initialization_before_registration_cannot_use_legacy_approval(
+    repository, tmp_path
+):
+    snapshot = tmp_path / "interrupted historical export"
+    snapshot.mkdir()
+    archive = subprocess.check_output(["git", "-C", str(ROOT), "archive", "HEAD"])
+    with tarfile.open(fileobj=io.BytesIO(archive)) as bundle:
+        bundle.extractall(snapshot, filter="data")
+    git(snapshot, "init", "-b", "feature/interrupted-copy")
+    assert ws.active_anchor(snapshot)
+    directory, _ = authority._location(snapshot)
+    directory.mkdir(parents=True)
+    lock = directory / "operation.lock"
+    lock.write_text("Interrupted before identity registration")
+    assert not (directory / "identity.json").exists()
+    assert not (snapshot / authority.IDENTITY).exists()
+    assert authority.applies(snapshot)
+    with pytest.raises((ValueError, OSError)):
+        ws.active_anchor(snapshot)
+    result = authority.status(snapshot)
+    assert result["state"] == "AWAITING_APPROVAL" and result["blocker"]
+    assert lock.read_text() == "Interrupted before identity registration"
 
 
 def test_cli_forwards_exact_root_and_reports_held_decisions(repository, capsys):
