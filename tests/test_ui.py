@@ -1,14 +1,15 @@
 """UI tests: input parsing, error translation, and a window smoke test.
 
 The window test drives handlers directly instead of running ``mainloop``.
-It is skipped where no display is available (headless CI).
+It is skipped where no display is available (headless CI). The whole module
+is skipped where Tk is not installed: the GUI is an optional example (#28).
 """
 
 from __future__ import annotations
 
-import tkinter as tk
-
 import pytest
+
+tk = pytest.importorskip("tkinter", reason="Tk is not installed; the GUI is optional")
 
 from contracts import AppError, EmptyInputError, InvalidCredentialsError, SessionExpiredError
 from src.ui.errors import describe_error
