@@ -4,8 +4,8 @@
 
 Rules (see README.md > Rules):
   contracts/      may import only the standard library (no I/O modules, no src.*)
-  src/ui/         may not import src.features, src.container, or I/O modules
-  src/features/   may not import src.ui, src.container, or tkinter;
+  src/testing/    may not import src.features, src.container, or I/O modules
+  src/features/   may not import src.testing, src.container, or UI toolkits;
                   every *public* class must subclass a contracts ABC
   src/container/  may import anything
 
@@ -23,8 +23,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 
-# Modules that do I/O. Importing one of these in the UI means business logic
-# has leaked into the shell.
+# Modules that do I/O. Importing one of these in an in-memory fake or a
+# presentation layer means business logic has leaked out of the features.
 IO_MODULES = (
     "sqlite3", "requests", "httpx", "aiohttp", "urllib", "http", "socket",
     "subprocess", "shutil", "smtplib", "ftplib", "pickle", "shelve",
@@ -34,8 +34,8 @@ UI_MODULES = ("tkinter", "PyQt5", "PyQt6", "PySide2", "PySide6", "wx", "kivy")
 # layer directory -> forbidden import prefixes
 FORBIDDEN: dict[str, tuple[str, ...]] = {
     "contracts": ("src", *IO_MODULES, *UI_MODULES),
-    "src/ui": ("src.features", "src.container", *IO_MODULES),
-    "src/features": ("src.ui", "src.container", *UI_MODULES),
+    "src/testing": ("src.features", "src.container", *IO_MODULES, *UI_MODULES),
+    "src/features": ("src.testing", "src.container", *UI_MODULES),
     "src/container": (),
 }
 
@@ -62,7 +62,7 @@ def _imported_names(tree: ast.AST, path: Path, root: Path) -> list[tuple[int, st
     """Yield (lineno, absolute dotted module name) for every import in ``tree``.
 
     Relative imports are resolved against the file's package so that
-    ``from . import x`` inside ``src/ui/`` reports as ``src.ui.x``.
+    ``from . import x`` inside ``src/testing/`` reports as ``src.testing.x``.
     """
     out: list[tuple[int, str]] = []
     for node in ast.walk(tree):

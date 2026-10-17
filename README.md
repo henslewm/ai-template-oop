@@ -36,10 +36,14 @@ independent acceptance. See [M6 operations](docs/workflow-migration/M6_OPERATION
 and [verification limits](docs/workflow-migration/M6_CLOSEOUT.md) for the
 foundation's operational reference.
 
-## Demo and architecture reference
+## Architecture reference
 
-The separate Tk/SQLite demo runs with `python main.py --mock` (demo/demo1234)
-or `python main.py` (register first); it requires Tk. Architecture references:
+The template is headless. The Tk demo window was removed (issue #28; see
+[headless record](docs/workflow-migration/HEADLESS_TEMPLATE.md)). The backend
+example stays: contracts, the memory fakes in `src/testing/fakes.py`, the
+SQLite features and the shared contract tests. For a runnable headless project,
+use the [intake and generator](docs/workflow-migration/SOFTWARE_INTAKE.md).
+Architecture references:
 [session boundaries and rules](CLAUDE.md), [contracts](contracts/), and
 [composition root](src/container/wiring.py). The operator shell only parses
 and displays; its trusted service owns workflow I/O.

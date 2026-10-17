@@ -7,7 +7,7 @@
     "src/__init__.py": "src/__init__.py",
     "src/features/auth.py": "src/features/auth.py",
     "src/features/data.py": "src/features/data.py",
-    "src/testing/fakes.py": "src/ui/mocks.py",
+    "src/testing/fakes.py": "src/testing/fakes.py",
     "tests/conftest.py": "tests/conftest.py",
     "tests/test_contract_auth.py": "tests/test_contract_auth.py",
     "tests/test_contract_data.py": "tests/test_contract_data.py",
@@ -46,11 +46,8 @@
     "tests/test_cli.py": "templates/oop-example/assets/test_cli.py.tmpl"
   },
   "rewrites": {
-    "tests/conftest.py": [
-      ["from src.ui.mocks import", "from src.testing.fakes import"]
-    ],
     "tools/validate_boundaries.py": [
-      ["\"src/features\": (\"src.ui\", \"src.container\", *UI_MODULES),", "\"src/features\": (\"src.ui\", \"src.presentation\", \"src.testing\", \"src.container\", *UI_MODULES),"],
+      ["\"src/features\": (\"src.testing\", \"src.container\", *UI_MODULES),", "\"src/features\": (\"src.presentation\", \"src.testing\", \"src.container\", *UI_MODULES),"],
       ["\"src/container\": (),", "\"src/presentation\": (\"src.features\", \"src.testing\", \"src.container\", *IO_MODULES, *UI_MODULES),\n    \"src/container\": (),"]
     ]
   }

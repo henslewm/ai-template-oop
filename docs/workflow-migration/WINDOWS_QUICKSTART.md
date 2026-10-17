@@ -2,7 +2,7 @@
 
 This is the current starting point after M1–M6 and the Tk-independent fix.
 Use PowerShell, Python **3.12+**, Git, and Docker Desktop's Linux engine.
-Tk is needed only for the demo window. The walkthrough uses no model, provider,
+Tk is not needed; the demo window was removed (`HEADLESS_TEMPLATE.md`). The walkthrough uses no model, provider,
 credential, hardware ingestion or deployment. Dependency installation needs
 package-index access; the worker and acceptance containers have network disabled.
 
