@@ -1,4 +1,4 @@
-"""The Wire-Up: the only package allowed to import both ``src.testing`` and
+"""The Wire-Up: the only package allowed to import both ``src.ui`` and
 ``src.features``. Builds concrete objects and injects them."""
 
 from src.container.wiring import Services, build_mock, build_production

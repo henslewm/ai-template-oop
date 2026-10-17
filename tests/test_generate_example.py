@@ -88,7 +88,7 @@ def test_generated_records_are_fresh_and_no_template_authority_is_copied(generat
     ):
         assert (generated / path).read_bytes() == (ROOT / path).read_bytes()
     assert (generated / "src/testing/fakes.py").read_bytes() == (
-        ROOT / "src/testing/fakes.py"
+        ROOT / "src/ui/mocks.py"
     ).read_bytes()
 
 

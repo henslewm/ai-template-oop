@@ -3,7 +3,7 @@
 The key idea: ``make_services`` is parametrised over *every* implementation
 (mock and production). Each ``test_contract_*`` test therefore runs once per
 implementation with identical assertions. If a feature session's class
-passes, it is substitutable for the in-memory fake callers were built against.
+passes, it is substitutable for the mock the UI was built against.
 
 To add an implementation, append one entry to ``IMPLEMENTATIONS``.
 """
@@ -18,7 +18,7 @@ import pytest
 
 from contracts import DataProcessor, UserAuthenticator
 from src.features import ProductionAuthenticator, SQLDataProcessor
-from src.testing.fakes import MockAuthenticator, MockDataProcessor
+from src.ui.mocks import MockAuthenticator, MockDataProcessor
 
 ServicesFactory = Callable[..., tuple[UserAuthenticator, DataProcessor]]
 
