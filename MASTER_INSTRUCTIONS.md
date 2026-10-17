@@ -4,7 +4,7 @@
 
 Keep every AI client (Claude Code, Codex, Vibe CLI, ChatGPT, Claude web, Mistral Vibe, Copilot) working to the same rules in this repository. The repository is the durable source of truth. Do not rely on one chat's memory when the repository can answer the question.
 
-This repository is a contract-first OOP application template (`contracts/`, `src/ui/`, `src/features/`, `src/container/`) that several AI sessions build in parallel. It also carries a bounded offline workflow foundation (`scripts/`, `tools/`, `config/`, `runtime/`) and a PowerShell operator shell, `start.ps1`.
+This repository is a contract-first OOP application template (`contracts/`, `src/testing/`, `src/features/`, `src/container/`; headless, see `docs/workflow-migration/HEADLESS_TEMPLATE.md`) that several AI sessions build in parallel. It also carries a bounded offline workflow foundation (`scripts/`, `tools/`, `config/`, `runtime/`) and a PowerShell operator shell, `start.ps1`.
 
 ## Authority order
 

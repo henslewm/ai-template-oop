@@ -1,7 +1,7 @@
 """Composition root.
 
 Two builders, one per environment. Add a third (``build_staging``, ...) rather
-than sprinkling ``if`` statements through the UI or the features.
+than sprinkling ``if`` statements through callers or the features.
 """
 
 from __future__ import annotations
@@ -11,12 +11,12 @@ from pathlib import Path
 
 from contracts import DataProcessor, UserAuthenticator
 from src.features import ProductionAuthenticator, SQLDataProcessor
-from src.ui.mocks import MockAuthenticator, MockDataProcessor
+from src.testing.fakes import MockAuthenticator, MockDataProcessor
 
 
 @dataclass(frozen=True)
 class Services:
-    """Everything the UI needs, already constructed."""
+    """Everything a caller needs, already constructed."""
 
     authenticator: UserAuthenticator
     processor: DataProcessor
