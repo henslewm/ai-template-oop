@@ -1,4 +1,4 @@
-"""In-memory stand-ins so callers can be built and tested before any feature
+"""In-memory stand-ins so the UI can be run and tested before any feature
 session has delivered a real implementation.
 
 These are *contract-complete*: they pass the same ``tests/test_contract_*``
