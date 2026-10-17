@@ -1,4 +1,4 @@
-# ai-template-oop
+# Contract-first OOP application template
 
 Contract-first application template with a bounded operator onboarding shell.
 
