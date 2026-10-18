@@ -34,5 +34,8 @@ jobs:
           tests/test_headless_imports.py
           tests/test_session_coordination.py
           tests/test_repository_tree.py
+          tests/test_project_intake.py
+          tests/test_generate_example.py
+          tests/test_new_project.py
       - name: Check workflow approval tests in disposable projection
         run: python -B tools/check_workflow_approval.py

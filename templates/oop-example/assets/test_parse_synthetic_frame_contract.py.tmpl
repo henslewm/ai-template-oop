@@ -1,0 +1,49 @@
+"""The same contract assertions exercise the real parser and its fake.
+
+Discovered by both pytest and the work packet's exact unittest command.
+"""
+
+import unittest
+
+from contracts import InvalidFrameError, SyntheticFrameParser
+from src.container.wiring import build_mock_parser, build_production_parser
+
+
+class ParserContract:
+    def test_implements_declared_interface(self):
+        self.assertIsInstance(self.build(), SyntheticFrameParser)
+
+    def test_valid_samples_and_every_payload(self):
+        parser = self.build()
+        for value in range(256):
+            with self.subTest(value=value):
+                frame = [161, value]
+                result = parser.parse_synthetic_frame(frame)
+                self.assertIs(type(result), int)
+                self.assertEqual(result, value)
+                self.assertEqual(frame, [161, value])
+
+    def test_invalid_embedded_samples_and_types(self):
+        parser = self.build()
+        for frame in (
+            [], [161], [160, 7], [161, 7, 8], [161, -1], [161, 256],
+            [True, 7], [161, True], [161, 7.0], ["161", 7],
+            None, (161, 7), "frame",
+        ):
+            with self.subTest(frame=frame):
+                with self.assertRaises(InvalidFrameError):
+                    parser.parse_synthetic_frame(frame)
+
+
+class TestProductionParser(ParserContract, unittest.TestCase):
+    build = staticmethod(build_production_parser)
+
+
+class TestMockParser(ParserContract, unittest.TestCase):
+    build = staticmethod(build_mock_parser)
+
+
+class TestContractDeclaration(unittest.TestCase):
+    def test_interface_cannot_be_instantiated(self):
+        with self.assertRaises(TypeError):
+            SyntheticFrameParser()

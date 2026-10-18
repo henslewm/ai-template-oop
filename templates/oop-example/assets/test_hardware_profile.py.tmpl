@@ -1,0 +1,19 @@
+"""The generated hardware work packet stays synthetic and unverified."""
+import json
+from pathlib import Path
+
+from scripts import work_packet
+from scripts import software_hardware
+
+CONTRACT = json.loads(
+    (Path(__file__).resolve().parents[1] / "WORK_PACKET.json").read_text(
+        encoding="utf-8"
+    )
+)
+
+
+def test_hardware_domain_rules_keep_synthetic_behavior_unverified():
+    assert work_packet.validate_contract(CONTRACT, software_hardware.PROFILE) == []
+    domain = CONTRACT["domain"]
+    assert domain["synthetic"] is True
+    assert domain["hardware_status"] == software_hardware.UNVERIFIED

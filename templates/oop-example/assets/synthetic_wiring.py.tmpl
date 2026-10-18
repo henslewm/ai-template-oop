@@ -1,0 +1,12 @@
+
+from contracts import SyntheticFrameParser
+from src.features.synthetic_frame import SyntheticByteFrameParser
+from src.testing.synthetic_frame import FakeSyntheticFrameParser
+
+
+def build_mock_parser() -> SyntheticFrameParser:
+    return FakeSyntheticFrameParser()
+
+
+def build_production_parser() -> SyntheticFrameParser:
+    return SyntheticByteFrameParser()

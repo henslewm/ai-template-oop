@@ -1,0 +1,19 @@
+"""Contract for fictional frames; no physical-device behavior is implied."""
+
+from abc import ABC, abstractmethod
+
+from contracts.errors import AppError
+
+
+class InvalidFrameError(AppError):
+    """The input is not a list containing tag 0xA1 and one unsigned byte."""
+
+
+class SyntheticFrameParser(ABC):
+    @abstractmethod
+    def parse_synthetic_frame(self, frame: list[int]) -> int:
+        """Return the payload of [0xA1, byte] without I/O or input mutation.
+
+        Raises InvalidFrameError for every other length, tag, container or
+        value type/range. Bytes must be exact ints (bools are invalid).
+        """

@@ -7,6 +7,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import re
 import subprocess
 import sys
 
@@ -249,6 +250,164 @@ def test_user_expected_outcomes_are_not_rewritten_to_make_tests_pass(host, spec)
         ]["expected"]["total"]
         == 99
     )
+
+
+def test_synthetic_hardware_profile_draft_review_generate_and_fresh_tests(host):
+    cli = str(ROOT / "tools/project_intake.py")
+    specification = host / "hardware-request.json"
+    drafted = run(
+        host,
+        cli,
+        "draft",
+        str(specification),
+        "--slug",
+        "synthetic-frame-parser",
+        "--profile",
+        intake.HARDWARE_PROFILE,
+    )
+    assert drafted.returncode == 0, drafted.stderr
+    spec = json.loads(specification.read_text(encoding="utf-8"))
+    assert spec["workflow"]["profile"] == intake.HARDWARE_PROFILE
+    spec["purpose"] = (
+        "Parse fictional device frames without communicating with hardware."
+    )
+    spec["open_questions"] = []
+    specification.write_text(json.dumps(spec), encoding="utf-8")
+
+    reviewed = run(host, cli, "review", str(specification))
+    assert reviewed.returncode == 0, reviewed.stderr
+    report = json.loads(reviewed.stdout)
+    assert report["ready"]
+    assert report["specification"] == spec
+    assert "WORK_PACKET.json" in report["generated_files"]
+    assert "contracts/synthetic_frame.py" in report["generated_files"]
+    assert "src/features/synthetic_frame.py" in report["architecture"]
+    target = host / "generated hardware project"
+    generated = run(
+        host,
+        cli,
+        "generate",
+        str(specification),
+        str(target),
+        "--accept",
+        report["fingerprint"],
+        "--reviewed-by",
+        "fixture-owner",
+    )
+    assert generated.returncode == 0, generated.stderr
+    assert project_authority.status(target)["state"] == "AWAITING_APPROVAL"
+    packet = json.loads((target / "WORK_PACKET.json").read_text(encoding="utf-8"))
+    assert packet["domain"]["synthetic"] is True
+    assert packet["domain"]["hardware_status"] == "UNVERIFIED_ON_HARDWARE"
+    provenance = json.loads((target / "GENERATION.json").read_text(encoding="utf-8"))
+    profile_files = [item for item in provenance["files"] if item["kind"] == "profile"]
+    assert {item["destination"] for item in profile_files} == {
+        "WORK_PACKET.json",
+        "contracts/synthetic_frame.py",
+        "src/features/synthetic_frame.py",
+        "src/testing/synthetic_frame.py",
+        "tests/test_parse_synthetic_frame_contract.py",
+        "tests/test_hardware_profile.py",
+    }
+    assert all(item["source"] is not None for item in profile_files)
+    assert len({item["destination"] for item in provenance["files"]}) == len(
+        provenance["files"]
+    )
+    for item in provenance["files"]:
+        assert (
+            hashlib.sha256((target / item["destination"]).read_bytes()).hexdigest()
+            == item["output_sha256"]
+        )
+        for extension in item.get("extensions", []):
+            assert (
+                hashlib.sha256((ROOT / extension["source"]).read_bytes()).hexdigest()
+                == extension["source_sha256"]
+            )
+    result = run(
+        target, "-m", "pytest", "-q", "-o", "addopts=", "-p", "no:cacheprovider"
+    )
+    assert result.returncode == 0, result.stdout + result.stderr
+    parser = run(
+        target,
+        "-c",
+        "from contracts import SyntheticFrameParser; "
+        "from src.container.wiring import build_production_parser; "
+        "parser = build_production_parser(); "
+        "assert isinstance(parser, SyntheticFrameParser); "
+        "assert parser.parse_synthetic_frame([161, 255]) == 255",
+    )
+    assert parser.returncode == 0, parser.stderr
+    assert not (target / "config/project-approval.json").exists()
+
+    # Use the packet's arguments, resolving its Python in this test environment.
+    argv = packet["validation"][0]["command"]["argv"]
+    assert argv[0] == "python"
+    checked = run(target, *argv[1:])
+    assert checked.returncode == 0, checked.stdout + checked.stderr
+    count = re.search(r"Ran (\d+) tests?", checked.stderr)
+    assert count and int(count[1]) > 0, checked.stderr
+
+    # An isolated fixture proves the command actually checks parser behavior.
+    parser_path = target / "src/features/synthetic_frame.py"
+    original = parser_path.read_bytes()
+    parser_path.write_text(
+        "from contracts import SyntheticFrameParser\n"
+        "class SyntheticByteFrameParser(SyntheticFrameParser):\n"
+        "    def parse_synthetic_frame(self, frame):\n"
+        "        return 0\n",
+        encoding="utf-8",
+    )
+    try:
+        rejected = run(target, *argv[1:])
+        assert rejected.returncode != 0
+        assert "FAIL" in rejected.stderr, rejected.stdout + rejected.stderr
+    finally:
+        parser_path.write_bytes(original)
+
+
+def test_hardware_user_expected_outcomes_are_not_rewritten(host):
+    spec = intake.draft("contradictory-frame", intake.HARDWARE_PROFILE)
+    spec["open_questions"] = []
+    spec["acceptance_criteria"] = [
+        {"name": "wrong-payload", "frame": [161, 7], "expected": 8}
+    ]
+    target = host / "wrong-hardware-expectation"
+    build(spec, target)
+    result = run(
+        target,
+        "-m",
+        "pytest",
+        "tests/test_project_acceptance.py",
+        "-q",
+        "-o",
+        "addopts=",
+    )
+    assert result.returncode == 1, result.stdout + result.stderr
+    assert "2 failed" in result.stdout
+    assert (
+        json.loads((target / "PROJECT_SPEC.json").read_text())["acceptance_criteria"]
+        == spec["acceptance_criteria"]
+    )
+
+
+@pytest.mark.parametrize("frame", [[True, 0], [161, -1], [161, 256], ["161", 0]])
+def test_hardware_profile_rejects_non_byte_frames(host, frame):
+    spec = intake.draft("hardware-check", intake.HARDWARE_PROFILE)
+    spec["open_questions"] = []
+    spec["acceptance_criteria"] = [{"name": "case", "frame": frame, "expected": 0}]
+    with pytest.raises(ValueError):
+        intake.validate(spec)
+
+
+@pytest.mark.parametrize("expected", [True, -1, 256, "0"])
+def test_hardware_profile_rejects_non_byte_expectations(host, expected):
+    spec = intake.draft("hardware-check", intake.HARDWARE_PROFILE)
+    spec["open_questions"] = []
+    spec["acceptance_criteria"] = [
+        {"name": "case", "frame": [161, 0], "expected": expected}
+    ]
+    with pytest.raises(ValueError):
+        intake.validate(spec)
 
 
 def test_cli_rejects_duplicate_json_keys_without_creating_project(host):
