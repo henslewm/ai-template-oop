@@ -8,4 +8,4 @@ __pycache__/
 venv/
 .idea/
 .vscode/
-.codex/hooks.json
+.codex/
