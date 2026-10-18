@@ -1,0 +1,15 @@
+"""Parse the explicitly synthetic frame format without device I/O."""
+
+from contracts import InvalidFrameError, SyntheticFrameParser
+
+
+class SyntheticByteFrameParser(SyntheticFrameParser):
+    def parse_synthetic_frame(self, frame: list[int]) -> int:
+        if (
+            not isinstance(frame, list)
+            or len(frame) != 2
+            or any(type(value) is not int or not 0 <= value <= 255 for value in frame)
+            or frame[0] != 0xA1
+        ):
+            raise InvalidFrameError()
+        return frame[1]

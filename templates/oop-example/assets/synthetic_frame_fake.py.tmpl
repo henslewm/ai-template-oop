@@ -1,0 +1,16 @@
+"""In-memory fictional frame fixtures behind the shared parser interface."""
+
+from contracts import InvalidFrameError, SyntheticFrameParser
+
+
+class FakeSyntheticFrameParser(SyntheticFrameParser):
+    def __init__(self) -> None:
+        self._frames = {(161, value): value for value in range(256)}
+
+    def parse_synthetic_frame(self, frame: list[int]) -> int:
+        if not isinstance(frame, list) or any(type(value) is not int for value in frame):
+            raise InvalidFrameError()
+        try:
+            return self._frames[tuple(frame)]
+        except KeyError as error:
+            raise InvalidFrameError() from error
