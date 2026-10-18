@@ -14,7 +14,7 @@ Use Mistral Vibe (formerly Le Chat) for synthesis, research, drafting, and revie
 
 ## Vibe CLI
 
-The Vibe command-line tool reads `.vibe/config.toml` (project level, over `~/.vibe/config.toml`) and the repository's `AGENTS.md` from trusted folders, so it follows the same startup protocol and foundation gate as Codex. The shipped config keeps the `default` agent and asks before running `bash`. Widening it (for example `accept-edits` or `auto-approve`) is the user's decision. Settings reference: https://docs.mistral.ai/vibe/code/cli/configuration
+The Vibe command-line tool reads `.vibe/config.toml` (project level, over `~/.vibe/config.toml`) and the repository's `AGENTS.md` from trusted folders, so it follows the same startup protocol and foundation gate as Codex. The shipped config keeps the `default` agent and asks before running `bash`. Widening it (for example `accept-edits` or `auto-approve`) is the user's decision. `default_agent` applies only to interactive sessions: `vibe --prompt ...` without `--agent` falls back to `auto-approve`, so always pass `--agent plan` (read-only) for programmatic runs (https://docs.mistral.ai/vibe/code/safety-approvals-permissions). Vibe ignores project configuration (`AGENTS.md`) in a folder it does not trust and warns about it; run from this repository's root after trusting the folder (`--trust` trusts it only for that run), or the startup protocol and foundation gate do not apply. Settings reference: https://docs.mistral.ai/vibe/code/cli/configuration
 
 ## Startup
 
