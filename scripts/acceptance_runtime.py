@@ -126,6 +126,9 @@ def pilot_checks(journal, state, *, reconcile=False):
         stream = "pilot-check:" + worker_id[:32] + ":" + check["id"]
         command = check["command"]
         h.require(command["argv"][0] == "python", "Pilot check entry point differs")
+        workdir = runtime.workspace_directory(
+            command.get("cwd", ""), original.data["read_paths"]
+        )
         if stream not in journal.verify():
             scope = h.SessionScope.load(
                 {
@@ -145,11 +148,24 @@ def pilot_checks(journal, state, *, reconcile=False):
                 },
             )
         events, _ = journal.read(stream)
-        if events[-1]["kind"] == "RESULT":
-            checks.append(events[-1]["data"])
-            continue
         initial = events[0]["data"]
         h.require(initial["check"] == check, "Independent check contract changed")
+        if events[-1]["kind"] == "RESULT":
+            result = events[-1]["data"]
+            prepared = next(
+                (e["data"] for e in events if e["kind"] == "CHECK_PREPARED"), None
+            )
+            h.require(
+                not result["passed"]
+                or (
+                    prepared is not None
+                    and prepared["runtime"].get("workdir", "/session/workspace")
+                    == workdir
+                ),
+                "Independent check cwd differs from contract",
+            )
+            checks.append(result)
+            continue
         scope = h.SessionScope.load(initial["scope"])
         run = journal.directory / initial["run"]
         aborted = any(e["kind"] == "CHECK_ABANDONED" for e in events)
@@ -162,6 +178,7 @@ def pilot_checks(journal, state, *, reconcile=False):
                     journal.directory,
                     authority.IMAGE,
                     command["argv"],
+                    cwd=command.get("cwd", ""),
                     immutable_workspace=True,
                     dispatch_stream=stream,
                     run=run,
@@ -198,6 +215,10 @@ def pilot_checks(journal, state, *, reconcile=False):
         if not aborted:
             prepared = next(e["data"] for e in events if e["kind"] == "CHECK_PREPARED")
             manifest, saved = prepared["runtime"], prepared["files"]
+            h.require(
+                manifest.get("workdir", "/session/workspace") == workdir,
+                "Independent check cwd differs from contract",
+            )
             if events[-1]["kind"] == "CHECK_PREPARED":
                 deadline = (
                     h.f.instant(h.f.wp.now()) + timedelta(seconds=180)
@@ -232,7 +253,7 @@ def pilot_checks(journal, state, *, reconcile=False):
                 )
 
             runtime.assert_boundary(
-                manifest["container"], manifest["volume"], authority.IMAGE
+                manifest["container"], manifest["volume"], authority.IMAGE, workdir
             )
             info = runtime.inspect(manifest["container"])
             h.require(
@@ -352,6 +373,7 @@ def prepare_check(journal, task_stream, validation_id):
     data = copy.deepcopy(state["submission"]["scope"])
     data.update(owner=state["controller"], run_id="accept-" + run_id)
     scope = h.SessionScope.load(data)
+    runtime.workspace_directory(command.get("cwd", ""), data["read_paths"])
     bound = min(
         300,
         command["timeout_seconds"],
@@ -390,6 +412,7 @@ def prepare_check(journal, task_stream, validation_id):
         journal.directory,
         state["submission"]["image"],
         command["argv"],
+        cwd=command.get("cwd", ""),
         run=h.run_path(journal, run_id),
         instructions=instructions,
         dispatch_stream=a.stream_name(task_stream),
@@ -458,16 +481,21 @@ def preflight(journal, task_stream, run_id, *, launching=False, consumed=False):
     record = run_record(journal, state)
     run = h.prepared_files(journal, record)
     manifest = r["prepared"]["runtime"]
+    check = next(
+        c for c in state["contract"]["validation"] if c["id"] == r["validation_id"]
+    )
+    workdir = runtime.workspace_directory(check["command"].get("cwd", ""))
     a.require(
         manifest["image"] == state["submission"]["image"]
         and manifest.get("immutable_workspace") is True
         and manifest["argv"] == r["argv"]
+        and manifest.get("workdir", "/session/workspace") == workdir
         and manifest["scope_sha256"] == h.SessionScope.load(r["scope"]).hash
         and manifest["dispatch_stream"] == a.stream_name(task_stream),
         "Changed check runtime binding",
     )
     runtime.assert_boundary(
-        manifest["container"], manifest["volume"], manifest["image"]
+        manifest["container"], manifest["volume"], manifest["image"], workdir
     )
     info = runtime.inspect(manifest["container"])
     a.require(

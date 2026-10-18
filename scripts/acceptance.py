@@ -217,6 +217,9 @@ def event_data(state, event):
         )
         if check is None:
             raise ValueError("Missing contract check")
+        h.runtime.workspace_directory(
+            check["command"].get("cwd", ""), data["scope"]["read_paths"]
+        )
         expected_scope = {
             **state["submission"]["scope"],
             "owner": state["controller"],
@@ -266,6 +269,14 @@ def event_data(state, event):
                 and manifest["image"] == state["submission"]["image"]
                 and manifest.get("immutable_workspace") is True
                 and manifest["argv"] == run["argv"]
+                and manifest.get("workdir", "/session/workspace")
+                == h.runtime.workspace_directory(
+                    next(
+                        c
+                        for c in state["contract"]["validation"]
+                        if c["id"] == run["validation_id"]
+                    )["command"].get("cwd", "")
+                )
                 and manifest["scope_sha256"] == h.SessionScope.load(run["scope"]).hash
                 and manifest["dispatch_stream"] == stream_name(state["task_stream"]),
                 "Wrong prepared run binding",
