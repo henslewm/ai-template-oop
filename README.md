@@ -20,6 +20,9 @@ and set `WORKFLOW_TEST_IMAGE` to the already verified local worker image.
 Python 3.12+ and Git must be installed. The launcher creates an isolated
 `.venv` and installs declared development dependencies only when it is absent;
 an existing environment is checked, never replaced or automatically repaired.
+The bundled launcher and verified operator walkthrough are Windows/PowerShell-only;
+no POSIX operator guide is currently provided. GitHub CLI (`gh`) is required for
+the separate pilot activation and delivery process, not for status or offline checks.
 
 `status` and bare `resume` inspect existing records without paid calls; neither
 requires Docker or a provider key. To explicitly continue eligible work, use
@@ -38,8 +41,10 @@ foundation's operational reference.
 
 ## Demo and architecture reference
 
-The separate Tk/SQLite demo runs with `python main.py --mock` (demo/demo1234)
-or `python main.py` (register first); it requires Tk. Architecture references:
+The Tk/SQLite GUI is kept as an optional example (owner decision on #28): run
+it with `python main.py --mock` (demo/demo1234) or `python main.py` (register
+first); it requires Tk. Nothing else needs Tk: without it, `python -m pytest`
+skips `tests/test_ui.py` and runs everything else. Architecture references:
 [session boundaries and rules](CLAUDE.md), [contracts](contracts/), and
 [composition root](src/container/wiring.py). The operator shell only parses
 and displays; its trusted service owns workflow I/O.

@@ -11,30 +11,50 @@ composition root, template assets and foundation approval remain unchanged.
 
 ## Use it
 
-Run from the template worktree with Python 3.12+ and Git available:
+Run from the directory where you want the new project created. The launcher
+locates the template tools relative to itself, so it can be called from any
+working directory. Use PowerShell 5.1 or PowerShell 7, Python, and Git:
+
+```powershell
+& "C:\path\to\ai-template-oop\new-project.ps1" classroom-summary
+```
+
+On the first run, the launcher creates `classroom-summary.request.json` in the
+current directory and opens it in Notepad (or the executable named by `EDITOR`).
+Edit it: describe your purpose and goal, supply numeric inputs and the expected
+count/total/mean/minimum/maximum, and resolve every open question. Keep the
+declared profile/features/contracts/dependencies unless implementing a separate
+supported profile. No credentials belong in this specification.
+
+Run the same command again. It displays the exact specification, proposed
+contract map, generated paths, limits, and review fingerprint. Enter the
+fingerprint exactly as shown and identify yourself as reviewer; generation does
+not bypass this acknowledgment. The launcher generates the project in
+`.\classroom-summary`, creates its `.venv`, installs `.[dev]`, and runs its tests.
+Choose a working directory outside the template checkout, since generation
+refuses to create a project inside its source repository.
+
+For a Windows 11 shortcut, use this as the shortcut's **Target** (substitute the
+checked-out template path and desired slug):
+
+```powershell
+C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -NoProfile -File "C:\path\to\ai-template-oop\new-project.ps1" classroom-summary
+```
+
+Set **Start in** to the parent directory where you want the request and generated
+project created. Double-click the shortcut once to draft/edit, then again to
+review and generate. The script does not change the execution policy.
+
+The equivalent explicit intake commands remain available for noninteractive use:
 
 ```powershell
 python -B tools/project_intake.py draft request.json --slug classroom-summary
-```
-
-Edit `request.json`: describe your purpose and goal, supply numeric inputs and
-the expected count/total/mean/minimum/maximum, and record unanswered questions.
-The draft contains a question deliberately; resolve it before generation.
-Keep the declared profile/features/contracts/dependencies unless implementing
-a separate supported profile. No credentials belong in this specification.
-
-Review the exact specification, proposed contract map, generated paths and limits:
-
-```powershell
 python -B tools/project_intake.py review request.json
+python -B tools/project_intake.py generate request.json ..\classroom-summary --accept <fingerprint-from-review> --reviewed-by <your-name>
 ```
 
 Review has no filesystem side effects. `ready: false` means unresolved questions
-remain. After reviewing the report, copy its fingerprint into generation:
-
-```powershell
-python -B tools/project_intake.py generate request.json ..\classroom-summary --accept <fingerprint-from-review> --reviewed-by <your-name>
-```
+remain.
 
 The fingerprint binds the specification, architecture, template inputs and tool
 sources. Editing requirements or those sources invalidates the acknowledgment;
@@ -47,7 +67,8 @@ cover positive values and negative/zero values. Expected outcomes are carried
 unchanged into tests; contradictory expectations cause failing tests rather
 than being silently recomputed to match the implementation.
 
-From the generated project:
+From the generated project (the launcher performs these setup and test steps
+automatically):
 
 ```powershell
 python -m venv .venv

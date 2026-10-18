@@ -1,0 +1,51 @@
+name: Escalation
+description: Request a bounded task escalation with retained failure evidence
+title: "[ESCALATION] "
+labels: ["escalation"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Follow the canonical packet's escalation path and remaining limits. This issue is a request and evidence view; it cannot add tiers, reset attempts or budgets, or override a hold. Preserve original failure records.
+  - type: input
+    id: task
+    attributes:
+      label: Affected task issue
+      description: Link the task issue and canonical work packet.
+    validations:
+      required: true
+  - type: textarea
+    id: packet
+    attributes:
+      label: Packet binding
+      description: Include task_id, latest revision, and complete contract SHA-256.
+    validations:
+      required: true
+  - type: textarea
+    id: trigger
+    attributes:
+      label: Escalation trigger
+      description: Identify the failed criterion, repeated failure, unavailable capability, or ambiguity that requires escalation.
+    validations:
+      required: true
+  - type: textarea
+    id: history
+    attributes:
+      label: Attempt history and evidence
+      description: Link relevant journal events, dispatch IDs, original results, failure fingerprints, and routing decisions; summarize the unresolved failure.
+    validations:
+      required: true
+  - type: textarea
+    id: bounds
+    attributes:
+      label: Packet path and remaining limits
+      description: Link the allowed escalation path, current tier, remaining attempts and budget, and any applicable hold. State when no authorized path remains.
+    validations:
+      required: true
+  - type: textarea
+    id: next_action
+    attributes:
+      label: Requested next action and owner
+      description: Name the responsible owner, bounded action or decision requested, required evidence, and due date if known.
+    validations:
+      required: true

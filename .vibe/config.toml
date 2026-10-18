@@ -4,6 +4,8 @@
 
 # "default" asks for approval before running tools. Do not set "auto-approve" here:
 # widening permissions is the user's decision (MASTER_MISTRAL.md, "Vibe CLI").
+# default_agent applies only to interactive sessions. `vibe --prompt` without --agent falls back
+# to auto-approve, so pass `--agent plan` for programmatic runs (MASTER_MISTRAL.md, "Vibe CLI").
 default_agent = "default"
 
 [tools.bash]

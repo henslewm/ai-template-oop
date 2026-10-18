@@ -130,6 +130,35 @@ def test_symlinked_archive_destination_is_refused_and_target_untouched(project, 
     assert list((project / web_setup.OUTPUT).glob(".building-*")) == []
 
 
+@pytest.mark.skipif(sys.platform != "win32", reason="directory junctions are Windows-only")
+def test_junctioned_output_folder_is_refused_and_target_untouched(project, tmp_path):
+    outside = tmp_path / "elsewhere"
+    outside.mkdir()
+    output = project / web_setup.OUTPUT
+    shutil.rmtree(output)
+    made = subprocess.run(["cmd", "/c", "mklink", "/J", str(output), str(outside)], capture_output=True)
+    if made.returncode != 0:
+        pytest.skip("junctions are not available on this system")
+    result = run_cli(project, "--client", "claude")
+    assert result.returncode == 1, result.stdout
+    assert "is a link" in result.stdout
+    assert list(outside.iterdir()) == []
+
+
+@pytest.mark.skipif(sys.platform != "win32", reason="directory junctions are Windows-only")
+def test_junction_is_detected_without_path_is_junction(tmp_path, monkeypatch):
+    # Python 3.11 has no Path.is_junction; detection must not depend on it.
+    monkeypatch.delattr(Path, "is_junction", raising=False)
+    outside = tmp_path / "elsewhere"
+    outside.mkdir()
+    junction = tmp_path / "linked"
+    made = subprocess.run(["cmd", "/c", "mklink", "/J", str(junction), str(outside)], capture_output=True)
+    if made.returncode != 0:
+        pytest.skip("junctions are not available on this system")
+    assert web_setup.is_link(junction)
+    assert not web_setup.is_link(outside)
+
+
 def test_output_folder_that_is_a_file_is_refused(project):
     output = project / web_setup.OUTPUT
     shutil.rmtree(output)

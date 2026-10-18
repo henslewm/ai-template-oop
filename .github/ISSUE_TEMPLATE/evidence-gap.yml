@@ -1,0 +1,51 @@
+name: Evidence gap
+description: Identify missing or conflicting evidence that blocks verification
+title: "[EVIDENCE GAP] "
+labels: ["evidence-gap"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Missing evidence remains unknown. This issue cannot substitute for a source or acceptance result and does not change the canonical work packet. Preserve provenance; link approved locations for restricted evidence instead of attaching it.
+  - type: input
+    id: task
+    attributes:
+      label: Affected task issue
+      description: Link the task issue and canonical work packet.
+    validations:
+      required: true
+  - type: textarea
+    id: binding
+    attributes:
+      label: Packet binding and affected criterion
+      description: Include task_id, latest revision, complete contract SHA-256, and the exact criterion or claim that cannot be verified.
+    validations:
+      required: true
+  - type: textarea
+    id: gap
+    attributes:
+      label: Missing, stale, or conflicting evidence
+      description: State exactly what is missing or inconsistent and what conclusion it prevents.
+    validations:
+      required: true
+  - type: textarea
+    id: searched
+    attributes:
+      label: Available evidence and searches performed
+      description: Link sources, journal events, queries, and dated search results. Distinguish inaccessible material from material not searched.
+    validations:
+      required: true
+  - type: textarea
+    id: verification
+    attributes:
+      label: Required source and verification
+      description: Specify the expected source, coverage or version, provenance, and check that would resolve the gap.
+    validations:
+      required: true
+  - type: textarea
+    id: next_action
+    attributes:
+      label: Next action and evidence owner
+      description: Name the responsible owner, permitted collection or verification action, dependency, and any permission still required.
+    validations:
+      required: true
