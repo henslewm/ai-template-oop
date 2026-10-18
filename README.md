@@ -20,6 +20,9 @@ and set `WORKFLOW_TEST_IMAGE` to the already verified local worker image.
 Python 3.12+ and Git must be installed. The launcher creates an isolated
 `.venv` and installs declared development dependencies only when it is absent;
 an existing environment is checked, never replaced or automatically repaired.
+The bundled launcher and verified operator walkthrough are Windows/PowerShell-only;
+no POSIX operator guide is currently provided. GitHub CLI (`gh`) is required for
+the separate pilot activation and delivery process, not for status or offline checks.
 
 `status` and bare `resume` inspect existing records without paid calls; neither
 requires Docker or a provider key. To explicitly continue eligible work, use

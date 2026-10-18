@@ -61,6 +61,20 @@ briefs do not automatically authorize those capabilities or remove existing
 restrictions. A source-backed gap review should determine what is actually
 missing before another implementation layer is added.
 
+## Current receipt and test route (verified 2026-10-18)
+
+`python -B scripts/validate_workflow_approval.py --fingerprint --require-active`
+returned `FOUNDATION VALID: ACTIVE` with fingerprint
+`8e75e71b3561eaec4ad5cf71e37a1dec9f2c7dce0d07e0be46346daacfc90481`.
+This approves bounded offline work only; it does not activate live workers,
+provider egress, publication or merge, and API budgets remain USD 0. Project
+approval and the separately gated live pilot remain distinct.
+
+For safe checks in a fresh clone, follow
+[WINDOWS_QUICKSTART.md §2](WINDOWS_QUICKSTART.md#2-inspect-authority-and-run-focused-non-gui-checks).
+It runs the focused tests and the approval projection; do not run
+`tests/test_workflow_approval.py` directly against the ACTIVE receipt.
+
 The next deliverable is one requirements matrix distinguishing the original
 worked-example application, the offline workflow foundation and the intended
 reusable template. For each requirement, identify owner authority, superseding
@@ -84,3 +98,10 @@ Read donor content via pinned git show only. Do not implement, enable resources,
 perform GitHub writes or rerun broad suites. Identify specific missing evidence
 before proposing any additional verification.
 ```
+
+## Original-goals record added
+
+2026-10-18: the dated, non-frozen [original-goals summary](ORIGINAL_GOALS_SUMMARY_2026-10-18.md)
+is the tracked handoff for the broader product intent and the deliberate
+`Original_plan.md` retirement. It records the provenance and limits of that
+decision without changing the protected historical checkout or its index.
