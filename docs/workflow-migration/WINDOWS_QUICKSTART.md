@@ -157,7 +157,8 @@ An absent journal is expected in a new clone. Do not initialize canonical state
 or copy fixture policy into it just to make examples work. Real execution still
 requires separate owner enablement; the shipped foundation does not provide it.
 Initialization/account provisioning and packet preparation are explicit Python
-coordinator APIs, not an automatic one-command project bootstrap.
+coordinator APIs; the separate supported software-intake bootstrap is documented
+in [Software intake](SOFTWARE_INTAKE.md) and does not provision operator state.
 
 Continue with the stage-specific references when operating beyond the proof:
 
