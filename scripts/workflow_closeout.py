@@ -48,7 +48,8 @@ def tree(root: Path, commit: str) -> dict[str, tuple[str, str]]:
                 "Linked or non-file candidate tree",
             )
             name = path.decode("utf-8")
-            a.h.checked_path(name)
+            # Inventory root Codex metadata; worker path validation stays unchanged.
+            a.h.checked_path(name.removeprefix(".codex/"))
             result[name] = (mode, oid)
     require(len(result) <= 10000, "Candidate tree exceeds bound")
     return result
