@@ -2,6 +2,9 @@
 
 Contract-first application template with a bounded operator onboarding shell.
 
+Supported host/Python baseline, required clients and onboarding acceptance are
+defined in [Platform support](docs/PLATFORM_SUPPORT.md).
+
 ## Start from PowerShell
 
 From the repository root:
