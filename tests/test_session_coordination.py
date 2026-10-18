@@ -390,6 +390,30 @@ def test_confirmed_merge_enriches_watch_notice_without_duplicate(clients):
     assert first.status()["notices"][0]["pr"] == 12
 
 
+def test_sync_preserves_ignored_work_that_incoming_tree_would_replace(clients):
+    (first, _), _ = clients
+    (first.root / ".gitignore").write_text("local-state.txt\n")
+    command(first.root, "git", "add", ".gitignore")
+    command(first.root, "git", "commit", "-m", "ignore local state")
+    before = sc.git(first.root, "rev-parse", "HEAD")
+    command(first.root, "git", "checkout", "-b", "feature/incoming")
+    (first.root / "local-state.txt").write_text("incoming tracked file\n")
+    command(first.root, "git", "add", "-f", "local-state.txt")
+    command(first.root, "git", "commit", "-m", "track incoming file")
+    incoming = sc.git(first.root, "rev-parse", "HEAD")
+    command(first.root, "git", "checkout", "feature/one")
+    (first.root / "local-state.txt").write_text("preserve my local work\n")
+    token = first.register("first", "worker")["token"]
+    first.target = lambda target: incoming
+    with first.connection(write=True) as db:
+        db.execute("UPDATE targets SET head=? WHERE name='main'", (before,))
+    assert not sc.git(first.root, "status", "--porcelain")
+    with pytest.raises(ValueError, match="Ignored work"):
+        first.sync(token, apply=True)
+    assert (first.root / "local-state.txt").read_text() == "preserve my local work\n"
+    assert sc.git(first.root, "rev-parse", "HEAD") == before
+
+
 def test_pilot_requires_designated_integration_token(monkeypatch):
     monkeypatch.delenv("AI_TEMPLATE_INTEGRATION_TOKEN", raising=False)
     with pytest.raises(ValueError, match="Register the pilot"):

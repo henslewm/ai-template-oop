@@ -22,7 +22,7 @@ import uuid
 
 def run(root, *args):
     return subprocess.run(args, cwd=root, capture_output=True, text=True,
-                          check=True, timeout=60).stdout.strip()
+                          check=True, timeout=60).stdout.rstrip("\r\n")
 
 
 def git(root, *args):
@@ -248,6 +248,14 @@ class Coordinator:
             require(not git(self.root, "status", "--porcelain"), "Dirty checkout; preserve work before sync")
             for target in self.config["shared_targets"]:
                 head = db.execute("SELECT head FROM targets WHERE name=?", (target,)).fetchone()[0]
+                # Git considers ignored files clean and may overwrite them when
+                # the incoming tree starts tracking their path. Preserve that
+                # work while allowing unrelated caches/virtualenvs to remain.
+                ignored = [p.casefold() for p in git(self.root, "ls-files", "--others", "--ignored", "--exclude-standard", "-z").split("\0") if p]
+                changed = [p.casefold() for p in git(self.root, "diff", "--name-only", "-z", "HEAD", head).split("\0") if p]
+                require(not any(a == b or a.startswith(b + "/") or b.startswith(a + "/")
+                                for a in ignored for b in changed),
+                        "Ignored work would be replaced; preserve it before sync")
                 git(self.root, "merge", "--no-edit", head)
         for notice in notices:
             self.ack(token, notice["id"], "synchronized")

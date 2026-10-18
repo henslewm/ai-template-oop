@@ -55,7 +55,9 @@ python tools/session_coordination.py close --token <token>
 `sync` inspects by default. `--apply` merges observed target commits into this
 session's own clean checkout only. Dirty/conflicted work refuses; nothing is
 stashed, reset or force-pushed. A merge conflict remains available for deliberate
-resolution. Acknowledgments are seen, deferred, blocked or synchronized; the last
+resolution. Ignored local files that incoming tracked paths would replace also
+refuse synchronization; unrelated caches and virtual environments are allowed.
+Acknowledgments are seen, deferred, blocked or synchronized; the last
 requires real ancestry. Unrelated work can continue deferred. Submission requires
 current base ancestry, fresh checks and independent exact-head approval.
 
