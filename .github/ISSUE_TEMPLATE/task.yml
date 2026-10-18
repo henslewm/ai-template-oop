@@ -1,0 +1,58 @@
+name: Architected task
+description: Track a bounded task against its canonical work packet and evidence
+title: "[TASK] "
+labels: ["task"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        The canonical JSON work packet and its latest revision define the task. This issue is an index and handoff, not a second contract; issue labels, comments, and closure do not authorize execution or establish acceptance. Keep secrets and restricted evidence out of GitHub.
+  - type: input
+    id: parent
+    attributes:
+      label: Parent objective or issue
+      description: Link the project objective, milestone, or controlling issue.
+    validations:
+      required: true
+  - type: textarea
+    id: packet
+    attributes:
+      label: Canonical work packet
+      description: Link the packet at a specific commit or durable version; include task_id, latest revision, and its complete contract SHA-256.
+    validations:
+      required: true
+  - type: textarea
+    id: objective
+    attributes:
+      label: Objective and outputs
+      description: Summarize the packet goal and intended outputs.
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Allowed scope and exclusions
+      description: Link the packet's allowed and prohibited paths, non-goals, and architecture boundaries.
+    validations:
+      required: true
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies
+      description: Link prerequisite task IDs and their current packet revisions and verified outcomes; state none if there are no dependencies.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria and validation
+      description: Link criterion IDs, declared checks, expected evidence, and results. Separate planned checks from verified results.
+    validations:
+      required: true
+  - type: textarea
+    id: handoff
+    attributes:
+      label: Next action and owner
+      description: Name the responsible owner, next bounded action, remaining permissions or decisions, and handoff location.
+    validations:
+      required: true
