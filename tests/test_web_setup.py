@@ -15,7 +15,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "scripts"))
 import web_setup  # noqa: E402 -- existing scripts layout
 
-EXPECTED_COUNTS = {"chatgpt": 15, "claude": 15, "mistral": 16}
+EXPECTED_COUNTS = {"chatgpt": 16, "claude": 16, "mistral": 17}
 
 
 @pytest.fixture
@@ -48,6 +48,7 @@ def test_each_listed_file_exists_in_the_repository(client):
     names = web_setup.listed_files(ROOT / listing)
     assert len(names) == EXPECTED_COUNTS[client]
     assert len(set(names)) == len(names)
+    assert "docs/SESSION_COORDINATION.md" in names
     assert [name for name in names if web_setup.inside(ROOT, name) is None] == []
 
 
