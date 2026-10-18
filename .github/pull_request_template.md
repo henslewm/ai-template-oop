@@ -28,7 +28,7 @@ Record exact commands and results for the reviewed commit. Distinguish executed 
 - Unresolved findings or evidence gaps:
 - Acceptance decision and evidence, or pending:
 
-Passing checks and opening this PR do not establish acceptance, authorize merge, or imply deployment.
+Integrate under the standing Git policy only through the designated local integration-lock holder after independent exact-head approval, successful checks and resolved findings. Passing checks alone do not establish independent acceptance or deployment.
 
 ## Risks and next action
 

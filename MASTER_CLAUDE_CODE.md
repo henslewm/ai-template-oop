@@ -19,7 +19,7 @@ Apply `MASTER_INSTRUCTIONS.md` → "Foundation gate" exactly as stated there; it
 | Session B, C, ...: Feature | `src/features/` | one ABC implementation per brief, registered in `tests/conftest.py` |
 | Session D: Integration | `src/container/` | wiring in `src/container/wiring.py` and `main.py` |
 
-Rules: every brief names its session, owned paths, acceptance checks, the facts it depends on, and the attempt limit (default 2). Run non-overlapping briefs in parallel and consolidate once. A subagent inherits `CLAUDE.md`, so the brief carries only what that does not. The delegating session verifies each result rather than trusting it, and on failure re-briefs at most once before handling it itself. User-reserved and consequential external actions are never delegated.
+Rules: every brief names its session, owned paths, acceptance checks, the facts it depends on, and the attempt limit (default 2). Run non-overlapping briefs in parallel and consolidate once. A subagent inherits `CLAUDE.md`, so the brief carries only what that does not. The delegating session verifies each result rather than trusting it, and on failure re-briefs at most once before handling it itself. Task-scoped interactive Git work may be delegated under standing authorization to its registered branch owner. Shared-target merges belong only to the designated local integrator; other user-reserved consequential external actions are never delegated.
 
 ## Execution rules
 

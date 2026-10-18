@@ -13,4 +13,4 @@ This repository needs no mail, calendar or contacts connector; add one only when
 
 ## Permission posture
 
-Start read-only. A connector's availability is not permission to push, merge, delete or rename branches, open pull requests, edit issues, send, publish, or change sharing. Consequential writes require an explicit request in the current task.
+Interactive Git work follows MASTER_INSTRUCTIONS.md → Standing Git authorization and session ownership: owned feature commits, non-forced pushes, PR updates and relevant comments have standing authorization; only the local integration-lock holder merges after independent exact-head review and successful checks, without another human confirmation. Retain branches; preserve unrelated work. Other external writes still require explicit authority.

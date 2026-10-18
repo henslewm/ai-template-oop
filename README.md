@@ -51,3 +51,12 @@ skips `tests/test_ui.py` and runs everything else. Architecture references:
 [session boundaries and rules](CLAUDE.md), [contracts](contracts/), and
 [composition root](src/container/wiring.py). The operator shell only parses
 and displays; its trusted service owns workflow I/O.
+
+## Interactive Git sessions
+
+Owned feature work has standing commit/push/PR authorization. Shared-target merges
+use one designated local integration lock, independent review and passing checks.
+Read [Session coordination](docs/SESSION_COORDINATION.md) before coding; it covers
+latest-main verification, independent clones on this Windows account, worker
+notices and recovery. No repeated human confirmation is required. Feature
+branches remain permanent. Cross-machine coordination is deferred.

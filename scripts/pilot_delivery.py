@@ -405,20 +405,9 @@ def deliver(operator):
             {"reason": "Hosting facts changed; inspect PR and resume --run"},
         )
         return None
-    _run(
-        operator.root,
-        [
-            "gh",
-            "pr",
-            "merge",
-            "--repo",
-            closeout.REPO,
-            str(pull["number"]),
-            "--rebase",
-            "--match-head-commit",
-            head,
-        ],
-    )
+    from scripts.session_coordination import guarded_pilot_merge
+
+    guarded_pilot_merge(operator.root, pull["number"], head, saved["review"])
     verify_merged(
         operator.root, pull["number"], head, saved["retained"], review=saved["review"]
     )
