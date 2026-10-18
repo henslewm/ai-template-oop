@@ -55,6 +55,10 @@ def inside(root: Path, name: str) -> Path | None:
     return resolved
 
 
+def is_link(path: Path) -> bool:
+    return path.is_symlink() or getattr(path, "is_junction", lambda: False)()
+
+
 def copy_to_clipboard(text: str) -> bool:
     if sys.platform == "win32":
         commands = [["clip"]]
@@ -91,12 +95,12 @@ def main() -> int:
                                        if missing else f"no files listed in {list_name}"))
         return 1
     output = root / OUTPUT
-    if output.is_symlink() or (output.exists() and not output.is_dir()):
+    if is_link(output) or (output.exists() and not output.is_dir()):
         print(f"Web setup refused: {output} is a link or not a directory; remove it first")
         return 1
     output.mkdir(exist_ok=True)
     archive = output / f"web-setup-{args.client}.zip"
-    if archive.is_symlink() or (archive.exists() and not archive.is_file()):
+    if is_link(archive) or (archive.exists() and not archive.is_file()):
         print(f"Web setup refused: {archive} is a link or not a regular file; remove it first")
         return 1
     # Build beside the target and rename over it, so an existing link is never followed or truncated.
