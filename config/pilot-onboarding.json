@@ -1,0 +1,29 @@
+{
+  "title": "Simple operator start and resume",
+  "parent": {"objective": "Make one bounded real self-improvement usable from a fresh session", "milestone": "Operator onboarding shell"},
+  "goal": "Implement start.ps1, scripts/operator_cli.py, tests/test_operator_cli.py and a compact README using only the trusted operator facade.",
+  "dependencies": [], "complexity": "low", "risk": "medium",
+  "routing": {"min_tier": 1, "max_tier": 3, "reasoning_effort": "medium", "reviewer_tier": 3},
+  "retry_budget": {"max_attempts": 2}, "escalation_path": [3],
+  "review": {"required_gates": ["deterministic", "model_review"]},
+  "non_goals": ["General project generation", "Unrestricted execution", "Portable Docker image distribution", "Changes to controllers, authority, budgets or application behavior"],
+  "scope": {"allowed": ["Edit the four approved shell paths only"], "prohibited": ["Change any immutable input or widen scope", "Execute model output on the host before acceptance"]},
+  "inputs": [{"name": "Operator facade", "description": "contracts/operator.py and scripts/operator_service.py define all service calls and output fields. The CLI parses, delegates and renders only."}],
+  "outputs": [{"name": "Short commands", "description": "From PowerShell: .\\start.ps1 \"Improve the operator start/resume experience\", .\\start.ps1 status, .\\start.ps1 resume, and .\\start.ps1 resume --run."}],
+  "interface": {"name": "OperatorService", "version": "1.0", "description": "Use open_service(root) from scripts.operator_service. Expose main(argv=None, *, service=None) for injection. status(), resume(run=False), start(objective); only resume(run=True) continues execution."},
+  "assumptions": ["Windows has Python 3.12+, Git and Docker Desktop; the verified local image must already exist", "No hardware interface is used"],
+  "sources": [{"id": "OWNER-PILOT", "reference": "Owner-approved bounded onboarding plan", "authority": "User direction"}],
+  "acceptance_criteria": [
+    {"id": "AC-LAUNCH", "description": "PowerShell launcher finds Python 3.12+ (py then python fallback), creates an isolated .venv only if missing, verifies existing venv Python/version/isolation and declared dev dependencies without replacing it, and checks Git/Docker/local image for start or resume --run. status and bare resume do not require Docker or a key. Delegate using the venv Python -B -m scripts.operator_cli from the repository root and propagate its exit status. Handle paths with spaces and forward arguments safely without Invoke-Expression."},
+    {"id": "AC-CLI", "description": "CLI imports only stdlib, contracts.operator and scripts.operator_service; expose main(argv=None, *, service=None), inject fake service for tests, and parse the quoted objective, status, resume and resume --run. status and bare resume call only inspection methods, no model calls. Print objective, progress, settled and pending USD, failed cost, context bytes, accepted cost when known, blockers and next action. Errors produce one actionable explanation and nonzero status without traceback."},
+    {"id": "AC-TEST", "description": "Worker tests cover start/status/resume/resume --run delegation, display of spend/blockers and invalid arguments/errors using injected fakes; no real service or paid calls. Tests run with unittest discover. Trusted pilot_shell_checks.py also runs independently."},
+    {"id": "AC-DOC", "description": "Replace README starting instructions with the three short PowerShell commands and explain resume --run, bounded preset, $1 task/$5 pilot caps, local activation/key/image prerequisites, status inspection without paid calls and compact handoff. Link docs/workflow-migration/WINDOWS_QUICKSTART.md for detailed offline verification. Keep the README compact; link architecture docs for the demo/reference."}
+  ],
+  "validation": [
+    {"id": "VAL-SHELL", "description": "Run worker shell tests", "criterion_ids": ["AC-CLI", "AC-TEST"], "evidence_required": ["Independent test exit and log"], "command": {"argv": ["python", "-B", "-m", "unittest", "discover", "-s", "tests", "-p", "test_operator_cli.py", "-v"], "timeout_seconds": 90}},
+    {"id": "VAL-TRUSTED", "description": "Run immutable facade and shell acceptance checks", "criterion_ids": ["AC-LAUNCH", "AC-CLI", "AC-TEST", "AC-DOC"], "evidence_required": ["Independent trusted check exit and log"], "command": {"argv": ["python", "-B", "tests/pilot_shell_checks.py", "-v"], "timeout_seconds": 90}}
+  ],
+  "context_scope": ["Exact enumerated read paths only"],
+  "architecture_boundaries": ["User-facing shell performs parsing and formatting; trusted facade owns all workflow I/O", "No worker self-modification of authority or executing controller"],
+  "domain": {"component": "ui_api", "hardware_status": "NOT_HARDWARE_FACING", "hardware_assumptions": [], "protocol_references": [], "validation_levels": {"VAL-SHELL": "unit", "VAL-TRUSTED": "contract"}}
+}

@@ -13,6 +13,7 @@ from scripts import acceptance as a
 from scripts import acceptance_runtime as ar
 from scripts import feedback as f
 from scripts import execution_harness as h
+from scripts import software_hardware as sh
 from scripts import workflow_runtime as runtime
 from test_execution_harness import (
     execution as _execution,
@@ -45,7 +46,9 @@ class AcceptanceDocker(Docker):
         return result
 
 
-def candidate_fixture(execution, risk="low", additional=()):
+def candidate_fixture(
+    execution, risk="low", additional=(), command=None, hardware_rung=False
+):
     e = execution
     packet = copy.deepcopy(f.replay(e.journal, e.stream)[0]["packet"])
     contract = f.wp.current(packet)["contract"]
@@ -56,7 +59,7 @@ def candidate_fixture(execution, risk="low", additional=()):
         contract["escalation_path"] = []
         for resource in e.routing["resources"]:
             resource["tier"] = tier
-    contract["validation"][0]["command"] = {
+    contract["validation"][0]["command"] = command or {
         "argv": [
             "python",
             "-B",
@@ -90,6 +93,16 @@ finally:
         ],
         "timeout_seconds": 60,
     }
+    if hardware_rung:
+        contract["validation"].append(
+            {
+                "id": "VAL-HIL",
+                "description": "Observe the synthetic sensor on a physical unit.",
+                "criterion_ids": ["AC-VALID"],
+                "evidence_required": ["Operator-recorded physical observation."],
+            }
+        )
+        contract["domain"]["validation_levels"]["VAL-HIL"] = "hardware_in_loop"
     packet = f.wp.create(
         "ACCEPT",
         packet["domain_profile"],
@@ -603,6 +616,41 @@ def test_hardware_manual_gate_stays_unverified(accepted_candidate):
         a.validate_checks(state, run, report)
 
 
+def test_synthetic_hardware_packet_stops_at_physical_gate_offline(execution):
+    e = candidate_fixture(execution, hardware_rung=True)
+    state, _ = a.load(e.journal, e.stream)
+    contract = state["contract"]
+
+    assert sh.validate_contract_domain(contract) == []
+    assert contract["domain"]["synthetic"] is True
+    assert contract["domain"]["hardware_status"] == "UNVERIFIED_ON_HARDWARE"
+    assert "command" not in next(
+        check for check in contract["validation"] if check["id"] == "VAL-HIL"
+    )
+
+    _, report = check(e)
+    assert report["results"][0]["status"] == "PASSED"
+    state, _ = a.load(e.journal, e.stream)
+    assert a.deterministic(state) is False
+    assert "VAL-HIL" not in state["attestations"]
+    with pytest.raises(ValueError, match="Hardware/manual validation remains UNVERIFIED"):
+        ar.prepare_check(e.journal, e.stream, "VAL-HIL")
+    with pytest.raises(ValueError, match="Hardware evidence ingestion is not enabled"):
+        a.apply(
+            state,
+            {
+                "kind": "ATTESTATION",
+                "timestamp": stamp(10),
+                "data": {
+                    "validation_id": "VAL-HIL",
+                    "actor": "Fixture Hardware Operator",
+                    "evidence": [{"sha256": "a" * 64, "size": 1}],
+                    "submission_sha256": a.sha(state["submission"]),
+                },
+            },
+        )
+
+
 def test_pinned_real_docker_independent_check(accepted_candidate):
     e = accepted_candidate
     image = os.environ.get("WORKFLOW_TEST_IMAGE")
@@ -622,6 +670,159 @@ def test_pinned_real_docker_independent_check(accepted_candidate):
         if manifest:
             REAL_DOCKER("rm", manifest["container"], manifest["setup_container"])
             REAL_DOCKER("volume", "rm", manifest["volume"])
+
+
+@pytest.mark.parametrize("real", [False, True])
+def test_nested_command_cwd_is_bound_and_executed(execution, real):
+    image = os.environ.get("WORKFLOW_TEST_IMAGE")
+    if real and not image:
+        pytest.skip("WORKFLOW_TEST_IMAGE required for real isolated acceptance")
+    e = candidate_fixture(
+        execution,
+        command={
+            "argv": [
+                "python",
+                "-B",
+                "-c",
+                "from pathlib import Path; "
+                "assert Path.cwd().as_posix() == '/session/workspace/src/features'; "
+                "assert Path('auth.py').read_bytes() == b'VALUE = 2\\n'",
+            ],
+            "timeout_seconds": 60,
+            "cwd": "src/features",
+        },
+    )
+    if real:
+        e.monkeypatch.setattr(runtime, "docker", REAL_DOCKER)
+        a.resubmit(e.journal, e.stream, e.worker_id, **{**e.bindings, "image": image})
+    manifest = None
+    try:
+        rid = ar.prepare_check(e.journal, e.stream, "VAL-FRAMES")
+        manifest = a.load(e.journal, e.stream)[0]["runs"][-1]["prepared"]["runtime"]
+        assert manifest["workdir"] == "/session/workspace/src/features"
+        assert (
+            runtime.inspect(manifest["container"])["Config"]["WorkingDir"]
+            == manifest["workdir"]
+        )
+        if not real:
+            starts = list(e.docker.starts)
+            e.docker.containers[manifest["container"]].workdir = "/session/workspace"
+            with pytest.raises(ValueError, match="boundary"):
+                ar.launch_check(e.journal, e.stream, rid)
+            assert e.docker.starts == starts
+            e.docker.containers[manifest["container"]].workdir = manifest["workdir"]
+            events, _ = e.journal.read(a.stream_name(e.stream))
+            replay = None
+            for event in events:
+                event = copy.deepcopy(event)
+                if event["kind"] == "CHECK_PREPARED":
+                    event["data"]["prepared"]["runtime"]["workdir"] = (
+                        "/session/workspace"
+                    )
+                    with pytest.raises(ValueError, match="binding"):
+                        a.apply(replay, event)
+                    break
+                replay = a.apply(replay, event)
+        ar.launch_check(e.journal, e.stream, rid)
+        report = ar.ingest_check(e.journal, e.stream, rid)
+        assert report["results"][0]["status"] == "PASSED"
+    finally:
+        if real and manifest:
+            REAL_DOCKER("rm", manifest["container"], manifest["setup_container"])
+            REAL_DOCKER("volume", "rm", manifest["volume"])
+
+
+@pytest.mark.parametrize(
+    "cwd",
+    [
+        "..",
+        "src/../features",
+        "/tmp",
+        "C:relative",
+        "C:\\tmp",
+        "\\tmp",
+        "\\\\host\\share",
+        "a\x00b",
+    ],
+)
+def test_command_cwd_escape_refuses_before_preparation(cwd, monkeypatch):
+    monkeypatch.setattr(
+        runtime, "docker", lambda *args, **kwargs: pytest.fail("Docker called")
+    )
+    with pytest.raises(ValueError, match="cwd"):
+        runtime.prepare(None, None, None, None, None, None, cwd=cwd)
+
+
+def test_missing_cwd_refuses_before_external_mutation(execution):
+    e = candidate_fixture(
+        execution,
+        command={
+            "argv": ["python", "-c", "pass"],
+            "timeout_seconds": 60,
+            "cwd": "absent",
+        },
+    )
+    before = set(e.docker.containers)
+    heads = e.journal.verify()
+    with pytest.raises(ValueError, match="not a directory"):
+        ar.prepare_check(e.journal, e.stream, "VAL-FRAMES")
+    assert set(e.docker.containers) == before
+    assert e.journal.verify() == heads
+
+
+def test_real_worker_checks_honor_nested_cwd(execution):
+    image = os.environ.get("WORKFLOW_TEST_IMAGE")
+    if not image:
+        pytest.skip("WORKFLOW_TEST_IMAGE required for real worker check")
+    from scripts.pilot_controller import APPLY
+
+    e = candidate_fixture(
+        execution,
+        command={
+            "argv": [
+                "python",
+                "-c",
+                "from pathlib import Path; "
+                "assert Path.cwd().as_posix() == '/session/workspace/src/features'; "
+                "assert Path('auth.py').read_bytes() == b'VALUE = 2\\n'",
+            ],
+            "timeout_seconds": 60,
+            "cwd": "src/features",
+        },
+    )
+    e.monkeypatch.setattr(runtime, "docker", REAL_DOCKER)
+    packet = a.load(e.journal, e.stream)[0]["submission"]["packet"]
+    run = runtime.prepare(
+        e.scope,
+        packet,
+        [],
+        e.journal.directory,
+        image,
+        ["python", "-B", "-c", APPLY],
+        instructions={
+            "brief.json": h.json_bytes(
+                {
+                    "replacements": [
+                        {
+                            "path": "src/features/auth.py",
+                            "content": "VALUE = 2\n",
+                        }
+                    ]
+                }
+            ),
+            "worker-rules.md": b"Fixture worker checks\n",
+            "dispatch.json": b"{}",
+            "report.json": b"",
+        },
+    )
+    manifest = f.wp.read_json(run / "runtime.json")
+    try:
+        outcome = runtime.execute(run, e.journal.directory, 60)
+        assert outcome["exit_code"] == 0, (run / "stdout.log").read_text()
+        assert (e.scope.root / "src/features/auth.py").read_bytes() == b"VALUE = 1\n"
+    finally:
+        REAL_DOCKER("rm", manifest["container"], manifest["setup_container"])
+        REAL_DOCKER("volume", "rm", manifest["volume"])
 
 
 def test_saved_check_replay_after_deadline_and_sync_is_identical(accepted_candidate):
