@@ -84,3 +84,10 @@ Read donor content via pinned git show only. Do not implement, enable resources,
 perform GitHub writes or rerun broad suites. Identify specific missing evidence
 before proposing any additional verification.
 ```
+
+## Original-goals record added
+
+2026-10-18: the dated, non-frozen [original-goals summary](ORIGINAL_GOALS_SUMMARY_2026-10-18.md)
+is the tracked handoff for the broader product intent and the deliberate
+`Original_plan.md` retirement. It records the provenance and limits of that
+decision without changing the protected historical checkout or its index.
