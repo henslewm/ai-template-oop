@@ -10,6 +10,7 @@ import argparse
 import os
 import re
 import shutil
+import stat
 import subprocess
 import sys
 import tempfile
@@ -47,12 +48,24 @@ def inside(root: Path, name: str) -> Path | None:
     for part in [path, *path.parents]:
         if part == root:
             break
-        if part.is_symlink() or getattr(part, "is_junction", lambda: False)():
+        if is_link(part):
             return None
     resolved = path.resolve()
     if not resolved.is_relative_to(root) or not resolved.is_file():
         return None
     return resolved
+
+
+def is_link(path: Path) -> bool:
+    """A symlink or, on Windows, a directory junction (Path.is_junction needs Python 3.12)."""
+    if path.is_symlink():
+        return True
+    if sys.platform != "win32":
+        return False
+    try:
+        return os.lstat(path).st_reparse_tag == stat.IO_REPARSE_TAG_MOUNT_POINT
+    except (OSError, AttributeError):
+        return False
 
 
 def copy_to_clipboard(text: str) -> bool:
@@ -91,12 +104,12 @@ def main() -> int:
                                        if missing else f"no files listed in {list_name}"))
         return 1
     output = root / OUTPUT
-    if output.is_symlink() or (output.exists() and not output.is_dir()):
+    if is_link(output) or (output.exists() and not output.is_dir()):
         print(f"Web setup refused: {output} is a link or not a directory; remove it first")
         return 1
     output.mkdir(exist_ok=True)
     archive = output / f"web-setup-{args.client}.zip"
-    if archive.is_symlink() or (archive.exists() and not archive.is_file()):
+    if is_link(archive) or (archive.exists() and not archive.is_file()):
         print(f"Web setup refused: {archive} is a link or not a regular file; remove it first")
         return 1
     # Build beside the target and rename over it, so an existing link is never followed or truncated.
