@@ -1,0 +1,21 @@
+# @PROJECT_SLUG@
+
+Features implement `contracts` ABCs and return immutable data or declared errors.
+Keep business orchestration in features; presentation parses, calls one service
+interface and renders. Construct and inject implementations in `src/container`.
+Change a generated contract before changing its public implementation signature.
+
+Use one implementation owner per branch/workspace. Workers receive only their
+named feature, relevant contracts/tests and a bounded handoff through the
+coordinator's scoped export. This instruction file is not filesystem isolation.
+Request exact missing paths/symbols instead of reading the whole repository.
+The batch feature needs its implementation, batch/auth/data contracts and batch
+tests; it must not import concrete authentication or persistence implementations.
+
+Run `python -m pytest` and `python tools/validate_boundaries.py`. The same behavior
+tests must pass for real and mock implementations. Independent acceptance of the
+exact candidate remains separate from tests, integration and deployment.
+
+This project starts unapproved. `tools/project_admin.py status` is read-only;
+review and owner activation are explicit. No paid, provider, publication, merge
+or deployment authority is transferred from the template. Branches are permanent.

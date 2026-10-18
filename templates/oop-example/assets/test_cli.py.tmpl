@@ -1,0 +1,42 @@
+"""Real entrypoint checks use the generated project, never the template app."""
+
+import json
+from pathlib import Path
+import subprocess
+import sys
+
+
+ROOT = Path(__file__).resolve().parents[1]
+
+
+def run(*args):
+    return subprocess.run(
+        [sys.executable, "-B", str(ROOT / "main.py"), *args],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        timeout=20,
+    )
+
+
+def test_memory_command():
+    result = run("--mock", "1", "2", "3")
+    assert result.returncode == 0, result.stderr
+    assert json.loads(result.stdout)["total"] == 6
+    assert "demo1234" not in result.stdout
+
+
+def test_sqlite_command_reuses_registered_account(tmp_path):
+    database = str(tmp_path / "example.db")
+    first = run("--db", database, "--register", "1", "2", "3")
+    second = run("--db", database, "4", "5", "6")
+    assert first.returncode == second.returncode == 0, first.stderr + second.stderr
+    assert json.loads(second.stdout)["record_id"] == 2
+    assert json.loads(second.stdout)["total"] == 15
+
+
+def test_authentication_error_is_actionable(tmp_path):
+    result = run("--db", str(tmp_path / "empty.db"), "1")
+    assert result.returncode == 1
+    assert "InvalidCredentialsError" in result.stderr
+    assert "Traceback" not in result.stderr

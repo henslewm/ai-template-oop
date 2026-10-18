@@ -11,7 +11,7 @@ import io
 import json
 import math
 import os
-from pathlib import Path
+from pathlib import Path, PurePosixPath, PureWindowsPath
 import subprocess
 import tarfile
 import time
@@ -51,7 +51,28 @@ def stopped(container):
     )
 
 
-def assert_boundary(container, volume, image):
+def workspace_directory(cwd="", read_paths=None):
+    """Translate a declared relative cwd into a directory inside the export."""
+    if (
+        not isinstance(cwd, str)
+        or any(ord(c) < 32 for c in cwd)
+        or PurePosixPath(cwd).is_absolute()
+        or PureWindowsPath(cwd).drive
+        or PureWindowsPath(cwd).root
+        or ".." in PureWindowsPath(cwd).parts
+    ):
+        raise ValueError("Check cwd must stay inside the reviewed workspace")
+    relative = PurePosixPath(cwd.replace("\\", "/")).as_posix()
+    if (
+        read_paths is not None
+        and relative != "."
+        and not any(p.startswith(relative + "/") for p in read_paths)
+    ):
+        raise ValueError("Check cwd is not a directory in the reviewed export")
+    return "/session/workspace" + ("/" + relative if relative != "." else "")
+
+
+def assert_boundary(container, volume, image, workdir="/session/workspace"):
     info = inspect(container)
     host, config = info["HostConfig"], info["Config"]
     if (
@@ -67,6 +88,7 @@ def assert_boundary(container, volume, image):
         or host.get("Devices")
         or config["User"] != "1000:1000"
         or info["Image"] != image
+        or config["WorkingDir"] != workdir
     ):
         raise ValueError("Runtime boundary differs from verified policy")
     mounts = info["Mounts"]
@@ -144,9 +166,12 @@ def prepare(
     instructions=None,
     dispatch_stream=None,
     immutable_workspace=False,
+    cwd="",
 ):
+    workdir = workspace_directory(cwd)
     check_state(scope, state)
     scope.verify_base()
+    workspace_directory(cwd, scope.data["read_paths"])
     export, baseline = scope.export(packet, graph, instructions=instructions)
     if not image.startswith("sha256:") or len(image) != 71:
         raise ValueError("Use a locally verified immutable image ID")
@@ -173,6 +198,7 @@ def prepare(
         "scope_sha256": scope.hash,
         "task_id": packet["task_id"],
         "argv": argv,
+        "workdir": workdir,
         "status": "preparing",
     }
     if dispatch_stream is not None:
@@ -272,7 +298,7 @@ def prepare(
             "--tmpfs",
             "/out:rw,noexec,nosuid,nodev,uid=1000,gid=1000,size=67108864",
             "--workdir",
-            "/session/workspace",
+            workdir,
             "--entrypoint",
             argv[0],
             image,
@@ -281,7 +307,7 @@ def prepare(
         .decode()
         .strip()
     )
-    assert_boundary(container, volume, image)
+    assert_boundary(container, volume, image, workdir)
     if immutable_workspace and inspect(container)["Mounts"][0].get("RW") is not False:
         raise ValueError("Acceptance session must be mounted read-only")
     record.update(container=container, setup_container=setup)
@@ -389,7 +415,12 @@ def execute(run, state, timeout, *, preflight=None, absolute_deadline=None):
     check_state(scope, state)
     scope.verify_base()
     verify_baseline(scope, wp.read_json(run / "baseline.json"))
-    assert_boundary(record["container"], record["volume"], record["image"])
+    assert_boundary(
+        record["container"],
+        record["volume"],
+        record["image"],
+        record.get("workdir", "/session/workspace"),
+    )
     if (
         record.get("immutable_workspace")
         and inspect(record["container"])["Mounts"][0].get("RW") is not False

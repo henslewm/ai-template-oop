@@ -1,0 +1,46 @@
+# @PROJECT_SLUG@
+
+A runnable, headless OOP example. Python 3.12+; application execution uses only
+the standard library. The demo account is fictional: `demo` / `demo1234`.
+
+```powershell
+python main.py --mock 1 2 3
+python main.py --db example.db --register 1 2 3
+python main.py --db example.db 4 5 6
+```
+
+The memory command returns count 3, total 6 and mean 2. The first SQLite command
+registers the account and stores a batch; the next reuses that account and database.
+Use a different `--username`/`--password` when registering another account.
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -e '.[dev]'
+.\.venv\Scripts\python.exe -B -m pytest
+.\.venv\Scripts\python.exe -B tools/validate_boundaries.py
+.\.venv\Scripts\python.exe -B tools/project_admin.py status
+```
+
+On POSIX use `.venv/bin/python` for the same Python commands.
+
+`contracts/` defines typed ABCs and frozen data. `src/features/` contains the
+existing SQLite auth/data implementations and a batch feature depending only on
+their interfaces. `src/container/` injects real or in-memory implementations.
+`src/presentation/` only parses and renders one `BatchService.execute` call.
+`src/testing/fakes.py` holds relocated headless fakes. Shared auth/data/batch
+behavior tests run against both backend combinations; CLI tests prove real usage.
+Boundary checks also cover presentation imports.
+
+The backend statistics are retained demo behavior, not a raw-telemetry processor
+or a new numerical-validation policy. No Tk, provider or hardware is required.
+
+`config/project.json` has this project's fresh UUID. Project status is
+`AWAITING_APPROVAL`; deterministic app/tests run without granting workflow
+authority. `tools/project_admin.py review` prepares an offline approval package;
+only an explicit owner decision can activate it. No approval, canonical runtime
+state, secrets, Git history or paid pilot is copied from the template.
+
+`GENERATION.json` records the source revision, dirty-source flag and exact source/
+output hashes. Only the explicit generation manifest is copied. This is one
+software worked example; general intake, hardware generation and worker setup
+remain separate packages. No workers are launched by generation.

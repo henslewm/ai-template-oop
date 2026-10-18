@@ -71,6 +71,36 @@ are not portable setup checks. Do not refresh those baselines to make a clone pa
 
 ## 3. Confirm the immutable local runtime image
 
+If the image is not already loaded, obtain it from a trusted machine that has
+the verified image. On that machine, inspect and export the image, then record
+the archive hash separately from the archive:
+
+```powershell
+$Image = 'sha256:61526e68966dc3330c3801cbed8740c62710376b0b01b15c960b60c66b6cae1e'
+$Archive = 'workflow-runtime.tar'
+docker image inspect $Image --format '{{.Id}} {{.Os}}/{{.Architecture}}'
+if ($LASTEXITCODE) { throw 'Trusted source image is unavailable' }
+docker image save --output $Archive $Image
+if ($LASTEXITCODE) { throw 'Image export failed' }
+Get-FileHash -Algorithm SHA256 $Archive
+```
+
+Transfer the archive and its recorded SHA256 through a trusted channel; do not
+commit the archive or hash to the repository. On the new machine, verify the
+transferred archive before loading it:
+
+```powershell
+$Archive = 'workflow-runtime.tar'
+if ((Get-FileHash -Algorithm SHA256 $Archive).Hash -ne '<source-archive-sha256>') {
+    throw 'Image archive hash does not match the trusted source'
+}
+docker image load --input $Archive
+if ($LASTEXITCODE) { throw 'Image import failed' }
+```
+
+The repository does not publish a downloadable image archive. Do not substitute
+a public or mutable image tag for the trusted artifact.
+
 ```powershell
 docker version
 if ($LASTEXITCODE) { throw 'Docker Linux engine unavailable' }
@@ -157,7 +187,8 @@ An absent journal is expected in a new clone. Do not initialize canonical state
 or copy fixture policy into it just to make examples work. Real execution still
 requires separate owner enablement; the shipped foundation does not provide it.
 Initialization/account provisioning and packet preparation are explicit Python
-coordinator APIs, not an automatic one-command project bootstrap.
+coordinator APIs; the separate supported software-intake bootstrap is documented
+in [Software intake](SOFTWARE_INTAKE.md) and does not provision operator state.
 
 Continue with the stage-specific references when operating beyond the proof:
 

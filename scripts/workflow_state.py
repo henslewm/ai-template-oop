@@ -166,10 +166,15 @@ def control_directory(root: Path) -> Path:
 
 
 def active_anchor(root: Path, expected: str | None = None) -> str:
-    """Read-only bootstrap adapter; current ACTIVE receipt and all bindings required."""
+    """Project authority when initialized; otherwise the historical campaign adapter."""
+    from scripts import project_authority
+
     root = Path(root).resolve()
-    package = approval.read_json(approval.safe_file(root, approval.PACKAGE))
-    anchor = approval.validate(package, root, require_active=True)
+    if project_authority.applies(root):
+        anchor = project_authority.active_anchor(root)
+    else:
+        package = approval.read_json(approval.safe_file(root, approval.PACKAGE))
+        anchor = approval.validate(package, root, require_active=True)
     _require(
         expected is None or anchor == expected,
         "Approval anchor changed; scheduling held",

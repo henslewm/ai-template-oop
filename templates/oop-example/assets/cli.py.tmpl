@@ -1,0 +1,38 @@
+"""Presentation depends only on the batch interface and its data contract."""
+
+from __future__ import annotations
+
+import argparse
+from dataclasses import asdict
+import json
+
+from contracts import BatchRequest, BatchService
+
+
+def parser() -> argparse.ArgumentParser:
+    result = argparse.ArgumentParser(description="Run an authenticated numeric batch.")
+    result.add_argument("values", type=float, nargs="+")
+    result.add_argument(
+        "--mock", action="store_true", help="Use in-memory demo services"
+    )
+    result.add_argument(
+        "--db", default="example.db", help="SQLite path for the real services"
+    )
+    result.add_argument("--username", default="demo")
+    result.add_argument(
+        "--password", default="demo1234", help="Fictional demo password"
+    )
+    result.add_argument(
+        "--register", action="store_true", help="Create the account before processing"
+    )
+    return result
+
+
+def execute(service: BatchService, args: argparse.Namespace) -> str:
+    request = BatchRequest(
+        args.username, args.password, tuple(args.values), args.register
+    )
+    value = service.execute(request)
+    output = asdict(value)
+    output["created_at"] = value.created_at.isoformat()
+    return json.dumps(output)

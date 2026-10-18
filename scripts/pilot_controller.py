@@ -102,7 +102,7 @@ for item in proposal['replacements']:
     Path(item['path']).write_text(item['content'],encoding='utf-8')
 packet=json.loads(Path('/session/packet.json').read_text())
 checks=packet['revision_history'][-1]['contract']['validation']
-codes=[subprocess.run(c['command']['argv'],timeout=c['command']['timeout_seconds']).returncode for c in checks]
+codes=[subprocess.run(c['command']['argv'],timeout=c['command']['timeout_seconds'],cwd=Path('/session/workspace') / c['command'].get('cwd','.').replace(chr(92),'/')).returncode for c in checks]
 sys.exit(0 if all(code==0 for code in codes) else 1)
 """
 
@@ -220,6 +220,10 @@ class Operator(OperatorService):
                 "write_paths": authority.WRITE_PATHS,
             }
         )
+        for check in h.f.wp.current(packet)["contract"]["validation"]:
+            runtime.workspace_directory(
+                check["command"].get("cwd", ""), scope.data["read_paths"]
+            )
         _, baseline = scope.export(packet, [])
         for stream, cap in ((PROJECT_BUDGET, 5), (TASK_BUDGET, 1)):
             if stream not in streams:
