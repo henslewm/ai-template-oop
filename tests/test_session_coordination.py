@@ -390,7 +390,8 @@ def test_confirmed_merge_enriches_watch_notice_without_duplicate(clients):
     assert first.status()["notices"][0]["pr"] == 12
 
 
-def test_sync_preserves_ignored_work_that_incoming_tree_would_replace(clients):
+@pytest.mark.parametrize("missed_preflight", [False, True])
+def test_sync_preserves_ignored_work_that_incoming_tree_would_replace(clients, monkeypatch, missed_preflight):
     (first, _), _ = clients
     (first.root / ".gitignore").write_text("local-state.txt\n")
     command(first.root, "git", "add", ".gitignore")
@@ -408,7 +409,14 @@ def test_sync_preserves_ignored_work_that_incoming_tree_would_replace(clients):
     with first.connection(write=True) as db:
         db.execute("UPDATE targets SET head=? WHERE name='main'", (before,))
     assert not sc.git(first.root, "status", "--porcelain")
-    with pytest.raises(ValueError, match="Ignored work"):
+    if missed_preflight:
+        native = sc.git
+        def file_arrived_after_inspection(root, *args):
+            if args[0] == "ls-files":
+                return ""
+            return native(root, *args)
+        monkeypatch.setattr(sc, "git", file_arrived_after_inspection)
+    with pytest.raises(subprocess.CalledProcessError if missed_preflight else ValueError):
         first.sync(token, apply=True)
     assert (first.root / "local-state.txt").read_text() == "preserve my local work\n"
     assert sc.git(first.root, "rev-parse", "HEAD") == before

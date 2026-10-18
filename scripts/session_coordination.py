@@ -256,7 +256,7 @@ class Coordinator:
                 require(not any(a == b or a.startswith(b + "/") or b.startswith(a + "/")
                                 for a in ignored for b in changed),
                         "Ignored work would be replaced; preserve it before sync")
-                git(self.root, "merge", "--no-edit", head)
+                git(self.root, "merge", "--no-edit", "--no-overwrite-ignore", head)
         for notice in notices:
             self.ack(token, notice["id"], "synchronized")
         return {"synchronized": git(self.root, "rev-parse", "HEAD")}
