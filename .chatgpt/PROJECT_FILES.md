@@ -16,6 +16,7 @@
 12. `contracts/data.py`
 13. `contracts/errors.py`
 14. `contracts/operator.py`
+15. `docs/PLATFORM_SUPPORT.md`
 
 Then connect GitHub so the chat can verify the latest repository versions.
 
