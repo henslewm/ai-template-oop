@@ -275,6 +275,83 @@ def test_registry_policy_drift_refuses_init(clients):
         first.init()
 
 
+def test_recovering_unrelated_worker_preserves_live_merge_intent(clients):
+    (first, second), clock = clients
+    worker = second.register("stopped worker", "worker")["token"]
+    token, request, _, _ = prepare_request(first)
+    with first.connection(write=True) as db:
+        db.execute("UPDATE requests SET state='intent' WHERE id=?", (request,))
+    clock[0] += 301
+    with first.connection(write=True) as db:
+        db.execute("UPDATE sessions SET heartbeat=? WHERE token=?", (clock[0], token))
+    second.recover(worker, "Worker process exited; unrelated integrator is still running")
+    assert first.status()["requests"][0]["state"] == "intent"
+    assert not first.status()["sessions"][1]["closed"]
+
+
+def test_target_uses_pinned_remote_object_not_fetch_head(clients, monkeypatch):
+    (first, _), _ = clients
+    calls = []
+    def observed(root, *args):
+        calls.append(args)
+        if args[0] == "ls-remote":
+            return "a" * 40 + "\trefs/heads/main"
+        assert args == ("fetch", "--no-prune", "--no-tags", "--no-write-fetch-head", "origin", "a" * 40)
+        return ""
+    monkeypatch.setattr(sc, "git", observed)
+    assert sc.Coordinator.target(first, "main") == "a" * 40
+    assert len(calls) == 2
+
+
+def test_successful_merge_is_exact_head_guarded_and_idempotent(clients, monkeypatch):
+    (first, _), _ = clients
+    token, request, head, _ = prepare_request(first)
+    native = sc.run
+    merges = []
+    def hosted(root, *args):
+        if args[:3] == ("gh", "pr", "merge"):
+            merges.append(args)
+            assert args[-3:] == ("--rebase", "--match-head-commit", head)
+            return ""
+        if args[:2] == ("gh", "api"):
+            return json.dumps({"head": {"sha": head}, "base": {"ref": "main"},
+                               "merged": True, "merge_commit_sha": head})
+        return native(root, *args)
+    monkeypatch.setattr(sc, "run", hosted)
+    assert first.integrate(token, request) == {"merged": head}
+    assert first.integrate(token, request) == {"merged": head}
+    assert len(merges) == 1
+    assert len(first.status()["notices"]) == 1
+
+
+def test_independent_clone_fetches_notice_and_synchronizes_own_branch(clients, tmp_path):
+    (first, _), _ = clients
+    clone = tmp_path / "real clone"
+    command(first.root, "git", "clone", "--no-hardlinks", str(first.root), str(clone))
+    command(clone, "git", "checkout", "-b", "feature/clone-worker")
+    command(clone, "git", "config", "user.name", "Fixture")
+    command(clone, "git", "config", "user.email", "fixture@example.invalid")
+    worker = sc.Coordinator(clone, database=first.database, clock=first.clock)
+    def fetch_target(branch):
+        head = sc.git(first.root, "rev-parse", "HEAD")
+        sc.git(clone, "fetch", "--no-write-fetch-head", "origin", head)
+        return head
+    worker.target = fetch_target
+    token = worker.register("clone worker", "worker")["token"]
+    old = sc.git(clone, "rev-parse", "HEAD")
+    (first.root / "contracts").mkdir()
+    (first.root / "contracts/change.txt").write_text("interface change\n")
+    command(first.root, "git", "add", "contracts/change.txt")
+    command(first.root, "git", "commit", "-m", "contract update")
+    head = sc.git(first.root, "rev-parse", "HEAD")
+    observed = worker.sync(token)
+    assert observed[0]["payload"]["contract_impact"] is True
+    assert sc.git(clone, "rev-parse", "HEAD") == old
+    assert worker.sync(token, apply=True)["synchronized"] == head
+    assert sc.git(first.root, "rev-parse", "HEAD") == head
+    assert worker.status()["acks"][0]["state"] == "synchronized"
+
+
 def test_pilot_requires_designated_integration_token(monkeypatch):
     monkeypatch.delenv("AI_TEMPLATE_INTEGRATION_TOKEN", raising=False)
     with pytest.raises(ValueError, match="Register the pilot"):
