@@ -31,6 +31,13 @@ PROJECT_INPUTS = {
     "PROJECT.md",
     "tests/test_project_acceptance.py",
 }
+PROFILE_FILES = {
+    "synthetic-hardware-frame-parser/1": {
+        "WORK_PACKET.json": "examples/work-packets/software-hardware.contract.json",
+        "src/features/synthetic_frame.py": "templates/oop-example/assets/synthetic_frame.py.tmpl",
+        "tests/test_hardware_profile.py": "templates/oop-example/assets/test_hardware_profile.py.tmpl",
+    }
+}
 
 
 def _path(value: str) -> None:
@@ -60,7 +67,9 @@ def _no_links(path: Path) -> None:
         )
 
 
-def _plan(source: Path, slug: str) -> tuple[dict[str, bytes], list[dict], str]:
+def _plan(
+    source: Path, slug: str, profile: str | None = None
+) -> tuple[dict[str, bytes], list[dict], str]:
     raw = approval.safe_file(source, MANIFEST).read_bytes()
     manifest = approval.read_json(source / MANIFEST)
     approval.exact(
@@ -127,6 +136,24 @@ def _plan(source: Path, slug: str) -> tuple[dict[str, bytes], list[dict], str]:
         record["output_sha256"] = hashlib.sha256(
             files[record["destination"]]
         ).hexdigest()
+    for destination, original in PROFILE_FILES.get(profile, {}).items():
+        _path(destination)
+        _path(original)
+        approval.require(
+            destination.casefold() not in names, "Duplicate generated path"
+        )
+        names.add(destination.casefold())
+        content = approval.safe_file(source, original).read_bytes()
+        files[destination] = content
+        records.append(
+            {
+                "source": original,
+                "destination": destination,
+                "kind": "profile",
+                "source_sha256": hashlib.sha256(content).hexdigest(),
+                "output_sha256": hashlib.sha256(content).hexdigest(),
+            }
+        )
     return files, records, hashlib.sha256(raw).hexdigest()
 
 
@@ -135,6 +162,7 @@ def generate(
     slug: str = "oop-example",
     *,
     source: Path = ROOT,
+    profile: str | None = None,
     project_files: dict[str, bytes] | None = None,
 ) -> dict:
     approval.require(
@@ -157,7 +185,7 @@ def generate(
             destination.is_dir() and not any(destination.iterdir()),
             "Destination must be missing or empty; existing work is never overwritten",
         )
-    files, records, manifest_hash = _plan(source, slug)
+    files, records, manifest_hash = _plan(source, slug, profile)
     for relative, content in (project_files or {}).items():
         approval.require(
             relative in PROJECT_INPUTS and isinstance(content, bytes),

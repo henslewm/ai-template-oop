@@ -1,0 +1,12 @@
+"""Parse the explicitly synthetic frame format without device I/O."""
+
+
+def parse_synthetic_frame(frame: list[int]) -> int:
+    if (
+        not isinstance(frame, list)
+        or len(frame) != 2
+        or any(type(value) is not int or not 0 <= value <= 255 for value in frame)
+        or frame[0] != 0xA1
+    ):
+        raise ValueError("Expected a synthetic frame containing tag 0xA1 and one byte")
+    return frame[1]
