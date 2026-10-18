@@ -1,0 +1,39 @@
+{
+  "actor": "Codex independent read-only acceptance reviewer (separate from implementation owner and caller acknowledgment)",
+  "verdict": "accepted",
+  "blocking_findings": [],
+  "nonblocking_findings": [],
+  "source_sha256": {
+    "tools/project_intake.py": "cc9d94f8a995145db140f500fdf83d901aa99a9f6ee9d6877ce0e7da4ced90d9",
+    "tools/generate_example.py": "5bd27e53752a84b2dc5415da00dc4bb53a6eb509cbda5d12da03172d1fcc6d17",
+    "tests/test_project_intake.py": "57e3acb69f76245f4bafa77d9eb71a4c4c7b0213d074ed859909659fe8347b3c",
+    "examples/intake/numeric-batch.json": "05098085a2c44a8643e641c4aadfc8e07d94bdfcbdb6cdf2ab68e761265f6e92"
+  },
+  "artifact_assessment": {
+    "path": "C:/Users/hensl/Documents/GitHub/ai-template/generated-intake-classroom",
+    "source_commit": "5f8270a04f2692159aa5af4423415b1946d42c33",
+    "template_dirty": false,
+    "project_id": "a65edc78-ddac-4ad9-84cc-923802822d67",
+    "fingerprint": "e3440137758cd3cd7908121924bd96ef083e72189f358a9fe2930230e078f861",
+    "provenance": "All 45 exact GENERATION.json destinations independently raw-hashed; zero output mismatches. Non-intake records equal the embedded review template inputs. Current executable tool hashes match review and generation metadata. Independently recomputed review fingerprint matches both stored fingerprints.",
+    "requirements": "Artifact specification equals the completed sample and review specification. Both scenarios retain all five user-supplied expected metrics. Generated acceptance test bytes equal the intake tool's fixed test source; the same assertions call services.batch.execute through build_mock/build_production for memory and SQLite.",
+    "holds": "Closed fields, exact profile/features/contracts/dependencies, bounded finite numeric inputs excluding booleans, unique criterion names, positive integer expected counts, malformed/duplicate-key JSON and invalid slugs are refused. Open questions and changed specification/template/tool fingerprints hold before generation. Incorrect expected outcomes remain unchanged and are intentionally allowed to fail acceptance.",
+    "architecture": "Intake validates requirements and delegates to the existing explicit-manifest generator. No new business controller, worker or provider is introduced. Architecture map and generated tests retain typed contracts, injected batch interface, composition-root construction and shared real/mock behavior. PROJECT.md names scoped contract/feature/test context, one implementation owner and independent acceptance; it explicitly distinguishes guidance from filesystem isolation.",
+    "restrictions": "Supplemental files are confined to four exact document/test destinations and cannot replace manifest outputs or authority records. Generator retains exclusive creation, non-empty-destination refusal, link/path restrictions and fresh project initialization. Caller acknowledgment explicitly provides neither independent acceptance nor workflow approval.",
+    "execution_evidence": "Completed verification.json has 11 successful command records: review, generation, isolated venv creation, editable dev installation, pip check, memory total 6, SQLite registration total 6, subsequent SQLite total 15 with record_id 2, generated suite 57 passed in 2.01s, Boundaries OK, and project status AWAITING_APPROVAL.",
+    "artifact_sha256": {
+      "PROJECT_SPEC.json": "549863aa5f25360f031df3b475587ded7cc23f78b405a6293ea8b8c681014c4a",
+      "INTAKE_REVIEW.json": "4b91e7b84a2b6d8d07792317363d40d0fbe0c5fd27c1daa728757ee6790aa36b",
+      "PROJECT.md": "51f0bb578a96ca2679c815424175377854279bb45c70ff982b79f4e311a8ffcb",
+      "GENERATION.json": "c04529fcdde2fa3815129524e0c5d6fe2b95f7add3dcf7800fb61e3216e84228",
+      "tests/test_project_acceptance.py": "e3245686f21a52b0b7117b3bccffef1ecb0f5de5aab1ab66ff7bfed14bec0a64"
+    }
+  },
+  "verification_limitations": [
+    "Independent static acceptance plus read-only hashing and inspection of main's completed execution log; no suites or application commands rerun.",
+    "Main's 47 focused tests, scoped Ruff/format, ty, source boundary checks and empty protected-file diff are supplied evidence; this artifact proof log records the separate generated-project execution. No Git commands were run by reviewer.",
+    "Existing contracts, application and foundation internals were not reopened for a broad audit; exact manifest destinations were read only for byte hashing. Relevant approval helper methods were inspected.",
+    "Acceptance covers authenticated-numeric-batch/1 only. Purpose/goal prose does not synthesize arbitrary code, authentication policy or new domains. Worker guidance is not runtime isolation, acknowledgment is a caller assertion, and no deployment/provider/hardware verification is implied.",
+    "Documentation/backlog may receive main-owned verification/status edits after this review; acceptance identity is the four frozen executable source/test/sample hashes above."
+  ]
+}

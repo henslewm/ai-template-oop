@@ -1,0 +1,63 @@
+name: Risk
+description: Track a task risk with evidence, mitigation, and an owner
+title: "[RISK] "
+labels: ["risk"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This issue records an assessment and proposed response. The current work packet and governing project records retain authority; this form does not change scope, routing, or approval. Keep secrets and restricted evidence out of GitHub.
+  - type: input
+    id: task
+    attributes:
+      label: Affected task issue
+      description: Link the task issue and canonical work packet.
+    validations:
+      required: true
+  - type: textarea
+    id: packet
+    attributes:
+      label: Packet binding
+      description: Include task_id, latest revision, and complete contract SHA-256.
+    validations:
+      required: true
+  - type: textarea
+    id: scenario
+    attributes:
+      label: Risk scenario and impact
+      description: Describe the possible event, cause, affected outcome, likelihood, and impact. Distinguish observed facts from assumptions.
+    validations:
+      required: true
+  - type: dropdown
+    id: tier
+    attributes:
+      label: Proposed risk tier
+      description: Use the packet's risk vocabulary; discrepancies require packet revision.
+      options:
+        - low
+        - medium
+        - high
+        - critical
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Risk evidence and related records
+      description: Link sources, adverse facts, validation results, and relevant journal records. Identify unsupported assumptions.
+    validations:
+      required: true
+  - type: textarea
+    id: mitigation
+    attributes:
+      label: Mitigation and decision threshold
+      description: State warning signals, proposed mitigation, residual risk, and conditions requiring a hold or human decision.
+    validations:
+      required: true
+  - type: textarea
+    id: owner
+    attributes:
+      label: Next action and risk owner
+      description: Name the responsible owner, next action, needed evidence or decision, and review date if known.
+    validations:
+      required: true

@@ -1,0 +1,36 @@
+name: Validate project
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install development dependencies
+        run: python -m pip install -e ".[dev]"
+      - name: Validate active workflow approval
+        run: python -B scripts/validate_workflow_approval.py --fingerprint --require-active
+      - name: Inspect workflow foundation and state directory
+        run: |
+          python -B scripts/workflow_state.py foundation
+          python -B scripts/workflow_state.py directory
+      - name: Validate application boundaries
+        run: python -B tools/validate_boundaries.py
+      - name: Run focused non-Docker, non-Tk tests
+        run: >-
+          python -B -m pytest -q -rs -p no:cacheprovider -o addopts=
+          tests/test_contract_auth.py
+          tests/test_contract_data.py
+          tests/test_boundaries.py
+          tests/test_headless_imports.py
+      - name: Check workflow approval tests in disposable projection
+        run: python -B tools/check_workflow_approval.py
