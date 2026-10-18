@@ -1,0 +1,3 @@
+# scripts/web_setup.py writes its upload archives here; they are local output, never committed.
+*
+!.gitignore
