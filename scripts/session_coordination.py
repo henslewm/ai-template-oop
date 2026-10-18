@@ -83,8 +83,13 @@ class Coordinator:
 
     def target(self, branch):
         require(branch in self.config["shared_targets"], "Not a configured shared target")
-        git(self.root, "fetch", "--no-prune", "--no-tags", "origin", "refs/heads/" + branch)
-        return git(self.root, "rev-parse", "FETCH_HEAD")
+        ref = "refs/heads/" + branch
+        head, observed = git(self.root, "ls-remote", "--exit-code", "origin", ref).split()
+        require(observed == ref, "Exact remote target required")
+        # FETCH_HEAD is mutable across commands in a checkout. Pin the observed
+        # object rather than trusting a later read of another fetch's result.
+        git(self.root, "fetch", "--no-prune", "--no-tags", "--no-write-fetch-head", "origin", head)
+        return head
 
     def init(self):
         self.identity()
@@ -114,6 +119,13 @@ class Coordinator:
     def event(self, db, kind, **payload):
         db.execute("INSERT INTO events(at,kind,payload) VALUES (?,?,?)",
                    (self.clock(), kind, json.dumps(payload, sort_keys=True)))
+
+    def intent_owner(self, db, request):
+        for row in db.execute("SELECT payload FROM events WHERE kind='MERGE_INTENT' ORDER BY id DESC"):
+            payload = json.loads(row[0])
+            if payload["request"] == request:
+                return payload["owner"]
+        return None
 
     def session(self, db, token, *, integrator=False, workspace=False):
         row = db.execute("SELECT * FROM sessions WHERE token=? AND closed=0", (token,)).fetchone()
@@ -275,6 +287,9 @@ class Coordinator:
         # heartbeat/recovery cannot replace ownership while the command runs.
         with self.connection(write=True) as db:
             self.session(db, token, integrator=True, workspace=True)
+            require(db.execute("SELECT state FROM requests WHERE id=?", (request,)).fetchone()[0] == "intent",
+                    "Merge intent changed; inspect before integration")
+            require(self.intent_owner(db, request) == token, "Merge intent belongs to another integration owner")
             second = self.gates(saved["pr"], saved["head"], json.loads(saved["review"]))
             require(second == live, "Hosting facts changed; reconcile intent before retry")
             run(self.root, "gh", "pr", "merge", "--repo", self.config["repository"], str(saved["pr"]),
@@ -302,8 +317,9 @@ class Coordinator:
 
     def close(self, token):
         with self.connection(write=True) as db:
-            self.session(db, token, workspace=True)
-            require(not db.execute("SELECT 1 FROM requests WHERE state='intent'").fetchone(), "Reconcile uncertain merge before closing")
+            owner = self.session(db, token, workspace=True)
+            if owner["role"] == "integrator":
+                require(not db.execute("SELECT 1 FROM requests WHERE state='intent'").fetchone(), "Reconcile uncertain merge before closing")
             db.execute("UPDATE sessions SET closed=1 WHERE token=?", (token,))
             self.event(db, "CLOSE", token=token)
         return {"closed": True, "branches_retained": True}
@@ -315,8 +331,13 @@ class Coordinator:
             old = db.execute("SELECT * FROM sessions WHERE token=? AND closed=0", (token,)).fetchone()
             require(old is not None, "Unknown active owner")
             require(self.clock() - old["heartbeat"] > self.config["stale_seconds"], "Live owner cannot be recovered")
-            for row in db.execute("SELECT * FROM requests WHERE state='intent'").fetchall():
+            # Recovering an unrelated worker cannot change the integrator's
+            # intent, including the gap before its external-call transaction.
+            pending = db.execute("SELECT * FROM requests WHERE state='intent'").fetchall() if old["role"] == "integrator" else []
+            for row in pending:
                 saved = dict(row)
+                require(self.intent_owner(db, saved["id"]) == token,
+                        "Uncertain intent belongs to another owner; preserve it for inspection")
                 pull = json.loads(run(self.root, "gh", "api", f"repos/{self.config['repository']}/pulls/{saved['pr']}"))
                 if pull["merged"]:
                     self.reconcile(db, saved)
