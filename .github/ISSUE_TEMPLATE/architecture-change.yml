@@ -1,0 +1,58 @@
+name: Architecture-change request
+description: Propose a material architecture change for an explicit human decision
+title: "[ARCHITECTURE CHANGE] "
+labels: ["architecture-change"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This is a proposal, not approval. Preserve the current packet and architecture until the controlling human decision is recorded. A change to a public interface must update `contracts/` first and requires the appropriate session owners to follow it. Keep secrets and restricted evidence out of GitHub.
+  - type: input
+    id: task
+    attributes:
+      label: Affected task issue
+      description: Link the task issue and canonical work packet.
+    validations:
+      required: true
+  - type: textarea
+    id: binding
+    attributes:
+      label: Packet and current foundation binding
+      description: Include task_id, latest revision, complete contract SHA-256, and the applicable approval fingerprint or receipt.
+    validations:
+      required: true
+  - type: textarea
+    id: conflict
+    attributes:
+      label: Current limitation or architecture conflict
+      description: Identify the affected packet requirement, contract interface, layer boundary, or permission that prevents the outcome.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Supporting evidence
+      description: Link original results, relevant journal events or dispatch IDs, and sources. Separate facts from proposals.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed change and alternatives
+      description: Describe the proposed delta, affected paths and interfaces, alternatives including retaining the current design, and why a change is needed.
+    validations:
+      required: true
+  - type: textarea
+    id: impact
+    attributes:
+      label: Impact and review package
+      description: Identify affected scope, dependencies, validation, permissions, risk, cost, and migration or rollback considerations.
+    validations:
+      required: true
+  - type: textarea
+    id: decision
+    attributes:
+      label: Human decision requested and owner
+      description: Name the decision-maker, exact decision requested, and next preparation owner. State that approval is pending unless the controlling decision is linked.
+    validations:
+      required: true

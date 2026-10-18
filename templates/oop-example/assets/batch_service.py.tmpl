@@ -1,0 +1,28 @@
+"""Business orchestration depends on interfaces, never sibling implementations."""
+
+from __future__ import annotations
+
+from contracts import (
+    BatchRequest,
+    BatchService,
+    DataProcessor,
+    ProcessingResult,
+    UserAuthenticator,
+)
+
+
+class AuthenticatedBatchService(BatchService):
+    def __init__(
+        self, authenticator: UserAuthenticator, processor: DataProcessor
+    ) -> None:
+        self._authenticator = authenticator
+        self._processor = processor
+
+    def execute(self, request: BatchRequest) -> ProcessingResult:
+        if request.register:
+            self._authenticator.register(request.username, request.password)
+        session = self._authenticator.login(request.username, request.password)
+        try:
+            return self._processor.process(request.values, session)
+        finally:
+            self._authenticator.logout(session)

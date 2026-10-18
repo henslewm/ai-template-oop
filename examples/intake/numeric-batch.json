@@ -1,0 +1,56 @@
+{
+  "schema_version": "software-intake/1",
+  "slug": "classroom-summary",
+  "purpose": "Summarize fictional classroom measurements after authentication; keep each result available in SQLite.",
+  "workflow": {
+    "profile": "authenticated-numeric-batch/1",
+    "goal": "A demo user submits numeric measurements and receives count, total, mean, minimum and maximum."
+  },
+  "features": [
+    "authentication",
+    "numeric-processing",
+    "authenticated-batch"
+  ],
+  "contracts": [
+    "UserAuthenticator",
+    "DataProcessor",
+    "BatchService"
+  ],
+  "dependencies": [
+    "stdlib",
+    "sqlite3"
+  ],
+  "acceptance_criteria": [
+    {
+      "name": "three-values",
+      "values": [
+        1,
+        2,
+        3
+      ],
+      "expected": {
+        "count": 3,
+        "total": 6,
+        "mean": 2,
+        "minimum": 1,
+        "maximum": 3
+      }
+    },
+    {
+      "name": "negative-and-zero",
+      "values": [
+        -3,
+        0,
+        3
+      ],
+      "expected": {
+        "count": 3,
+        "total": 0,
+        "mean": 0,
+        "minimum": -3,
+        "maximum": 3
+      }
+    }
+  ],
+  "open_questions": []
+}
