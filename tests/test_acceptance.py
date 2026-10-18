@@ -13,6 +13,7 @@ from scripts import acceptance as a
 from scripts import acceptance_runtime as ar
 from scripts import feedback as f
 from scripts import execution_harness as h
+from scripts import software_hardware as sh
 from scripts import workflow_runtime as runtime
 from test_execution_harness import (
     execution as _execution,
@@ -45,7 +46,9 @@ class AcceptanceDocker(Docker):
         return result
 
 
-def candidate_fixture(execution, risk="low", additional=(), command=None):
+def candidate_fixture(
+    execution, risk="low", additional=(), command=None, hardware_rung=False
+):
     e = execution
     packet = copy.deepcopy(f.replay(e.journal, e.stream)[0]["packet"])
     contract = f.wp.current(packet)["contract"]
@@ -90,6 +93,16 @@ finally:
         ],
         "timeout_seconds": 60,
     }
+    if hardware_rung:
+        contract["validation"].append(
+            {
+                "id": "VAL-HIL",
+                "description": "Observe the synthetic sensor on a physical unit.",
+                "criterion_ids": ["AC-VALID"],
+                "evidence_required": ["Operator-recorded physical observation."],
+            }
+        )
+        contract["domain"]["validation_levels"]["VAL-HIL"] = "hardware_in_loop"
     packet = f.wp.create(
         "ACCEPT",
         packet["domain_profile"],
@@ -601,6 +614,41 @@ def test_hardware_manual_gate_stays_unverified(accepted_candidate):
     }
     with pytest.raises(ValueError, match="hardware"):
         a.validate_checks(state, run, report)
+
+
+def test_synthetic_hardware_packet_stops_at_physical_gate_offline(execution):
+    e = candidate_fixture(execution, hardware_rung=True)
+    state, _ = a.load(e.journal, e.stream)
+    contract = state["contract"]
+
+    assert sh.validate_contract_domain(contract) == []
+    assert contract["domain"]["synthetic"] is True
+    assert contract["domain"]["hardware_status"] == "UNVERIFIED_ON_HARDWARE"
+    assert "command" not in next(
+        check for check in contract["validation"] if check["id"] == "VAL-HIL"
+    )
+
+    _, report = check(e)
+    assert report["results"][0]["status"] == "PASSED"
+    state, _ = a.load(e.journal, e.stream)
+    assert a.deterministic(state) is False
+    assert "VAL-HIL" not in state["attestations"]
+    with pytest.raises(ValueError, match="Hardware/manual validation remains UNVERIFIED"):
+        ar.prepare_check(e.journal, e.stream, "VAL-HIL")
+    with pytest.raises(ValueError, match="Hardware evidence ingestion is not enabled"):
+        a.apply(
+            state,
+            {
+                "kind": "ATTESTATION",
+                "timestamp": stamp(10),
+                "data": {
+                    "validation_id": "VAL-HIL",
+                    "actor": "Fixture Hardware Operator",
+                    "evidence": [{"sha256": "a" * 64, "size": 1}],
+                    "submission_sha256": a.sha(state["submission"]),
+                },
+            },
+        )
 
 
 def test_pinned_real_docker_independent_check(accepted_candidate):
