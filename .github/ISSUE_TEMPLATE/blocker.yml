@@ -1,0 +1,51 @@
+name: Blocker
+description: Record an obstacle to a task with evidence and an owned next action
+title: "[BLOCKER] "
+labels: ["blocker"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This issue records a blocker; it does not revise the work packet, reset its retry or budget limits, or authorize work to resume. Preserve the original result and link any later resolution. Keep secrets and restricted evidence out of GitHub.
+  - type: input
+    id: task
+    attributes:
+      label: Canonical task issue
+      description: Link the issue for the blocked task.
+    validations:
+      required: true
+  - type: textarea
+    id: packet
+    attributes:
+      label: Packet binding
+      description: Link the canonical packet and include task_id, latest revision, and complete contract SHA-256.
+    validations:
+      required: true
+  - type: textarea
+    id: blocked_outcome
+    attributes:
+      label: Blocked outcome and cause
+      description: Identify the affected packet criterion, dependency, access, decision, or input. Separate observed facts from assumptions.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence and attempted remedies
+      description: Link the original check result, journal event or dispatch ID, reproduction details, and prior attempts. Do not replace unsuccessful evidence.
+    validations:
+      required: true
+  - type: textarea
+    id: resolution
+    attributes:
+      label: Resolution condition
+      description: Specify observable evidence needed to resolve the blocker and any remaining scope, budget, or permission limits.
+    validations:
+      required: true
+  - type: textarea
+    id: next_action
+    attributes:
+      label: Next action and owner
+      description: Name the responsible owner, concrete next action, dependency, and due date if known.
+    validations:
+      required: true
