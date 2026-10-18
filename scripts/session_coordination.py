@@ -34,6 +34,16 @@ def require(value, message):
         raise ValueError(message)
 
 
+def ancestor(root, before, after):
+    try:
+        git(root, "merge-base", "--is-ancestor", before, after)
+        return True
+    except subprocess.CalledProcessError as error:
+        if error.returncode != 1:
+            raise
+        return False
+
+
 def canonical_database(repository_id):
     base = Path(os.environ.get("LOCALAPPDATA", Path.home() / ".local" / "state"))
     return base / "ai-template-sessions" / str(repository_id) / "coordination.sqlite3"
@@ -176,13 +186,34 @@ class Coordinator:
     def notice(self, db, target, before, head, *, pr=None):
         if before == head:
             return
+        current = db.execute("SELECT head FROM targets WHERE name=?", (target,)).fetchone()[0]
+        # Another clone can have recorded a newer target while this observer was
+        # fetching. Ensure that object's ancestry is available in this clone.
+        try:
+            git(self.root, "cat-file", "-e", current + "^{commit}")
+        except subprocess.CalledProcessError:
+            git(self.root, "fetch", "--no-prune", "--no-tags", "--no-write-fetch-head", "origin", current)
+        advance = current != head and ancestor(self.root, current, head)
+        if current != head and not advance:
+            require(ancestor(self.root, head, current), "Shared target diverged; preserve state and inspect")
+            if pr is None:
+                return  # Stale snapshot, never a reverse-change notice.
         paths = git(self.root, "diff", "--name-only", before, head).splitlines()
         payload = {"target": target, "before": before, "head": head, "pr": pr,
                    "paths": paths, "contract_impact": any(p.startswith("contracts/") for p in paths),
                    "diff": f"https://github.com/{self.config['repository']}/compare/{before}...{head}"}
         db.execute("INSERT OR IGNORE INTO notices(target,head,payload) VALUES (?,?,?)",
                    (target, head, json.dumps(payload, sort_keys=True)))
-        db.execute("UPDATE targets SET head=? WHERE name=?", (head, target))
+        if pr is not None:
+            existing = json.loads(db.execute("SELECT payload FROM notices WHERE target=? AND head=?", (target, head)).fetchone()[0])
+            if existing["pr"] is None:
+                # A watcher may discover this commit before merge reconciliation.
+                # Enrich its existing notice without losing its observed diff.
+                existing["pr"] = pr
+                db.execute("UPDATE notices SET payload=? WHERE target=? AND head=?",
+                           (json.dumps(existing, sort_keys=True), target, head))
+        if advance:
+            db.execute("UPDATE targets SET head=? WHERE name=?", (head, target))
 
     def observe(self, token):
         self.heartbeat(token)

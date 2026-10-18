@@ -352,6 +352,44 @@ def test_independent_clone_fetches_notice_and_synchronizes_own_branch(clients, t
     assert worker.status()["acks"][0]["state"] == "synchronized"
 
 
+def test_delayed_observation_cannot_regress_newer_recorded_target(clients):
+    (first, _), _ = clients
+    before, newer = add_notice(first)
+    with first.connection(write=True) as db:
+        first.notice(db, "main", newer, before)  # delayed watcher captured old head
+        assert db.execute("SELECT head FROM targets WHERE name='main'").fetchone()[0] == newer
+        assert db.execute("SELECT count(*) FROM notices").fetchone()[0] == 1
+
+
+def test_divergent_target_observation_preserves_known_history(clients):
+    (first, _), _ = clients
+    before, newer = add_notice(first)
+    command(first.root, "git", "checkout", "-b", "feature/divergent", before)
+    (first.root / "other.txt").write_text("divergent\n")
+    command(first.root, "git", "add", "other.txt")
+    command(first.root, "git", "commit", "-m", "divergent")
+    divergent = sc.git(first.root, "rev-parse", "HEAD")
+    with pytest.raises(ValueError, match="diverged"):
+        with first.connection(write=True) as db:
+            first.notice(db, "main", newer, divergent)
+    with first.connection() as db:
+        assert db.execute("SELECT head FROM targets WHERE name='main'").fetchone()[0] == newer
+        assert db.execute("SELECT count(*) FROM notices").fetchone()[0] == 1
+
+
+def test_confirmed_merge_enriches_watch_notice_without_duplicate(clients):
+    (first, _), _ = clients
+    before = sc.git(first.root, "rev-parse", "HEAD")
+    (first.root / "source.txt").write_text("merged\n")
+    command(first.root, "git", "commit", "-am", "merged")
+    head = sc.git(first.root, "rev-parse", "HEAD")
+    with first.connection(write=True) as db:
+        first.notice(db, "main", before, head)
+        first.notice(db, "main", before, head, pr=12)
+        assert db.execute("SELECT count(*) FROM notices").fetchone()[0] == 1
+    assert first.status()["notices"][0]["pr"] == 12
+
+
 def test_pilot_requires_designated_integration_token(monkeypatch):
     monkeypatch.delenv("AI_TEMPLATE_INTEGRATION_TOKEN", raising=False)
     with pytest.raises(ValueError, match="Register the pilot"):
