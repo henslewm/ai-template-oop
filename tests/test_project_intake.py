@@ -295,6 +295,14 @@ def test_synthetic_hardware_profile_draft_review_generate_and_fresh_tests(host):
         "fixture-owner",
     )
     assert generated.returncode == 0, generated.stderr
+    run_command = (
+        "python -m unittest discover -s tests -p 'test_parse_synthetic_frame*.py'"
+    )
+    assert json.loads(generated.stdout)["run"] == run_command
+    readme = (target / "README.md").read_text(encoding="utf-8")
+    assert run_command in readme
+    assert "build_production_parser" in readme
+    assert "UNVERIFIED_ON_HARDWARE" in readme
     assert project_authority.status(target)["state"] == "AWAITING_APPROVAL"
     packet = json.loads((target / "WORK_PACKET.json").read_text(encoding="utf-8"))
     assert packet["domain"]["synthetic"] is True

@@ -1,0 +1,43 @@
+# @PROJECT_SLUG@
+
+A headless Python 3.12+ project for explicitly fictional hardware frames:
+tag `0xA1` followed by one unsigned payload byte. No device I/O is performed.
+
+Install the declared test dependencies in this project's own environment:
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -e '.[dev]'
+.\.venv\Scripts\python.exe -m unittest discover -s tests -p 'test_parse_synthetic_frame*.py'
+.\.venv\Scripts\python.exe -m pytest
+.\.venv\Scripts\python.exe tools/validate_boundaries.py
+.\.venv\Scripts\python.exe tools/project_admin.py status
+```
+
+When `python` selects that environment, the unchanged work-packet command is:
+
+```powershell
+python -m unittest discover -s tests -p 'test_parse_synthetic_frame*.py'
+```
+
+The command checks the real and fake parser against the same contract, every
+payload and malformed samples. Exercise the parser directly through its builder:
+
+```powershell
+.\.venv\Scripts\python.exe -c "from src.container.wiring import build_production_parser; print(build_production_parser().parse_synthetic_frame([161, 255]))"
+```
+
+This returns `255`. `contracts.SyntheticFrameParser` defines the interface;
+invalid frames raise `contracts.InvalidFrameError`. `build_mock_parser` supplies
+the fake implementation. The user's unchanged acceptance outcomes are in
+`PROJECT_SPEC.json` and `tests/test_project_acceptance.py`. `WORK_PACKET.json`
+is the synthetic software-hardware JSON domain contract, not an application ABC.
+The template's authentication/numeric batch example remains available separately.
+
+The project has a fresh UUID in `config/project.json` and remains
+`AWAITING_APPROVAL`. Hardware stays `UNVERIFIED_ON_HARDWARE`; passing synthetic
+tests establishes no physical-device compatibility. No approval, keys, runtime
+state, provider, worker, deployment or paid-workflow authority is copied.
+`GENERATION.json` records source and output hashes, including profile inputs.
+Interactive Git authority requires this generated project's owner; branches
+are retained. On POSIX, use `.venv/bin/python` for the equivalent commands.

@@ -47,6 +47,9 @@ PROFILE_EXTENSIONS = {
         "src/container/wiring.py": "templates/oop-example/assets/synthetic_wiring.py.tmpl",
     }
 }
+PROFILE_READMES = {
+    "synthetic-hardware-frame-parser/1": "templates/oop-example/assets/README_hardware.md.tmpl",
+}
 
 
 def _path(value: str) -> None:
@@ -95,6 +98,8 @@ def _plan(
             isinstance(manifest[kind], dict), "Manifest mappings must be objects"
         )
         for destination, original in manifest[kind].items():
+            if destination == "README.md":
+                original = PROFILE_READMES.get(profile, original)
             _path(destination)
             _path(original)
             approval.require(
@@ -279,7 +284,11 @@ def generate(
             "directory": str(destination),
             "project": project,
             "workflow_state": "AWAITING_APPROVAL",
-            "run": "python main.py --mock 1 2 3",
+            "run": (
+                "python -m unittest discover -s tests -p 'test_parse_synthetic_frame*.py'"
+                if profile == "synthetic-hardware-frame-parser/1"
+                else "python main.py --mock 1 2 3"
+            ),
         }
     finally:
         lock.unlink(missing_ok=True)
