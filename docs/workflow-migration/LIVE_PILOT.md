@@ -35,6 +35,10 @@ python -B tools/pilot_admin.py status
 python -B tools/pilot_admin.py run
 ```
 
+Before `run`, set `OPENAI_API_KEY` in the operator process environment. The
+provider transport reads it from that environment when sending a request; do
+not put the key in the repository or worker inputs.
+
 The report must bind `head`, a separate `actor`, `verdict: APPROVE` and
 `blocking_findings: []`. Activation verifies the merged PR and the complete
 executing scripts/contracts/config/runtime/tools inventory against that head.
