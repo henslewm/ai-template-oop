@@ -19,5 +19,6 @@ When that is unavailable, run `python scripts/web_setup.py --client mistral`. It
 - `contracts/data.py`
 - `contracts/errors.py`
 - `contracts/operator.py`
+- `docs/PLATFORM_SUPPORT.md`
 
 `AGENTS.md` is included because the Vibe CLI reads it; a chat should know what the CLI session will follow. Libraries accept Markdown, code, PDF, and Office files (up to 100 files per upload, 100 MB per file). Re-upload changed files after material repository updates, or rely on the GitHub connector so chats never read stale copies. Do not rely on chat-to-chat continuity or Memories: if it matters, it belongs in the repository.

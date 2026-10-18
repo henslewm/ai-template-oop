@@ -15,7 +15,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "scripts"))
 import web_setup  # noqa: E402 -- existing scripts layout
 
-EXPECTED_COUNTS = {"chatgpt": 14, "claude": 14, "mistral": 15}
+EXPECTED_COUNTS = {"chatgpt": 15, "claude": 15, "mistral": 16}
 
 
 @pytest.fixture
