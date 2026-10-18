@@ -10,6 +10,7 @@ import argparse
 import os
 import re
 import shutil
+import stat
 import subprocess
 import sys
 import tempfile
@@ -47,7 +48,7 @@ def inside(root: Path, name: str) -> Path | None:
     for part in [path, *path.parents]:
         if part == root:
             break
-        if part.is_symlink() or getattr(part, "is_junction", lambda: False)():
+        if is_link(part):
             return None
     resolved = path.resolve()
     if not resolved.is_relative_to(root) or not resolved.is_file():
@@ -56,7 +57,15 @@ def inside(root: Path, name: str) -> Path | None:
 
 
 def is_link(path: Path) -> bool:
-    return path.is_symlink() or getattr(path, "is_junction", lambda: False)()
+    """A symlink or, on Windows, a directory junction (Path.is_junction needs Python 3.12)."""
+    if path.is_symlink():
+        return True
+    if sys.platform != "win32":
+        return False
+    try:
+        return os.lstat(path).st_reparse_tag == stat.IO_REPARSE_TAG_MOUNT_POINT
+    except (OSError, AttributeError):
+        return False
 
 
 def copy_to_clipboard(text: str) -> bool:
