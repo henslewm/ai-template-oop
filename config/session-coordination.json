@@ -1,0 +1,8 @@
+{
+  "version": 1,
+  "repository": "henslewm/ai-template-oop",
+  "repository_id": 1413471548,
+  "shared_targets": ["main"],
+  "heartbeat_seconds": 60,
+  "stale_seconds": 300
+}

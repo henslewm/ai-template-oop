@@ -32,5 +32,6 @@ jobs:
           tests/test_contract_data.py
           tests/test_boundaries.py
           tests/test_headless_imports.py
+          tests/test_session_coordination.py
       - name: Check workflow approval tests in disposable projection
         run: python -B tools/check_workflow_approval.py

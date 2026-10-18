@@ -21,3 +21,5 @@
 Then connect GitHub so the chat can verify the latest repository versions.
 
 The contracts are the interfaces every proposed change must respect. Open other source files and the `docs/workflow-migration/` records through GitHub when a task needs them rather than uploading them all. Rerun the script and re-upload after a material change to a listed file.
+
+- `docs/SESSION_COORDINATION.md`

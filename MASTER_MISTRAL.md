@@ -26,7 +26,7 @@ Vibe in the browser has no runtime that can run `python -B scripts/validate_work
 
 ## Work and closeout
 
-Apply `MASTER_INSTRUCTIONS.md`. Keep to the `CLAUDE.md` layout and propose `contracts/` changes first. Default connectors to read-only; the GitHub App connector can search repositories, review issues, and manage pull requests, but use write actions only on the user's explicit current instruction, and never merge or delete a branch. At the end of meaningful work, produce commit-ready changes, the checks a repository client must run, and a short handoff. Never imply a commit or push occurred unless it was verified.
+Apply `MASTER_INSTRUCTIONS.md`. Keep to the `CLAUDE.md` layout and propose `contracts/` changes first. Interactive Git work follows MASTER_INSTRUCTIONS.md → Standing Git authorization and session ownership: owned feature commits, non-forced pushes, PR updates and relevant comments have standing authorization; only the local integration-lock holder merges after independent exact-head review and successful checks, without another human confirmation. Retain branches; preserve unrelated work. Other external writes still require explicit authority. At the end of meaningful work, produce commit-ready changes, the checks a repository client must run, and a short handoff. Never imply a commit or push occurred unless it was verified.
 
 ## Notes
 

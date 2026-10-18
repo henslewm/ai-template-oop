@@ -28,7 +28,7 @@ Apply `MASTER_INSTRUCTIONS.md` → "Foundation gate" exactly as stated there; it
 
 ## Safety
 
-Do not force-push, delete, rename or reset branches, delete evidence, expose secrets, send external communications, change permissions, or perform consequential external writes without explicit user authority. Do not edit the approval-frozen files named in `MASTER_INSTRUCTIONS.md`; editing one withdraws the ACTIVE approval. The shipped receipt sets every API budget to USD 0: a paid worker run needs the separate pilot activation in `docs/workflow-migration/LIVE_PILOT.md`.
+Follow `MASTER_INSTRUCTIONS.md` → "Standing Git authorization and session ownership" for interactive Git operations; do not ask again for authorized commits, pushes, PRs or gated integration. Never force-push, delete, rename or reset branches, delete evidence or expose secrets. Unrelated communications and permission changes still require explicit authority. Do not edit the approval-frozen files named in `MASTER_INSTRUCTIONS.md`; editing one withdraws the ACTIVE approval. The shipped receipt sets every API budget to USD 0: a paid worker run needs the separate pilot activation in `docs/workflow-migration/LIVE_PILOT.md`.
 
 ## Review guidelines
 

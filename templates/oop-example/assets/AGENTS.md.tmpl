@@ -19,3 +19,13 @@ exact candidate remains separate from tests, integration and deployment.
 This project starts unapproved. `tools/project_admin.py status` is read-only;
 review and owner activation are explicit. No paid, provider, publication, merge
 or deployment authority is transferred from the template. Branches are permanent.
+
+Those flags govern generated offline controllers. Interactive Git work follows
+this project's owner's standing authorization when granted: owned feature
+commits, non-forced pushes and PR updates need no repeated approval. A designated
+integration owner must serialize shared-target merges using the owner's shared
+lock, independent exact-head review and successful checks. Never self-approve,
+automatically pull another checkout or delete retained feature branches. Verify
+latest remote main before coding. Configure coordination for this generated
+repository; never reuse the template repository's identity or lock. The template
+owner's authorization does not automatically grant authority in another project.

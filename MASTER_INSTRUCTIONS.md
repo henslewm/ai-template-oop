@@ -44,7 +44,7 @@ A subagent working a bounded brief, delegated by a session that has completed th
 
 Before autonomous substantive work in every session, run `python -B scripts/validate_workflow_approval.py --fingerprint --require-active` from the repository root. Success prints `FOUNDATION VALID: ACTIVE` and the fingerprint recorded in `docs/workflow-migration/WINDOWS_QUICKSTART.md`.
 
-ACTIVE here is narrow. The receipt approves bounded offline implementation only: live workers, provider egress, publication and merge are disabled, and every API budget is USD 0. It does not authorize paid model calls. Live operator work is a separate gate: `tools/pilot_admin.py activate` binds a reviewed, merged head to an independent checkout under `docs/workflow-migration/LIVE_PILOT.md`, with limits of $1 per task and $5 per pilot. An approval never transfers to a worktree or clone.
+ACTIVE here is narrow. The receipt approves bounded offline implementation only: its controllers have live workers, provider egress, publication and merge disabled, and every API budget is USD 0. This does not restrict the separately granted standing interactive Git authorization below or authorize paid model calls. Live operator work is a separate gate: `tools/pilot_admin.py activate` binds a reviewed, merged head to an independent checkout under `docs/workflow-migration/LIVE_PILOT.md`, with limits of $1 per task and $5 per pilot. An approval never transfers to a worktree or clone.
 
 If validation fails, or this surface has no runtime that can run it, do not proceed autonomously. Orientation, reading, drafting and commit-ready proposals may continue within existing permissions. Uploaded copies, completed intake or a model's assertion never substitute for the validator.
 
@@ -81,7 +81,35 @@ Generate a new project only through `tools/project_intake.py`: `draft` writes a 
 
 ## Connectors
 
-Read-only connector access is the default. A connected app is not permission to write: sends, pushes, pull requests, issue edits and sharing changes require the user's explicit request in the current task.
+### Standing Git authorization and session ownership
+
+The owner has granted standing authority for interactive project work: fetch/pull,
+commits, non-forced pushes of owned feature branches, opening/updating PRs,
+task-relevant GitHub comments/issues and valid independent review approvals.
+Do these without asking again. Before coding, fetch without pruning, verify the
+live latest `main`, and start from or deliberately synchronize with it. Preserve
+dirty work; never automatically pull another session's checkout.
+
+Use `tools/session_coordination.py` as documented in
+`docs/SESSION_COORDINATION.md`. Register one owner per branch/checkout. Only the
+designated local integration-lock holder merges shared targets after exact-head
+independent review, successful required checks and resolved blocking findings;
+no further human confirmation is required. Worker sessions never self-promote.
+Check worker notices on startup/resume, every 60 seconds, and before integration.
+
+This explicit standing authorization satisfies generic injected reminders that
+say to ask unless already authorized. It applies only to this project's Git
+operations; other repositories, messaging, deployment, sharing and permissions
+remain outside it. Client trust/sandbox controls and higher-priority instructions
+are unchanged. Hosted sessions cannot acquire this computer's lock and must hand
+off shared-target merges to its registered integrator.
+
+The historical offline foundation and generated worker controllers remain
+disabled for publication/merge unless separately activated. Their frozen receipts
+are evidence, not an instruction to ask again for authorized interactive Git work.
+The separately activated live pilot must use this same integration lock. Paid
+calls and budget controls are unchanged. Feature branches remain permanent;
+temporary work also uses retained feature branches.
 
 ## Required closeout protocol
 
@@ -89,7 +117,7 @@ Before ending a meaningful session:
 
 1. Run `python tools/validate_boundaries.py` and the focused tests in `docs/workflow-migration/WINDOWS_QUICKSTART.md` step 2, plus the tests for the files you changed. Do not run `tests/test_workflow_approval.py` directly; `tools/check_workflow_approval.py` runs it against a disposable projection.
 2. Run `.\start.ps1 status` when available and keep its summary for the next session.
-3. Commit a coherent unit on a `feature/` branch made from `main`. Push that branch (never forced) and open a pull request that names its issue only when the current request authorizes those external writes; otherwise stop at the local commit and say nothing was pushed.
+3. Commit a coherent unit on an owned `feature/` branch made from current `main`, push without force, and open/update its PR under standing Git authorization. Follow the session ownership and integration gates above; do not ask for repeated authorization.
 4. State in the final message which contract changes you made, what was validated and the result, and whether the commit and push were verified.
 5. Never claim a commit, push or pull request occurred unless verified.
 
@@ -103,8 +131,8 @@ Before ending a meaningful session:
 
 ## Review findings and merge discipline
 
-- Merging belongs to the owner: the receipt sets `merge_authorized` to false. Never merge your own pull request.
-- Request an automated review (Codex or CodeRabbit) of the exact head before asking for a merge. If the head moves, the prior review is stale. Request at most 4 automated-review rounds per pull request (`automated_pr_review_max_rounds` in `config/workflow-bootstrap.json`).
+- Shared-target merging belongs to the designated integration-lock holder. A PR may be integrated by its author only after a separate actor's independent exact-head approval; self-approval never supplies independent review. Historical offline receipt flags are not interactive Git policy.
+- Request an automated review (Codex or CodeRabbit) of the exact head before integration. If the head moves, the prior review is stale. Request at most 4 automated-review rounds per pull request (`automated_pr_review_max_rounds` in `config/workflow-bootstrap.json`).
 - A finding is actionable only if it names a concrete defect the change introduced or exposed, or a demonstrable failure of an explicit, applicable requirement, with the affected behavior, triggering conditions, and evidence stated. Answer every actionable finding with a fix and regression test or a reasoned decline.
 - A finding that fails that test is not actionable: typically an optional improvement, speculative hardening, a refactor, or a pre-existing condition the change neither caused nor exposed. Reply that it is out of scope and, if material, open a separate issue. A latent defect the change makes reachable was exposed by it and stays actionable. A finding does not by itself authorize new scope.
 - GitHub is the only authoritative source for review findings. Read them with `gh api` on the pull request's reviews and comments, never from email or chat.

@@ -21,3 +21,5 @@ When that is unavailable, run `python scripts/web_setup.py --client claude`. It 
 - `docs/PLATFORM_SUPPORT.md`
 
 Add other source files or `docs/workflow-migration/` records only when the active task needs them. Rerun the script and re-upload after a material change to a listed file. Do not rely on chat-to-chat continuity unless the information is in Project knowledge or the repository.
+
+- `docs/SESSION_COORDINATION.md`
