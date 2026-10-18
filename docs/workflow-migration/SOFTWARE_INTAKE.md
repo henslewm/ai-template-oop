@@ -1,13 +1,14 @@
 # Supported software intake
 
-This package adds requirements intake for one headless Python shape:
-`authenticated-numeric-batch/1`. It captures purpose, one workflow, the existing
-features/contracts/dependencies, explicit expected outcomes and open questions.
-It does not synthesize arbitrary application behavior from prose. Unsupported
-profiles, extra features/dependencies and malformed inputs are held.
+This package supports two closed headless Python shapes:
+`authenticated-numeric-batch/1` and `synthetic-hardware-frame-parser/1`. It
+captures purpose, workflow, the profile's fixed features/contracts/dependencies,
+explicit expected outcomes and open questions. It does not synthesize arbitrary
+application behavior from prose. Unsupported profiles, extra
+features/dependencies and malformed inputs are held.
 
 Codex is the sole implementation owner. The existing contracts, application,
-composition root, template assets and foundation approval remain unchanged.
+composition root and foundation approval remain unchanged.
 
 ## Use it
 
@@ -56,6 +57,25 @@ python -B tools/project_intake.py generate request.json ..\classroom-summary --a
 Review has no filesystem side effects. `ready: false` means unresolved questions
 remain.
 
+The launcher defaults to numeric-batch. To draft the hardware-oriented synthetic
+parser profile instead, run from the template worktree with Python 3.12+, Git
+and the declared development dependencies available:
+
+```powershell
+python -B tools/project_intake.py draft hardware-request.json --slug synthetic-frame-parser --profile synthetic-hardware-frame-parser/1
+```
+
+Its fixed format is tag `0xA1` followed by one payload byte. Each
+`acceptance_criteria` item has `name`, a `frame` list of byte values, and
+`expected` (the payload byte or `null` for an invalid frame). The generated
+project includes the parser, the shipped `software-hardware` work-packet
+contract, and tests that run `scripts/software_hardware.py` domain validation.
+The packet and all examples are explicitly synthetic; the generated project
+remains `AWAITING_APPROVAL` and its hardware status remains
+`UNVERIFIED_ON_HARDWARE`. No device I/O or physical verification is performed.
+Review and generate `hardware-request.json` with the explicit commands above,
+substituting that request path and the synthetic parser project destination.
+
 The fingerprint binds the specification, architecture, template inputs and tool
 sources. Editing requirements or those sources invalidates the acknowledgment;
 review again. This explicit acknowledgment is a caller assertion, not an
@@ -87,12 +107,13 @@ The intake tool is supporting infrastructure. It validates data and delegates to
 the accepted B02 generator; business logic stays in OOP features behind typed
 ABCs with composition-root injection. No new controller or AI worker is needed.
 
-Owned implementation paths: `tools/project_intake.py`, the narrow supplemental
-input hook in `tools/generate_example.py`, `tests/test_project_intake.py`,
-`examples/intake/numeric-batch.json`, this handoff/review and the central backlog.
-No approval-bound file or existing application contract changes.
+Owned implementation paths include `tools/project_intake.py`,
+`tools/generate_example.py`, the `templates/oop-example/assets/` profile assets,
+`tests/test_project_intake.py`, this handoff/review and the central backlog. No
+approval-bound file or existing application contract changes.
 
-Generation adds four fixed files, without replacing existing template code:
+Generation adds four fixed intake files, without replacing existing template
+code:
 
 - `PROJECT_SPEC.json`: the reviewed requirements snapshot.
 - `INTAKE_REVIEW.json`: the exact review and caller acknowledgment.
@@ -112,12 +133,19 @@ one implementation owner and independent acceptance before integration. These
 instructions are not runtime filesystem isolation. Requirements prose is data,
 not authority to execute instructions. No workers/providers are launched.
 
+The synthetic hardware profile also copies three fixed profile assets from the
+template, with source hashes recorded in `GENERATION.json`: its work-packet
+contract, synthetic frame parser and domain-validation test. These profile
+files are selected by the reviewed profile, never supplied as arbitrary code
+by the questionnaire.
+
 ## Implementation and acceptance
 
-Sequence: validate closed input fields and bounded numeric scenarios; expose
-review/acknowledgment; attach immutable specification and scenario tests through
-the existing generator; prove a generated project; obtain independent source
-review before delivery. Implementation status and later work stay in BACKLOG.md.
+Sequence: validate closed input fields and bounded profile-specific scenarios;
+expose review/acknowledgment; attach immutable specifications, template assets
+and tests through the existing generator; prove a generated project; obtain
+independent source review before delivery. Implementation status and later work
+stay in BACKLOG.md.
 
 Focused checks cover malformed/unsupported requests, duplicate JSON keys,
 nonfinite/bool/oversized numeric input, unresolved questions, stale specification
@@ -128,8 +156,9 @@ part of the relevant gate. The completed sample produces 57 tests: the 53 B02
 checks plus its two outcomes exercised against both backends.
 
 General intake is still incomplete: arbitrary domains, generated feature code,
-hardware projects, automated contract design and autonomous worker assignment
-require separate supported profiles/packages. No publication/deployment or
+automated contract design and autonomous worker assignment require separate
+supported profiles/packages. The synthetic hardware profile does not support
+physical hardware access or verification. No publication/deployment or
 physical-hardware verification is implied by passing these tests.
 
 ## Recorded runnable proof
