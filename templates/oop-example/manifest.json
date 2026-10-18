@@ -1,0 +1,57 @@
+{
+  "schema_version": "oop-example/1",
+  "copy": {
+    "contracts/auth.py": "contracts/auth.py",
+    "contracts/data.py": "contracts/data.py",
+    "contracts/errors.py": "contracts/errors.py",
+    "src/__init__.py": "src/__init__.py",
+    "src/features/auth.py": "src/features/auth.py",
+    "src/features/data.py": "src/features/data.py",
+    "src/testing/fakes.py": "src/ui/mocks.py",
+    "tests/conftest.py": "tests/conftest.py",
+    "tests/test_contract_auth.py": "tests/test_contract_auth.py",
+    "tests/test_contract_data.py": "tests/test_contract_data.py",
+    "tests/test_boundaries.py": "tests/test_boundaries.py",
+    "tools/validate_boundaries.py": "tools/validate_boundaries.py",
+    "tools/project_admin.py": "tools/project_admin.py",
+    "scripts/project_authority.py": "scripts/project_authority.py",
+    "scripts/validate_workflow_approval.py": "scripts/validate_workflow_approval.py",
+    "scripts/workflow_state.py": "scripts/workflow_state.py",
+    "scripts/workflow_runtime.py": "scripts/workflow_runtime.py",
+    "scripts/workflow_scope.py": "scripts/workflow_scope.py",
+    "scripts/work_packet.py": "scripts/work_packet.py",
+    "scripts/software_hardware.py": "scripts/software_hardware.py",
+    "scripts/cli_exit.py": "scripts/cli_exit.py",
+    "config/work-packet.schema.json": "config/work-packet.schema.json",
+    "config/domains/software-hardware.schema.json": "config/domains/software-hardware.schema.json",
+    "requirements-work-packets.txt": "requirements-work-packets.txt",
+    "BRANCH_RETENTION.md": "BRANCH_RETENTION.md"
+  },
+  "render": {
+    ".gitignore": "templates/oop-example/assets/gitignore.tmpl",
+    "README.md": "templates/oop-example/assets/README.md.tmpl",
+    "AGENTS.md": "templates/oop-example/assets/AGENTS.md.tmpl",
+    "pyproject.toml": "templates/oop-example/assets/pyproject.toml.tmpl",
+    "main.py": "templates/oop-example/assets/main.py.tmpl",
+    "contracts/__init__.py": "templates/oop-example/assets/contracts_init.py.tmpl",
+    "contracts/batch.py": "templates/oop-example/assets/batch_contract.py.tmpl",
+    "src/features/__init__.py": "templates/oop-example/assets/features_init.py.tmpl",
+    "src/features/batch.py": "templates/oop-example/assets/batch_service.py.tmpl",
+    "src/container/__init__.py": "templates/oop-example/assets/container_init.py.tmpl",
+    "src/container/wiring.py": "templates/oop-example/assets/wiring.py.tmpl",
+    "src/testing/__init__.py": "templates/oop-example/assets/testing_init.py.tmpl",
+    "src/presentation/__init__.py": "templates/oop-example/assets/presentation_init.py.tmpl",
+    "src/presentation/cli.py": "templates/oop-example/assets/cli.py.tmpl",
+    "tests/test_contract_batch.py": "templates/oop-example/assets/test_contract_batch.py.tmpl",
+    "tests/test_cli.py": "templates/oop-example/assets/test_cli.py.tmpl"
+  },
+  "rewrites": {
+    "tests/conftest.py": [
+      ["from src.ui.mocks import", "from src.testing.fakes import"]
+    ],
+    "tools/validate_boundaries.py": [
+      ["\"src/features\": (\"src.ui\", \"src.container\", *UI_MODULES),", "\"src/features\": (\"src.ui\", \"src.presentation\", \"src.testing\", \"src.container\", *UI_MODULES),"],
+      ["\"src/container\": (),", "\"src/presentation\": (\"src.features\", \"src.testing\", \"src.container\", *IO_MODULES, *UI_MODULES),\n    \"src/container\": (),"]
+    ]
+  }
+}

@@ -1,0 +1,12 @@
+# Mistral Vibe CLI project settings. Vibe reads ./.vibe/config.toml over ~/.vibe/config.toml.
+# Reference: https://docs.mistral.ai/vibe/code/cli/configuration
+# Vibe also loads this repository's AGENTS.md from trusted folders; the startup protocol lives there.
+
+# "default" asks for approval before running tools. Do not set "auto-approve" here:
+# widening permissions is the user's decision (MASTER_MISTRAL.md, "Vibe CLI").
+# default_agent applies only to interactive sessions. `vibe --prompt` without --agent falls back
+# to auto-approve, so pass `--agent plan` for programmatic runs (MASTER_MISTRAL.md, "Vibe CLI").
+default_agent = "default"
+
+[tools.bash]
+permission = "ask"

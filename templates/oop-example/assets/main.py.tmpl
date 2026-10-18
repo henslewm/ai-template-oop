@@ -1,0 +1,26 @@
+"""Headless entrypoint; the composition root chooses concrete implementations."""
+
+from __future__ import annotations
+
+import sys
+
+from contracts import AppError
+from src.container import build_mock, build_production
+from src.presentation.cli import execute, parser
+
+
+def main(argv: list[str] | None = None) -> int:
+    arguments = parser()
+    args = arguments.parse_args(argv)
+    try:
+        services = build_mock() if args.mock else build_production(args.db)
+        output = execute(services.batch, args)
+    except AppError as exc:
+        print(f"Application error: {type(exc).__name__}", file=sys.stderr)
+        return 1
+    print(output)
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
