@@ -89,7 +89,7 @@ Before ending a meaningful session:
 
 1. Run `python tools/validate_boundaries.py` and the focused tests in `docs/workflow-migration/WINDOWS_QUICKSTART.md` step 2, plus the tests for the files you changed. Do not run `tests/test_workflow_approval.py` directly; `tools/check_workflow_approval.py` runs it against a disposable projection.
 2. Run `.\start.ps1 status` when available and keep its summary for the next session.
-3. Commit a coherent unit on a `feature/` branch made from `main`, push that branch (never forced), and open a pull request that names its issue.
+3. Commit a coherent unit on a `feature/` branch made from `main`. Push that branch (never forced) and open a pull request that names its issue only when the current request authorizes those external writes; otherwise stop at the local commit and say nothing was pushed.
 4. State in the final message which contract changes you made, what was validated and the result, and whether the commit and push were verified.
 5. Never claim a commit, push or pull request occurred unless verified.
 
