@@ -81,6 +81,13 @@ def candidate(root, state):
 
 def verify_candidate(root, state, commit):
     expected = closeout.tree(root, state["scope"]["base_commit"])
+    if any(
+        (before is not None) != (path in expected)
+        for path, before in state["baseline"].items()
+    ):
+        raise ValueError(
+            "Accepted scope baseline contains input outside the delivery base"
+        )
     for item in state["bundle"]["changes"]:
         content = base64.b64decode(item["content_base64"], validate=True)
         blob = _git(root, "hash-object", "--stdin", data=content).decode().strip()

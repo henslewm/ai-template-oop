@@ -53,7 +53,7 @@ def inventory(root: Path, commit: str | None = None) -> dict[str, str]:
             .splitlines()
         )
         approval.require(
-            not (set(extra) - set(WRITE_PATHS)),
+            not extra,
             "Unreviewed untracked pilot input; preserve and reconcile it before activation",
         )
     names = (
@@ -61,6 +61,14 @@ def inventory(root: Path, commit: str | None = None) -> dict[str, str]:
         .decode()
         .splitlines()
     )
+    if commit is None:
+        # Ignored output files are still inputs to the scoped Docker export.
+        # Every existing input must belong to the delivery base, even when the
+        # worker leaves it unchanged and it never appears in the replacement bundle.
+        approval.require(
+            all(p in names or not (root / p).exists() for p in READ_PATHS),
+            "Untracked pilot scope input; preserve and reconcile it before activation",
+        )
     names = [
         p
         for p in names
