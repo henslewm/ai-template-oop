@@ -120,6 +120,9 @@ for text in requirements:
         }
         & git rev-parse --show-toplevel | Out-Null
         if ($LASTEXITCODE -ne 0) { throw 'Run from a valid Git checkout before running work.' }
+        if (-not (Get-Command gh -ErrorAction SilentlyContinue)) {
+            throw 'Install GitHub CLI (gh) and make it available on PATH before running work; see docs/workflow-migration/LIVE_PILOT.md.'
+        }
         if (-not (Get-Command docker -ErrorAction SilentlyContinue)) {
             throw 'Install Docker Desktop and make docker available on PATH before running work.'
         }
