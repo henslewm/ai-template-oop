@@ -105,3 +105,12 @@ before proposing any additional verification.
 is the tracked handoff for the broader product intent and the deliberate
 `Original_plan.md` retirement. It records the provenance and limits of that
 decision without changing the protected historical checkout or its index.
+
+## Current activation status (audit issue #18)
+
+2026-10-22: `docs/workflow-migration/README.md` and `BOOTSTRAP_REVIEW.md` are
+approval-frozen and still read `AWAITING_APPROVAL`, autonomy off — that text
+predates activation and cannot be edited without withdrawing approval.
+`config/workflow-bootstrap.json` is the current source of truth: `"state":
+"ACTIVE"`, approved 2026-10-14 (see its own record for the receipt). Treat the
+frozen files' status line as historical, not current.
